@@ -1,0 +1,52 @@
+name: likeminds_chat_ss_sample
+description: Sample app running the SS package with demo creds.
+publish_to: 'none' # Remove this line if you wish to publish to pub.dev
+
+version: 1.0.0+1
+
+environment:
+  sdk: '>=3.0.0 <4.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  likeminds_chat_ss_fl:
+    path: ../
+
+  likeminds_chat_fl:
+
+  cupertino_icons: ^1.0.2
+  flutter_lints: ^2.0.0
+  envied:
+  device_info_plus: 
+  firebase_core: 
+  firebase_messaging: 
+  connectivity_plus: 
+  flutter_material_color_picker: 
+  sizer: 
+  fluttertoast: 
+  shared_preferences: 
+  overlay_support: 
+
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+
+# The following section is specific to Flutter packages.
+flutter:
+  uses-material-design: true
+
+  assets:
+    - packages/likeminds_chat_ss_fl/assets/icons/audio.svg
+    - packages/likeminds_chat_ss_fl/assets/icons/attachment.svg
+    - packages/likeminds_chat_ss_fl/assets/icons/camera.svg
+    - packages/likeminds_chat_ss_fl/assets/icons/delete.svg
+    - packages/likeminds_chat_ss_fl/assets/icons/document.svg
+    - packages/likeminds_chat_ss_fl/assets/icons/edit.svg
+    - packages/likeminds_chat_ss_fl/assets/icons/gallery.svg
+    - packages/likeminds_chat_ss_fl/assets/icons/reply.svg
+    - packages/likeminds_chat_ss_fl/assets/icons/select.svg
+    - packages/likeminds_chat_ss_fl/assets/icons/send.svg
+    - packages/likeminds_chat_ss_fl/assets/icons/copy.svg
