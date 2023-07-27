@@ -1,0 +1,66 @@
+name: likeminds_chat_ss_fl
+description: Flutter library for Suraasa+LikeMinds chat.
+version: 0.0.1
+publish_to: none
+
+environment:
+  sdk: '>=3.0.0 <4.0.0'
+  flutter: ">=1.17.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  likeminds_chat_fl: 
+
+  likeminds_chat_ui_fl:
+    path: ../LikeMinds-Flutter-Chat-UI
+
+  get_it: 
+  envied:
+  device_info_plus: 
+  permission_handler: 
+  shared_preferences: 
+  simple_s3: 
+  flutter_bloc:
+  bloc:
+  equatable: 
+  google_fonts: 
+  overlay_support: 
+  lazy_load_scrollview: 
+  infinite_scroll_pagination: 
+  firebase_core: 
+  firebase_messaging: 
+  firebase_database: 
+  go_router:
+  open_filex:
+  visibility_detector:
+  image_picker: 
+  file_picker: 
+  pdf_render: 
+  path_provider: 
+  video_thumbnail:
+  pdf_bitmaps:
+  custom_pop_up_menu: 
+  flick_video_player:
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^2.0.0
+
+# The following section is specific to Flutter packages.
+flutter:
+
+  assets:
+    - packages/likeminds_chat_ss_fl/assets/icons/audio.svg
+    - packages/likeminds_chat_ss_fl/assets/icons/attachment.svg
+    - packages/likeminds_chat_ss_fl/assets/icons/camera.svg
+    - packages/likeminds_chat_ss_fl/assets/icons/delete.svg
+    - packages/likeminds_chat_ss_fl/assets/icons/document.svg
+    - packages/likeminds_chat_ss_fl/assets/icons/edit.svg
+    - packages/likeminds_chat_ss_fl/assets/icons/gallery.svg
+    - packages/likeminds_chat_ss_fl/assets/icons/reply.svg
+    - packages/likeminds_chat_ss_fl/assets/icons/select.svg
+    - packages/likeminds_chat_ss_fl/assets/icons/send.svg
+    - packages/likeminds_chat_ss_fl/assets/icons/copy.svg
