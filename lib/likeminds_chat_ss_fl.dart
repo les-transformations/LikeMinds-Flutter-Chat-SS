@@ -89,12 +89,7 @@ class LMChat extends StatelessWidget {
                 )
               ],
               child: MaterialApp.router(
-                routerConfig: router
-                  ..go(
-                    _defaultChatroom != null
-                        ? '/chatroom/$_defaultChatroom/'
-                        : '/',
-                  ),
+                routerConfig: router,
                 debugShowCheckedModeBanner: !isDebug,
                 theme: ThemeData(
                   colorScheme: ColorScheme.fromSeed(
