@@ -197,38 +197,14 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
     } else if (state is ConversationError) {
       toast(state.message);
     }
-    // if (state is UpdateConversations) {
-    //                             if (state.response.id != lastConversationId) {
-    //                               addConversationToPagedList(
-    //                                 state.response,
-    //                               );
-    //                               lastConversationId = state.response.id;
-    //                             }
-    //                           }
-  }
-
-  bool checkDeletePermissions(Conversation conversation) {
-    final MemberStateResponse isCm =
-        locator<LMPreferenceService>().getMemberRights()!;
-
-    if (isCm.member?.state == 1 && conversation.deletedByUserId == null) {
-      return true;
-    } else if (user!.id == conversation.userId &&
-        conversation.deletedByUserId == null) {
-      return true;
-    } else {
-      return false;
+    if (state is ConversationUpdated) {
+      if (state.response.id != lastConversationId) {
+        addConversationToPagedList(
+          state.response,
+        );
+        lastConversationId = state.response.id;
+      }
     }
-  }
-
-  bool checkEditPermissions(Conversation conversation) {
-    if (conversation.answer.isEmpty) {
-      return false;
-    } else if (user!.id == conversation.userId &&
-        conversation.deletedByUserId == null) {
-      return true;
-    }
-    return false;
   }
 
   void addLocalConversationToPagedList(Conversation conversation) {
@@ -267,7 +243,7 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
         (element) => element.temporaryId == conversation.temporaryId);
     if (index != -1) {
       conversationList[index] = conversation;
-    } else {
+    } else if (conversationList.isNotEmpty) {
       if (conversationList.first.date != conversation.date) {
         conversationList.insert(
           0,
@@ -348,6 +324,23 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
     rebuildConversationList.value = !rebuildConversationList.value;
   }
 
+  void updateDeletedConversation(DeleteConversationResponse response) {
+    List<Conversation> conversationList =
+        pagedListController.itemList ?? <Conversation>[];
+    int index = conversationList.indexWhere(
+        (element) => element.id == response.conversations!.first.id);
+    if (index != -1) {
+      conversationList[index].deletedByUserId = user!.id;
+    }
+    pagedListController.itemList = conversationList;
+    scrollController.animateTo(
+      scrollController.position.pixels + 10,
+      duration: const Duration(milliseconds: 500),
+      curve: Curves.easeOut,
+    );
+    rebuildConversationList.value = !rebuildConversationList.value;
+  }
+
   @override
   Widget build(BuildContext context) {
     return AnnotatedRegion<SystemUiOverlayStyle>(
@@ -410,6 +403,10 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
                   chatroom = state.getChatroomResponse.chatroom!;
                   lastConversationId =
                       state.getChatroomResponse.lastConversationId ?? 0;
+                  _conversationBloc.add(InitConversations(
+                    chatroomId: chatroom!.id,
+                    conversationId: lastConversationId,
+                  ));
                   LMAnalytics.get().track(AnalyticsKeys.chatroomOpened, {
                     'chatroom_id': chatroom!.id,
                     'community_id': chatroom!.communityId,
@@ -443,9 +440,7 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
                               builderDelegate:
                                   PagedChildBuilderDelegate<Conversation>(
                                 noItemsFoundIndicatorBuilder: (context) =>
-                                    const SizedBox(
-                                  height: 10,
-                                ),
+                                    const SizedBox(height: 10),
                                 firstPageProgressIndicatorBuilder: (context) =>
                                     const SkeletonChatList(),
                                 newPageProgressIndicatorBuilder: (context) =>
@@ -511,6 +506,7 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
                                               item.replyId.toString()]
                                           : null
                                       : null;
+
                                   CustomPopupMenuController
                                       chatBubbleIndividualController =
                                       CustomPopupMenuController();
@@ -518,7 +514,7 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
                                       ? LMChatBubble(
                                           key: Key(item.id.toString()),
                                           isSent: item.userId == user!.id,
-                                          backgroundColor: primary.shade500,
+                                          backgroundColor: secondary.shade500,
                                           menuController:
                                               chatBubbleIndividualController,
                                           menu: ClipRRect(
@@ -660,14 +656,10 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
                                                                       .build());
                                                           if (response
                                                               .success) {
-                                                            item.deletedByUserId =
-                                                                user!.id;
                                                             chatBubbleIndividualController
                                                                 .hideMenu();
-                                                            rebuildConversationList
-                                                                    .value =
-                                                                !rebuildConversationList
-                                                                    .value;
+                                                            updateDeletedConversation(
+                                                                response.data!);
                                                             toast(
                                                                 "Message deleted");
                                                           }
@@ -763,6 +755,26 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
                                             replyToConversation:
                                                 item.replyConversationObject,
                                             borderRadius: 10,
+                                            title:
+                                                item.replyConversationObject !=
+                                                        null
+                                                    ? LMTextView(
+                                                        text: item
+                                                            .replyConversationObject!
+                                                            .member!
+                                                            .name,
+                                                        overflow: TextOverflow
+                                                            .ellipsis,
+                                                        maxLines: 1,
+                                                        textStyle:
+                                                            const TextStyle(
+                                                          color: kPrimaryColor,
+                                                          fontSize: 12,
+                                                          fontWeight:
+                                                              FontWeight.bold,
+                                                        ),
+                                                      )
+                                                    : null,
                                             backgroundColor: Theme.of(context)
                                                 .colorScheme
                                                 .onPrimary
@@ -781,6 +793,13 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
                                               item.member!,
                                           onLongPress: (conversation) {
                                             // _startSelection(conversation);
+                                            if (chatBubbleIndividualController
+                                                .menuIsShowing) {
+                                              chatBubbleIndividualController
+                                                  .hideMenu();
+                                            }
+                                            chatBubbleIndividualController
+                                                .showMenu();
                                           },
                                           mediaWidget:
                                               item.deletedByUserId == null
@@ -995,6 +1014,10 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
                                               color: Colors.black54,
                                             ),
                                           ),
+                                          mediaWidget:
+                                              item.deletedByUserId == null
+                                                  ? getContent(item)
+                                                  : null,
                                           content: LMChatContent(
                                             conversation: item,
                                             visibleLines: 2,
@@ -1061,6 +1084,13 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
                                               item.member!,
                                           onLongPress: (conversation) {
                                             // _startSelection(conversation);
+                                            if (chatBubbleIndividualController
+                                                .menuIsShowing) {
+                                              chatBubbleIndividualController
+                                                  .hideMenu();
+                                            }
+                                            chatBubbleIndividualController
+                                                .showMenu();
                                           },
                                         );
                                 },
@@ -1094,6 +1124,10 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
                                 children: [
                                   BackButton(
                                     onPressed: () {
+                                      _chatroomActionBloc.add(
+                                        MarkReadChatroomEvent(
+                                            chatroomId: widget.chatroomId),
+                                      );
                                       BlocProvider.of<HomeBloc>(context)
                                           .add(UpdateHomeEvent());
                                       router.pop();
@@ -1226,7 +1260,7 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
     );
   }
 
-  Widget getContent(Conversation conversation) {
+  Widget? getContent(Conversation conversation) {
     if (conversation.attachmentsUploaded == null ||
         !conversation.attachmentsUploaded!) {
       // If conversation has media but not uploaded yet
@@ -1234,9 +1268,9 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
       if (mediaFiles[conversation.temporaryId] == null ||
           mediaFiles[conversation.temporaryId]!.isEmpty) {
         // return expandableText;
-        return const SizedBox.shrink();
+        return null;
       }
-      Widget mediaWidget;
+      Widget? mediaWidget;
       if (mediaFiles[conversation.temporaryId]!.first.mediaType ==
               MediaType.photo ||
           mediaFiles[conversation.temporaryId]!.first.mediaType ==
@@ -1248,14 +1282,14 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
         mediaWidget =
             documentPreviewFactory(mediaFiles[conversation.temporaryId]!);
       } else {
-        mediaWidget = const SizedBox();
+        mediaWidget = null;
       }
       return Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Stack(
             children: [
-              mediaWidget,
+              mediaWidget ?? const SizedBox.shrink(),
               const Positioned(
                 top: 0,
                 bottom: 0,
@@ -1281,10 +1315,10 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
               ? conversationAttachmentsMeta['${conversation.id}']
               : null;
       if (conversationAttachments == null) {
-        return const SizedBox.shrink();
+        return null;
       }
 
-      Widget mediaWidget;
+      Widget? mediaWidget;
       if (conversationAttachments.first.mediaType == MediaType.photo ||
           conversationAttachments.first.mediaType == MediaType.video) {
         mediaWidget = getImageMessage(
@@ -1298,19 +1332,19 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
           MediaType.document) {
         mediaWidget = documentPreviewFactory(conversationAttachments);
       } else {
-        mediaWidget = const SizedBox();
+        mediaWidget = null;
       }
 
       return Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
-          mediaWidget,
+          mediaWidget ?? const SizedBox.shrink(),
           conversation.answer.isEmpty
               ? const SizedBox.shrink()
               : kVerticalPaddingXSmall,
         ],
       );
     }
-    return const SizedBox();
+    return null;
   }
 }

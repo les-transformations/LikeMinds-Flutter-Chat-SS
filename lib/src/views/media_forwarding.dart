@@ -252,7 +252,7 @@ class _MediaForwardState extends State<MediaForward> {
                     GestureDetector(
                       onTap: () async {
                         if (await handlePermissions(1)) {
-                          List<Media> pickedVideoFiles = await pickMediaFiles();
+                          List<Media> pickedVideoFiles = await pickImageFiles();
                           if (pickedVideoFiles.isNotEmpty) {
                             if (mediaList.length + pickedVideoFiles.length >
                                 10) {

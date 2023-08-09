@@ -29,11 +29,11 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   SystemChrome.setPreferredOrientations(
       [DeviceOrientation.portraitUp, DeviceOrientation.portraitDown]);
+  await setupNotifications();
   LMChat.setupLMChat(
     apiKey: !isDebug ? EnvProd.apiKey : EnvDev.apiKey,
     lmCallBack: ExampleCallback(),
   );
-  await setupNotifications();
   // await AppLocalPreference.instance.initialize();
   runApp(const MyApp());
 }
@@ -46,7 +46,7 @@ void main() async {
 /// 5. Listen for FG and BG notifications
 /// 6. Handle notifications - [_handleNotification]
 Future setupNotifications() async {
-  await Firebase.initializeApp();
+  final app = await Firebase.initializeApp();
   final devId = await deviceId();
   final fcmToken = await setupMessaging();
   if (fcmToken == null) {
