@@ -111,7 +111,7 @@ class _ChatBarState extends State<ChatBar> {
     } else if (!MemberRightCheck.checkRespondRights(getMemberState)) {
       return 'The community managers have restricted you from responding here';
     } else {
-      return "Write something here";
+      return "Type something..";
     }
   }
 
@@ -210,7 +210,7 @@ class _ChatBarState extends State<ChatBar> {
                               enabled: checkIfAnnouncementChannel(),
                               hintMaxLines: 1,
                               hintStyle: Theme.of(context).textTheme.bodyMedium,
-                              hintText: "Type something..",
+                              hintText: getChatBarHintText(),
                             ),
                             focusNode: _focusNode,
                           ),
@@ -317,7 +317,7 @@ class _ChatBarState extends State<ChatBar> {
                                                       try {
                                                         List<Media>
                                                             pickedMediaFiles =
-                                                            await pickMediaFiles();
+                                                            await pickImageFiles();
                                                         if (pickedMediaFiles
                                                                 .length >
                                                             10) {
@@ -376,7 +376,88 @@ class _ChatBarState extends State<ChatBar> {
                                                       const Color.fromRGBO(
                                                           154, 123, 186, 1),
                                                   title: LMTextView(
-                                                    text: 'Gallery',
+                                                    text: 'Image',
+                                                    textStyle: Theme.of(context)
+                                                        .textTheme
+                                                        .bodyMedium,
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                            SizedBox(height: 2.h),
+                                            Row(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.spaceEvenly,
+                                              children: [
+                                                LMIconButton(
+                                                  onTap: (bool isActive) async {
+                                                    _popupMenuController
+                                                        .hideMenu();
+                                                    if (await handlePermissions(
+                                                        2)) {
+                                                      try {
+                                                        List<Media>
+                                                            pickedMediaFiles =
+                                                            await pickVideoFiles();
+                                                        if (pickedMediaFiles
+                                                                .length >
+                                                            10) {
+                                                          toast(
+                                                              'Only 10 attachments can be sent');
+                                                          return;
+                                                        }
+
+                                                        if (pickedMediaFiles
+                                                            .isNotEmpty) {
+                                                          for (Media mediaFile
+                                                              in pickedMediaFiles) {
+                                                            if (getFileSizeInDouble(
+                                                                    mediaFile
+                                                                        .size!) >
+                                                                100) {
+                                                              toast(
+                                                                  'File size should be smaller than 100 MB');
+                                                              pickedMediaFiles
+                                                                  .remove(
+                                                                      mediaFile);
+                                                            }
+                                                          }
+                                                        }
+                                                        if (pickedMediaFiles
+                                                            .isNotEmpty) {
+                                                          router.pushNamed(
+                                                            "media_forward",
+                                                            extra:
+                                                                pickedMediaFiles,
+                                                            pathParameters: {
+                                                              'chatroomId':
+                                                                  widget
+                                                                      .chatroom
+                                                                      .id
+                                                                      .toString()
+                                                            },
+                                                          );
+                                                        }
+                                                      } catch (e) {
+                                                        toast(
+                                                            'Something went wrong, try again');
+                                                        return;
+                                                      }
+                                                    }
+                                                  },
+                                                  icon: const LMIcon(
+                                                    type: LMIconType.svg,
+                                                    assetPath: ssVideoIcon,
+                                                    color: kWhiteColor,
+                                                    size: 24,
+                                                  ),
+                                                  containerSize: 48,
+                                                  borderRadius: 24,
+                                                  backgroundColor:
+                                                      ui.Color.fromARGB(
+                                                          255, 151, 188, 98),
+                                                  title: LMTextView(
+                                                    text: 'Video',
                                                     textStyle: Theme.of(context)
                                                         .textTheme
                                                         .bodyMedium,
@@ -512,6 +593,9 @@ class _ChatBarState extends State<ChatBar> {
                                     result = "";
                                     if (editConversation == null) {
                                       widget.scrollToBottom();
+                                    }
+                                    if (replyToConversation != null) {
+                                      chatActionBloc!.add(ReplyRemove());
                                     }
                                     editConversation = null;
                                     replyToConversation = null;

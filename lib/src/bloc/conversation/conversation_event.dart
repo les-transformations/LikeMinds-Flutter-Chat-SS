@@ -3,8 +3,16 @@ part of 'conversation_bloc.dart';
 abstract class ConversationEvent extends Equatable {}
 
 class InitConversations extends ConversationEvent {
+  final int chatroomId;
+  final int conversationId;
+
+  InitConversations({
+    required this.chatroomId,
+    required this.conversationId,
+  });
+
   @override
-  List<Object?> get props => [];
+  List<Object?> get props => [chatroomId, conversationId];
 }
 
 class LoadConversations extends ConversationEvent {

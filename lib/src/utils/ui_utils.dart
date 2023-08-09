@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:likeminds_chat_fl/likeminds_chat_fl.dart';
+import 'package:likeminds_chat_ss_fl/src/service/preference_service.dart';
+import 'package:likeminds_chat_ss_fl/src/service/service_locator.dart';
 
 //Generic method for getting height
 double getHeight(BuildContext context) {
@@ -11,6 +13,30 @@ double getHeight(BuildContext context) {
 double getWidth(BuildContext context) {
   return MediaQuery.of(context).size.width;
 }
+
+bool checkDeletePermissions(Conversation conversation) {
+    final MemberStateResponse isCm =
+        locator<LMPreferenceService>().getMemberRights()!;
+
+    if (isCm.member?.state == 1 && conversation.deletedByUserId == null) {
+      return true;
+    } else if ( locator<LMPreferenceService>().getUser()!.id == conversation.userId &&
+        conversation.deletedByUserId == null) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  bool checkEditPermissions(Conversation conversation) {
+    if (conversation.answer.isEmpty) {
+      return false;
+    } else if (locator<LMPreferenceService>().getUser()!.id == conversation.userId &&
+        conversation.deletedByUserId == null) {
+      return true;
+    }
+    return false;
+  }
 
 //Utils method for getting initials of a name (or first letter of every word)
 String getInitials(String? name) {
