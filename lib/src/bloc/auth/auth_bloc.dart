@@ -1,5 +1,6 @@
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
+import 'package:likeminds_chat_ss_fl/likeminds_chat_ss_fl.dart';
 import 'package:likeminds_chat_ss_fl/src/service/likeminds_service.dart';
 import 'package:likeminds_chat_ss_fl/src/service/preference_service.dart';
 import 'package:likeminds_chat_ss_fl/src/service/service_locator.dart';
@@ -14,7 +15,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     on<AuthEvent>((event, emit) async {
       if (event is InitAuthEvent) {
         emit(AuthLoading());
-        setupChat(
+        LMChat.setupLMChat(
           apiKey: event.apiKey,
           lmCallBack: event.callback,
         );
@@ -27,13 +28,15 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
                   ..userName(event.username))
                 .build());
         if (response.success) {
+          final user = response.data!.initiateUser!.user;
           final memberRights =
               await locator<LikeMindsService>().getMemberState();
           locator<LMPreferenceService>()
-              .storeUserData(response.data!.initiateUser!.user);
+              .storeUserData(user);
           locator<LMPreferenceService>()
               .storeCommunityData(response.data!.initiateUser!.community);
           locator<LMPreferenceService>().storeMemberRights(memberRights.data!);
+          LMNotificationHandler.instance.registerDevice(user.id);
           emit(AuthSuccess(user: response.data!.initiateUser!.user));
         } else {
           emit(AuthError(message: response.errorMessage!));

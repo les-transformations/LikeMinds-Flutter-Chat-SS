@@ -111,7 +111,7 @@ class _ChatBarState extends State<ChatBar> {
     } else if (!MemberRightCheck.checkRespondRights(getMemberState)) {
       return 'The community managers have restricted you from responding here';
     } else {
-      return "Write something here";
+      return "Type something...";
     }
   }
 
@@ -191,7 +191,10 @@ class _ChatBarState extends State<ChatBar> {
                           child: LMTextField(
                             isDown: false,
                             chatroomId: widget.chatroom.id,
-                            style: Theme.of(context).textTheme.bodyMedium,
+                            style: Theme.of(context)
+                                .textTheme
+                                .bodyMedium!
+                                .copyWith(fontSize: 14),
                             onTagSelected: (tag) {
                               debugPrint(tag.toString());
                               userTags.add(tag);
@@ -209,8 +212,11 @@ class _ChatBarState extends State<ChatBar> {
                               border: InputBorder.none,
                               enabled: checkIfAnnouncementChannel(),
                               hintMaxLines: 1,
-                              hintStyle: Theme.of(context).textTheme.bodyMedium,
-                              hintText: "Type something..",
+                              hintStyle: Theme.of(context)
+                                  .textTheme
+                                  .bodyMedium!
+                                  .copyWith(fontSize: 14),
+                              hintText: getChatBarHintText(),
                             ),
                             focusNode: _focusNode,
                           ),
@@ -231,7 +237,7 @@ class _ChatBarState extends State<ChatBar> {
                                       child: Padding(
                                         padding: EdgeInsets.symmetric(
                                           vertical: 6.w,
-                                          horizontal: 4.w,
+                                          horizontal: 5.w,
                                         ),
                                         child: Column(
                                           mainAxisAlignment:
@@ -239,8 +245,9 @@ class _ChatBarState extends State<ChatBar> {
                                           children: [
                                             Row(
                                               mainAxisAlignment:
-                                                  MainAxisAlignment.spaceEvenly,
+                                                  MainAxisAlignment.start,
                                               children: [
+                                                SizedBox(width: 12.w),
                                                 LMIconButton(
                                                   onTap: (bool active) async {
                                                     _popupMenuController
@@ -308,6 +315,7 @@ class _ChatBarState extends State<ChatBar> {
                                                         .bodyMedium,
                                                   ),
                                                 ),
+                                                Spacer(),
                                                 LMIconButton(
                                                   onTap: (bool isActive) async {
                                                     _popupMenuController
@@ -317,7 +325,7 @@ class _ChatBarState extends State<ChatBar> {
                                                       try {
                                                         List<Media>
                                                             pickedMediaFiles =
-                                                            await pickMediaFiles();
+                                                            await pickImageFiles();
                                                         if (pickedMediaFiles
                                                                 .length >
                                                             10) {
@@ -376,12 +384,96 @@ class _ChatBarState extends State<ChatBar> {
                                                       const Color.fromRGBO(
                                                           154, 123, 186, 1),
                                                   title: LMTextView(
-                                                    text: 'Gallery',
+                                                    text: 'Image',
                                                     textStyle: Theme.of(context)
                                                         .textTheme
                                                         .bodyMedium,
                                                   ),
                                                 ),
+                                                Spacer(),
+                                                LMIconButton(
+                                                  onTap: (bool isActive) async {
+                                                    _popupMenuController
+                                                        .hideMenu();
+                                                    if (await handlePermissions(
+                                                        2)) {
+                                                      try {
+                                                        List<Media>
+                                                            pickedMediaFiles =
+                                                            await pickVideoFiles();
+                                                        if (pickedMediaFiles
+                                                                .length >
+                                                            10) {
+                                                          toast(
+                                                              'Only 10 attachments can be sent');
+                                                          return;
+                                                        }
+
+                                                        if (pickedMediaFiles
+                                                            .isNotEmpty) {
+                                                          for (Media mediaFile
+                                                              in pickedMediaFiles) {
+                                                            if (getFileSizeInDouble(
+                                                                    mediaFile
+                                                                        .size!) >
+                                                                100) {
+                                                              toast(
+                                                                  'File size should be smaller than 100 MB');
+                                                              pickedMediaFiles
+                                                                  .remove(
+                                                                      mediaFile);
+                                                            }
+                                                          }
+                                                        }
+                                                        if (pickedMediaFiles
+                                                            .isNotEmpty) {
+                                                          router.pushNamed(
+                                                            "media_forward",
+                                                            extra:
+                                                                pickedMediaFiles,
+                                                            pathParameters: {
+                                                              'chatroomId':
+                                                                  widget
+                                                                      .chatroom
+                                                                      .id
+                                                                      .toString()
+                                                            },
+                                                          );
+                                                        }
+                                                      } catch (e) {
+                                                        toast(
+                                                            'Something went wrong, try again');
+                                                        return;
+                                                      }
+                                                    }
+                                                  },
+                                                  icon: const LMIcon(
+                                                    type: LMIconType.svg,
+                                                    assetPath: ssVideoIcon,
+                                                    color: kWhiteColor,
+                                                    size: 24,
+                                                  ),
+                                                  containerSize: 48,
+                                                  borderRadius: 24,
+                                                  backgroundColor:
+                                                      ui.Color.fromARGB(
+                                                          255, 151, 188, 98),
+                                                  title: LMTextView(
+                                                    text: 'Video',
+                                                    textStyle: Theme.of(context)
+                                                        .textTheme
+                                                        .bodyMedium,
+                                                  ),
+                                                ),
+                                                SizedBox(width: 12.w),
+                                              ],
+                                            ),
+                                            SizedBox(height: 2.h),
+                                            Row(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.start,
+                                              children: [
+                                                SizedBox(width: 11.w),
                                                 LMIconButton(
                                                   onTap: (bool active) async {
                                                     _popupMenuController
@@ -432,6 +524,7 @@ class _ChatBarState extends State<ChatBar> {
                                                         .bodyMedium,
                                                   ),
                                                 ),
+                                                Spacer(),
                                               ],
                                             ),
                                           ],
@@ -483,6 +576,7 @@ class _ChatBarState extends State<ChatBar> {
                                               .build(),
                                           replyConversation: editConversation!
                                               .replyConversationObject));
+                                      widget.scrollToBottom();
                                     } else {
                                       // Fluttertoast.showToast(msg: "Send message");
                                       conversationBloc!.add(
@@ -502,6 +596,7 @@ class _ChatBarState extends State<ChatBar> {
                                                     .build(),
                                             repliedTo: replyToConversation),
                                       );
+                                      widget.scrollToBottom();
                                     }
                                     if (widget.chatroom.isGuest ?? false) {
                                       toast("Chatroom joined");
@@ -512,6 +607,9 @@ class _ChatBarState extends State<ChatBar> {
                                     result = "";
                                     if (editConversation == null) {
                                       widget.scrollToBottom();
+                                    }
+                                    if (replyToConversation != null) {
+                                      chatActionBloc!.add(ReplyRemove());
                                     }
                                     editConversation = null;
                                     replyToConversation = null;

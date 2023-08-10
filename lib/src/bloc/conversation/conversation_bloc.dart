@@ -2,10 +2,7 @@ import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:likeminds_chat_ss_fl/likeminds_chat_ss_fl.dart';
-import 'package:likeminds_chat_ss_fl/src/service/likeminds_service.dart';
-import 'package:likeminds_chat_ss_fl/src/service/media_service.dart';
-import 'package:likeminds_chat_ss_fl/src/service/preference_service.dart';
-import 'package:likeminds_chat_ss_fl/src/service/service_locator.dart';
+import 'package:likeminds_chat_ss_fl/src/utils/imports.dart';
 import 'package:likeminds_chat_ss_fl/src/utils/media/media_helper.dart';
 import 'package:likeminds_chat_ss_fl/src/utils/realtime/realtime.dart';
 import 'package:likeminds_chat_fl/likeminds_chat_fl.dart';
@@ -15,10 +12,32 @@ part 'conversation_state.dart';
 
 class ConversationBloc extends Bloc<ConversationEvent, ConversationState> {
   MediaService mediaService = MediaService(!isDebug);
-  // final DatabaseReference realTime = LMRealtime.instance.chatroom();
+  final DatabaseReference realTime = LMRealtime.instance.chatroom();
   int? lastConversationId;
 
   ConversationBloc() : super(ConversationInitial()) {
+    on<InitConversations>((event, emit) {
+      debugPrint("Conversations initiated");
+      int chatroomId = event.chatroomId;
+        lastConversationId = event.conversationId;
+
+        realTime.onValue.listen(
+          (event) {
+            if (event.snapshot.value != null) {
+              final response = event.snapshot.value as Map;
+              final conversationId =
+                  int.parse(response["collabcard"]["answer_id"]);
+              if (lastConversationId != null &&
+                  conversationId != lastConversationId) {
+                add(UpdateConversations(
+                  chatroomId: chatroomId,
+                  conversationId: conversationId,
+                ));
+              }
+            }
+          },
+        );
+    },);
     on<ConversationEvent>((event, emit) async {
       if (event is LoadConversations) {
         if (event.getConversationRequest.page > 1) {
@@ -70,6 +89,56 @@ class ConversationBloc extends Bloc<ConversationEvent, ConversationState> {
         );
       },
     );
+    on<UpdateConversations>((event, emit) async {
+      if (lastConversationId != null &&
+            event.conversationId != lastConversationId) {
+          int maxTimestamp = DateTime.now().millisecondsSinceEpoch;
+          final response = await locator<LikeMindsService>()
+              .getConversation((GetConversationRequestBuilder()
+                    ..chatroomId(event.chatroomId)
+                    ..minTimestamp(0)
+                    ..maxTimestamp(maxTimestamp * 1000)
+                    ..isLocalDB(false)
+                    ..page(1)
+                    ..pageSize(5)
+                    ..conversationId(event.conversationId))
+                  .build());
+          if (response.success) {
+            GetConversationResponse conversationResponse = response.data!;
+          conversationResponse.conversationData!.forEach((element) {
+            element.member = conversationResponse
+                .userMeta?[element.userId ?? element.memberId];
+          });
+          conversationResponse.conversationData!.forEach((element) {
+            String? replyId = element.replyId == null
+                ? element.replyConversation?.toString()
+                : element.replyId.toString();
+            element.replyConversationObject =
+                conversationResponse.conversationMeta?[replyId];
+            element.replyConversationObject?.member =
+                conversationResponse.userMeta?[
+                    element.replyConversationObject?.userId ??
+                        element.replyConversationObject?.memberId];
+          });
+            Conversation realTimeConversation =
+                response.data!.conversationData!.first;
+            if (response.data!.conversationMeta != null &&
+                realTimeConversation.replyId != null) {
+              Conversation? replyConversationObject = response.data!
+                  .conversationMeta![realTimeConversation.replyId.toString()];
+              realTimeConversation.replyConversationObject =
+                  replyConversationObject;
+            }
+            emit(
+              ConversationUpdated(
+                response: realTimeConversation,
+              ),
+            );
+
+            lastConversationId = event.conversationId;
+          }
+        }
+    },);
   }
 
   mapPostMultiMediaConversation(

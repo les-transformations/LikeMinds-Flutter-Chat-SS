@@ -3,6 +3,7 @@ import 'dart:ui' as ui;
 
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:likeminds_chat_ss_fl/src/service/media_service.dart';
 import 'package:likeminds_chat_ss_fl/src/utils/constants/ui_constants.dart';
 import 'package:likeminds_chat_ss_fl/src/utils/media/media_utils.dart';
@@ -78,7 +79,7 @@ Widget getChatItemAttachmentTile(
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
               textStyle: const TextStyle(
-                fontSize: 10,
+                fontSize: 12,
                 fontWeight: FontWeight.normal,
               ),
             ),
@@ -95,7 +96,7 @@ Widget getChatItemAttachmentTile(
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
               textStyle: const TextStyle(
-                fontSize: 10,
+                fontSize: 12,
                 fontWeight: FontWeight.normal,
               ),
             ),
@@ -113,7 +114,7 @@ Widget getChatItemAttachmentTile(
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
                 textStyle: const TextStyle(
-                  fontSize: 10,
+                  fontSize: 12,
                   fontWeight: FontWeight.normal,
                 ),
               ),
@@ -139,12 +140,12 @@ Widget getChatItemAttachmentTile(
     return Row(
       children: <Widget>[
         mediaFiles.length > 1
-            ? Text(
-                '${mediaFiles.length}',
+            ? LMTextView(
+                text: '${mediaFiles.length}',
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
-                style: const TextStyle(
-                  fontSize: 10,
+                textStyle: const TextStyle(
+                  fontSize: 12,
                   fontWeight: FontWeight.normal,
                 ),
               )
@@ -235,11 +236,11 @@ MediaType getMediaTypeFromExtention(String extention) {
   }
 }
 
-Future<List<Media>> pickMediaFiles() async {
+Future<List<Media>> pickImageFiles() async {
   FilePickerResult? pickedFiles = await FilePicker.platform.pickFiles(
     allowMultiple: true,
-    type: FileType.custom,
-    allowedExtensions: mediaExtentions,
+    type: FileType.image,
+    // allowedExtensions: videoExtentions,
   );
   List<Media> mediaList = <Media>[];
   if (pickedFiles == null) {
@@ -273,6 +274,58 @@ Future<List<Media>> pickMediaFiles() async {
   }
   return mediaList;
 }
+
+Future<List<Media>> pickVideoFiles() async {
+  FilePickerResult? pickedFiles = await FilePicker.platform.pickFiles(
+    allowMultiple: true,
+    type: FileType.video,
+    // allowedExtensions: videoExtentions,
+  );
+  List<Media> mediaList = <Media>[];
+  if (pickedFiles == null) {
+    return [];
+  }
+  if (pickedFiles.files.isNotEmpty) {
+    for (int i = 0; i < pickedFiles.files.length; i++) {
+      File file = File(pickedFiles.paths[i]!);
+      MediaType mediaType =
+          getMediaTypeFromExtention(pickedFiles.files[i].extension!);
+      Media media;
+      if (mediaType == MediaType.photo) {
+        ui.Image image = await decodeImageFromList(file.readAsBytesSync());
+        media = Media(
+          mediaType: mediaType,
+          height: image.height,
+          width: image.width,
+          mediaFile: file,
+          size: pickedFiles.files[i].size,
+        );
+      } else {
+        media = Media(
+          mediaType: mediaType,
+          mediaFile: file,
+          size: pickedFiles.files[i].size,
+        );
+      }
+      getVideoThumbnail(media);
+      mediaList.add(media);
+    }
+  }
+  return mediaList;
+}
+
+// Future<List<Media>> pickMultipleMediaFiles() async{
+//   final List<XFile> pickedFiles = await ImagePicker().pickMultipleMedia();
+//    List<Media> mediaList = <Media>[];
+//   if (pickedFiles.isEmpty) {
+//     return [];
+//   } else {
+//     pickedFiles.forEach((element) {
+//       File file = File(element.path);
+
+//     });
+//   }
+// }
 
 Future<List<Media>> pickDocumentFiles() async {
   FilePickerResult? pickedFiles = await FilePicker.platform.pickFiles(

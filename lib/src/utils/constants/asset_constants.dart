@@ -1,6 +1,8 @@
 const String kAssetDocPDFIcon =
     'packages/likeminds_chat_mm_fl/assets/icons/doc_pdf.svg';
 
+const String ssVideoIcon =
+    'packages/likeminds_chat_ss_fl/assets/icons/video.svg';
 const String ssAudioIcon =
     'packages/likeminds_chat_ss_fl/assets/icons/audio.svg';
 const String ssCameraIcon =
