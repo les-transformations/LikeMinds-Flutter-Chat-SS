@@ -16,7 +16,7 @@ class LMRealtime {
     debugPrint('LMRealtime initialized');
     FirebaseApp app = Firebase.app('likeminds_chat');
     database = FirebaseDatabase.instanceFor(app: app);
-    debugPrint("BETA database is ${database.databaseURL}");
+    debugPrint("Database is ${database}");
   }
 
   set chatroomId(int chatroomId) {

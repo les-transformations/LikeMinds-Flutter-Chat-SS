@@ -22,6 +22,7 @@ Future<bool> handlePermissions(int mediaType) async {
               'Permissions denied, change app settings',
               duration: Toast.LENGTH_LONG,
             );
+            openAppSettings();
             return false;
           } else if (permissionStatus == PermissionStatus.granted) {
             return true;
@@ -40,6 +41,7 @@ Future<bool> handlePermissions(int mediaType) async {
               'Permissions denied, change app settings',
               duration: Toast.LENGTH_LONG,
             );
+            openAppSettings();
             return false;
           } else if (permissionStatus == PermissionStatus.granted) {
             return true;
@@ -63,6 +65,7 @@ Future<bool> handlePermissions(int mediaType) async {
             'Permissions denied, change app settings',
             duration: Toast.LENGTH_LONG,
           );
+          openAppSettings();
           return false;
         }
       }

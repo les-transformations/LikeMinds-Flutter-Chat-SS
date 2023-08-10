@@ -164,7 +164,7 @@ class _ChatroomMenuState extends State<ChatroomMenu> {
         toast("Chatroom left");
         _controller!.hideMenu();
         homeBloc?.add(UpdateHomeEvent());
-        // router.pop();
+        router.pop();
       } else {
         toast(response.errorMessage!);
       }

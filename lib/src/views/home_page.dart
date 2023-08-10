@@ -7,6 +7,7 @@ import 'package:likeminds_chat_ss_fl/src/service/service_locator.dart';
 import 'package:likeminds_chat_ss_fl/src/utils/constants/ui_constants.dart';
 import 'package:likeminds_chat_ss_fl/src/utils/imports.dart';
 import 'package:likeminds_chat_ss_fl/src/utils/media/media_helper.dart';
+import 'package:likeminds_chat_ss_fl/src/utils/realtime/realtime.dart';
 import 'package:likeminds_chat_ss_fl/src/utils/tagging/helpers/tagging_helper.dart';
 import 'package:likeminds_chat_ss_fl/src/widgets/skeleton_list.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
@@ -215,6 +216,7 @@ class _HomePageState extends State<HomePage> {
         LMListItem(
           // chatroom: chatrooms[i],
           onTap: () {
+            LMRealtime.instance.chatroomId = chatrooms[i].id;
             router.push("/chatroom/${chatrooms[i].id}");
           },
           avatar: LMProfilePicture(
@@ -227,6 +229,8 @@ class _HomePageState extends State<HomePage> {
             text: chatrooms[i].header.isEmpty
                 ? "NOT PRODUCING"
                 : chatrooms[i].header,
+            maxLines: 1,
+                                        overflow: TextOverflow.ellipsis,
             textStyle: const TextStyle(
               fontSize: 16,
               fontWeight: FontWeight.w500,

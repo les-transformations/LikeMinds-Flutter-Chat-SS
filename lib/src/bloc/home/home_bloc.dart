@@ -12,11 +12,11 @@ part 'home_state.dart';
 
 class HomeBloc extends Bloc<HomeEvent, HomeState> {
   HomeBloc() : super(HomeInitial()) {
-    // final DatabaseReference realTime = LMRealtime.instance.homeFeed();
-    // realTime.onValue.listen((event) {
-    //   debugPrint(event.toString());
-    //   add(UpdateHomeEvent());
-    // });
+    final DatabaseReference realTime = LMRealtime.instance.homeFeed();
+    realTime.onValue.listen((event) {
+      debugPrint(event.toString());
+      add(UpdateHomeEvent());
+    });
     on<HomeEvent>(
       (event, emit) async {
         if (event is InitHomeEvent) {
