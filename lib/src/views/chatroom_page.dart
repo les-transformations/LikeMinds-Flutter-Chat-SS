@@ -365,7 +365,7 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
                     width: 42,
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(24),
-                      color: primary.shade200,
+                      color: secondary.shade200,
                       boxShadow: [
                         BoxShadow(
                           offset: const Offset(0, 2),
@@ -471,34 +471,38 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
                                           //     ? 70.w
                                           //     : 35.w,
                                           margin: const EdgeInsets.symmetric(
-                                              vertical: 5),
+                                            vertical: 5,
+                                          ),
                                           padding: const EdgeInsets.symmetric(
-                                            horizontal: 6,
-                                            vertical: 6,
+                                            horizontal: 8,
+                                            vertical: 4,
                                           ),
                                           decoration: BoxDecoration(
-                                              color:
-                                                  kWhiteColor.withOpacity(0.5),
-                                              borderRadius:
-                                                  BorderRadius.circular(12),
-                                              border: Border.all(
-                                                  color: kGrey3Color)),
+                                            color: kWhiteColor.withOpacity(0.5),
+                                            borderRadius:
+                                                BorderRadius.circular(18),
+                                            border: Border.all(
+                                              color: Color.fromRGBO(
+                                                  226, 232, 240, 1),
+                                            ),
+                                          ),
                                           alignment: Alignment.center,
                                           child: LMTextView(
-                                              text: TaggingHelper
-                                                  .extractStateMessage(
-                                                      item.answer),
-                                              textAlign: TextAlign.center,
-                                              textStyle: const TextStyle(
-                                                fontSize: 10,
-                                              )),
+                                            text: TaggingHelper
+                                                .extractStateMessage(
+                                                    item.answer),
+                                            textAlign: TextAlign.center,
+                                            textStyle: const TextStyle(
+                                              fontSize: 10,
+                                              color: Color.fromRGBO(
+                                                  100, 116, 139, 1),
+                                            ),
+                                          ),
                                         )
                                       ],
                                     );
                                   }
-                                  // item.
 
-                                  // return SSChatBubble();
                                   final replyAttachments = item.replyId != null
                                       ? conversationAttachmentsMeta.containsKey(
                                               item.replyId.toString())
@@ -510,6 +514,7 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
                                   CustomPopupMenuController
                                       chatBubbleIndividualController =
                                       CustomPopupMenuController();
+
                                   return item.userId == user!.id
                                       ? LMChatBubble(
                                           key: Key(item.id.toString()),
@@ -525,8 +530,8 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
                                                     BorderRadius.circular(6),
                                               ),
                                               constraints: BoxConstraints(
-                                                minWidth: 32.w,
-                                                maxWidth: 50.w,
+                                                minWidth: 42.w,
+                                                maxWidth: 60.w,
                                               ),
                                               // color: Colors.white,
                                               child: IntrinsicWidth(
@@ -712,16 +717,18 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
                                                 child: const LMTextView(
                                                   text: "Edited • ",
                                                   textStyle: TextStyle(
-                                                    fontSize: 12,
-                                                    color: Colors.black54,
+                                                    fontSize: 10,
+                                                    color: Color.fromRGBO(
+                                                        71, 85, 105, 1),
                                                   ),
                                                 ),
                                               ),
                                               LMTextView(
                                                 text: item.createdAt,
                                                 textStyle: const TextStyle(
-                                                  fontSize: 12,
-                                                  color: Colors.black54,
+                                                  fontSize: 10,
+                                                  color: Color.fromRGBO(
+                                                      71, 85, 105, 1),
                                                 ),
                                               ),
                                             ],
@@ -734,10 +741,15 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
                                                   .colorScheme
                                                   .onPrimary,
                                             ),
-                                            linkStyle: TextStyle(
+                                            tagStyle: TextStyle(
                                               fontSize: 14,
                                               fontWeight: FontWeight.bold,
                                               color: primary.shade800,
+                                            ),
+                                            linkStyle: TextStyle(
+                                              fontSize: 14,
+                                              fontWeight: FontWeight.bold,
+                                              color: secondary.shade100,
                                             ),
                                             visibleLines: 2,
                                             animation: true,
@@ -819,7 +831,10 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
                                                 borderRadius:
                                                     BorderRadius.circular(6),
                                               ),
-                                              width: 36.w,
+                                              constraints: BoxConstraints(
+                                                minWidth: 42.w,
+                                                maxWidth: 60.w,
+                                              ),
                                               // color: Colors.white,
                                               child: IntrinsicWidth(
                                                 child: Column(
@@ -998,20 +1013,22 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
                                           avatar: LMProfilePicture(
                                             fallbackText: item.member!.name,
                                             imageUrl: item.member!.imageUrl,
-                                            size: 32,
+                                            size: 24,
                                           ),
                                           outsideTitle: LMTextView(
                                             text: item.member!.name,
                                             textStyle: const TextStyle(
-                                              fontSize: 12,
-                                              color: Colors.black87,
+                                              fontSize: 10,
+                                              color: Color.fromRGBO(
+                                                  71, 85, 105, 1),
                                             ),
                                           ),
                                           outsideFooter: LMTextView(
                                             text: item.createdAt,
                                             textStyle: const TextStyle(
-                                              fontSize: 12,
-                                              color: Colors.black54,
+                                              fontSize: 10,
+                                              color: Color.fromRGBO(
+                                                  71, 85, 105, 1),
                                             ),
                                           ),
                                           mediaWidget:
@@ -1026,10 +1043,15 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
                                               fontSize: 14,
                                               color: Colors.black87,
                                             ),
-                                            linkStyle: TextStyle(
+                                            tagStyle: TextStyle(
                                               fontSize: 14,
                                               fontWeight: FontWeight.bold,
                                               color: primary.shade600,
+                                            ),
+                                            linkStyle: const TextStyle(
+                                              fontSize: 14,
+                                              fontWeight: FontWeight.bold,
+                                              color: kWhiteColor,
                                             ),
                                           ),
                                           borderRadius: const BorderRadius.only(
@@ -1103,21 +1125,23 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
                   return Column(
                     children: [
                       Container(
-                        decoration:
-                            BoxDecoration(color: kWhiteColor, boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withOpacity(0.15),
-                            blurRadius: 10,
-                            offset: const Offset(0, 10),
-                          )
-                        ]),
+                        decoration: BoxDecoration(
+                          color: kWhiteColor.withOpacity(1),
+                          // boxShadow: [
+                          //   BoxShadow(
+                          //     color: Colors.black.withOpacity(1),
+                          //     blurRadius: 5,
+                          //     offset: const Offset(4, 2),
+                          //   )
+                          // ],
+                        ),
                         child: Column(
                           children: <Widget>[
                             kVerticalPaddingMedium,
                             Padding(
                               padding: EdgeInsets.symmetric(
                                 horizontal: 4.w,
-                                vertical: 2.h,
+                                vertical: 8,
                               ),
                               child: Row(
                                 mainAxisAlignment: MainAxisAlignment.start,
@@ -1137,16 +1161,16 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
                                         EdgeInsets.zero,
                                       ),
                                       fixedSize: MaterialStateProperty.all(
-                                        const Size(36, 36),
+                                        const Size(24, 24),
                                       ),
                                     ),
                                   ),
                                   LMProfilePicture(
                                     fallbackText: chatroom!.header,
                                     imageUrl: chatroom?.chatroomImageUrl,
-                                    size: 42,
+                                    size: 36,
                                   ),
-                                  SizedBox(width: 4.w),
+                                  SizedBox(width: 2.w),
                                   Expanded(
                                     child: Column(
                                       crossAxisAlignment:
@@ -1157,18 +1181,18 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
                                           maxLines: 1,
                                           overflow: TextOverflow.ellipsis,
                                           textStyle: const TextStyle(
-                                            fontSize: 16,
+                                            fontSize: 14,
                                             fontWeight: FontWeight.w500,
                                           ),
                                         ),
-                                        kVerticalPaddingSmall,
+                                        kVerticalPaddingXSmall,
                                         LMTextView(
                                           text:
                                               '${chatroom!.participantCount} participants',
                                           maxLines: 1,
                                           overflow: TextOverflow.ellipsis,
                                           textStyle: const TextStyle(
-                                            fontSize: 14,
+                                            fontSize: 12,
                                           ),
                                         ),
                                       ],
@@ -1183,13 +1207,22 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
                                 ],
                               ),
                             ),
-                            Divider(),
+                            const Divider(),
                           ],
                         ),
                       ),
                       Expanded(
                         child: Container(
-                          color: kWhiteColor,
+                          decoration: BoxDecoration(
+                            color: kWhiteColor.withOpacity(1),
+                            // boxShadow: [
+                            //   BoxShadow(
+                            //     color: Colors.black.withOpacity(1),
+                            //     blurRadius: 2,
+                            //     offset: const Offset(0, 2),
+                            //   )
+                            // ],
+                          ),
                           child: pagedListView,
                         ),
                       ),

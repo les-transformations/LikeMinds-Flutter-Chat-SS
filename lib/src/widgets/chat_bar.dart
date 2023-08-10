@@ -111,7 +111,7 @@ class _ChatBarState extends State<ChatBar> {
     } else if (!MemberRightCheck.checkRespondRights(getMemberState)) {
       return 'The community managers have restricted you from responding here';
     } else {
-      return "Type something..";
+      return "Type something...";
     }
   }
 
@@ -191,7 +191,10 @@ class _ChatBarState extends State<ChatBar> {
                           child: LMTextField(
                             isDown: false,
                             chatroomId: widget.chatroom.id,
-                            style: Theme.of(context).textTheme.bodyMedium,
+                            style: Theme.of(context)
+                                .textTheme
+                                .bodyMedium!
+                                .copyWith(fontSize: 14),
                             onTagSelected: (tag) {
                               debugPrint(tag.toString());
                               userTags.add(tag);
@@ -209,7 +212,10 @@ class _ChatBarState extends State<ChatBar> {
                               border: InputBorder.none,
                               enabled: checkIfAnnouncementChannel(),
                               hintMaxLines: 1,
-                              hintStyle: Theme.of(context).textTheme.bodyMedium,
+                              hintStyle: Theme.of(context)
+                                  .textTheme
+                                  .bodyMedium!
+                                  .copyWith(fontSize: 14),
                               hintText: getChatBarHintText(),
                             ),
                             focusNode: _focusNode,
@@ -231,7 +237,7 @@ class _ChatBarState extends State<ChatBar> {
                                       child: Padding(
                                         padding: EdgeInsets.symmetric(
                                           vertical: 6.w,
-                                          horizontal: 4.w,
+                                          horizontal: 5.w,
                                         ),
                                         child: Column(
                                           mainAxisAlignment:
@@ -239,8 +245,9 @@ class _ChatBarState extends State<ChatBar> {
                                           children: [
                                             Row(
                                               mainAxisAlignment:
-                                                  MainAxisAlignment.spaceEvenly,
+                                                  MainAxisAlignment.start,
                                               children: [
+                                                SizedBox(width: 12.w),
                                                 LMIconButton(
                                                   onTap: (bool active) async {
                                                     _popupMenuController
@@ -308,6 +315,7 @@ class _ChatBarState extends State<ChatBar> {
                                                         .bodyMedium,
                                                   ),
                                                 ),
+                                                Spacer(),
                                                 LMIconButton(
                                                   onTap: (bool isActive) async {
                                                     _popupMenuController
@@ -382,13 +390,7 @@ class _ChatBarState extends State<ChatBar> {
                                                         .bodyMedium,
                                                   ),
                                                 ),
-                                              ],
-                                            ),
-                                            SizedBox(height: 2.h),
-                                            Row(
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment.spaceEvenly,
-                                              children: [
+                                                Spacer(),
                                                 LMIconButton(
                                                   onTap: (bool isActive) async {
                                                     _popupMenuController
@@ -463,6 +465,15 @@ class _ChatBarState extends State<ChatBar> {
                                                         .bodyMedium,
                                                   ),
                                                 ),
+                                                SizedBox(width: 12.w),
+                                              ],
+                                            ),
+                                            SizedBox(height: 2.h),
+                                            Row(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.start,
+                                              children: [
+                                                SizedBox(width: 11.w),
                                                 LMIconButton(
                                                   onTap: (bool active) async {
                                                     _popupMenuController
@@ -513,6 +524,7 @@ class _ChatBarState extends State<ChatBar> {
                                                         .bodyMedium,
                                                   ),
                                                 ),
+                                                Spacer(),
                                               ],
                                             ),
                                           ],
@@ -564,6 +576,7 @@ class _ChatBarState extends State<ChatBar> {
                                               .build(),
                                           replyConversation: editConversation!
                                               .replyConversationObject));
+                                      widget.scrollToBottom();
                                     } else {
                                       // Fluttertoast.showToast(msg: "Send message");
                                       conversationBloc!.add(
@@ -583,6 +596,7 @@ class _ChatBarState extends State<ChatBar> {
                                                     .build(),
                                             repliedTo: replyToConversation),
                                       );
+                                      widget.scrollToBottom();
                                     }
                                     if (widget.chatroom.isGuest ?? false) {
                                       toast("Chatroom joined");
