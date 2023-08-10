@@ -1046,12 +1046,12 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
                                             tagStyle: TextStyle(
                                               fontSize: 14,
                                               fontWeight: FontWeight.bold,
-                                              color: primary.shade600,
+                                              color: secondary.shade600,
                                             ),
-                                            linkStyle: const TextStyle(
+                                            linkStyle: TextStyle(
                                               fontSize: 14,
                                               fontWeight: FontWeight.bold,
-                                              color: kWhiteColor,
+                                              color: secondary.shade600,
                                             ),
                                           ),
                                           borderRadius: const BorderRadius.only(
