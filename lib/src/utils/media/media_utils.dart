@@ -109,6 +109,9 @@ Widget getImageMessage(
     ChatRoom chatroom,
     Conversation conversation,
     Map<int, User?> userMeta) {
+  if (conversationAttachments == null || conversationAttachments.isEmpty) {
+    return const SizedBox();
+  }
   void onTap() {
     router.pushNamed(
       "media_preview",

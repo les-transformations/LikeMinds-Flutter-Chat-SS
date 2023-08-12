@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:likeminds_chat_ss_fl/src/bloc/chatroom/chatroom_bloc.dart';
 import 'package:likeminds_chat_ss_fl/src/bloc/chatroom_action/chatroom_action_bloc.dart';
-import 'package:likeminds_chat_ss_fl/src/bloc/conversation/conversation_bloc.dart';
 import 'package:likeminds_chat_ss_fl/src/bloc/conversation_action/conversation_action_bloc.dart';
 import 'package:likeminds_chat_ss_fl/src/bloc/participants/participants_bloc.dart';
 import 'package:likeminds_chat_ss_fl/src/service/media_service.dart';
