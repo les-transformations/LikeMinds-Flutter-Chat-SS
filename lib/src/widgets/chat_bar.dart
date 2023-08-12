@@ -7,12 +7,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:likeminds_chat_ss_fl/src/bloc/conversation/conversation_bloc.dart';
 import 'package:likeminds_chat_ss_fl/src/bloc/conversation_action/conversation_action_bloc.dart';
 import 'package:likeminds_chat_ss_fl/src/navigation/router.dart';
-import 'package:likeminds_chat_ss_fl/src/service/media_service.dart';
-import 'package:likeminds_chat_ss_fl/src/service/preference_service.dart';
-import 'package:likeminds_chat_ss_fl/src/service/service_locator.dart';
 import 'package:likeminds_chat_ss_fl/src/utils/analytics/analytics.dart';
 import 'package:likeminds_chat_ss_fl/src/utils/constants/asset_constants.dart';
-import 'package:likeminds_chat_ss_fl/src/utils/constants/ui_constants.dart';
 import 'package:likeminds_chat_ss_fl/src/utils/imports.dart';
 import 'package:likeminds_chat_ss_fl/src/utils/media/media_helper.dart';
 import 'package:likeminds_chat_ss_fl/src/utils/media/media_utils.dart';
@@ -23,7 +19,6 @@ import 'package:likeminds_chat_ss_fl/src/utils/tagging/helpers/tagging_helper.da
 import 'package:likeminds_chat_ss_fl/src/utils/tagging/tagging_textfield_ta.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:likeminds_chat_fl/likeminds_chat_fl.dart';
-import 'package:likeminds_chat_ui_fl/likeminds_chat_ui_fl.dart';
 import 'package:overlay_support/overlay_support.dart';
 
 class ChatBar extends StatefulWidget {
@@ -224,6 +219,7 @@ class _ChatBarState extends State<ChatBar> {
                         checkIfAnnouncementChannel()
                             ? CustomPopupMenu(
                                 controller: _popupMenuController,
+                                enablePassEvent: false,
                                 arrowColor: Colors.white,
                                 showArrow: false,
                                 menuBuilder: () => Container(
@@ -278,17 +274,18 @@ class _ChatBarState extends State<ChatBar> {
                                                             mediaFile: file,
                                                           );
                                                           mediaList.add(media);
-                                                          router.pushNamed(
-                                                            "media_forward",
-                                                            extra: mediaList,
-                                                            pathParameters: {
-                                                              'chatroomId':
-                                                                  widget
-                                                                      .chatroom
-                                                                      .id
-                                                                      .toString()
-                                                            },
-                                                          );
+                                                          if (mediaList
+                                                              .isNotEmpty) {
+                                                            router.pushNamed(
+                                                              "media_forward",
+                                                              extra: mediaList,
+                                                              pathParameters: {
+                                                                'chatroomId': widget
+                                                                    .chatroom.id
+                                                                    .toString()
+                                                              },
+                                                            );
+                                                          }
                                                         }
                                                       }
                                                     } catch (e) {
@@ -524,7 +521,7 @@ class _ChatBarState extends State<ChatBar> {
                                                         .bodyMedium,
                                                   ),
                                                 ),
-                                                Spacer(),
+                                                const Spacer(),
                                               ],
                                             ),
                                           ],

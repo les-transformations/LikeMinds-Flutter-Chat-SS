@@ -47,6 +47,17 @@ class ConversationDelete extends ConversationActionState {
       ];
 }
 
+class ConversationDeleteError extends ConversationActionState {
+  final String errorMessage;
+
+  ConversationDeleteError(this.errorMessage);
+
+  @override
+  List<Object> get props => [
+        errorMessage,
+      ];
+}
+
 class ReplyConversationState extends ConversationActionState {
   final int chatroomId;
   final int conversationId;
