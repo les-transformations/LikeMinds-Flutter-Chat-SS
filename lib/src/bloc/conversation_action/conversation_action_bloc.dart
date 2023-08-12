@@ -37,6 +37,22 @@ class ConversationActionBloc
       ));
     });
     on<ReplyRemove>((event, emit) => emit(ReplyRemoveState()));
+    on<DeleteConversation>(
+      (event, emit) async {
+        final response = await locator<LikeMindsService>()
+            .deleteConversation((DeleteConversationRequestBuilder()
+                  ..conversationIds(
+                      event.deleteConversationRequest.conversationIds)
+                  ..reason("Delete"))
+                .build());
+        if (response.success) {
+          emit(ConversationDelete(response.data!));
+        } else {
+          emit(ConversationDeleteError(
+              response.errorMessage ?? 'An error occured'));
+        }
+      },
+    );
   }
 
   mapEditConversation(

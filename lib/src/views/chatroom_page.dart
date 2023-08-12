@@ -482,7 +482,7 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
                                             borderRadius:
                                                 BorderRadius.circular(18),
                                             border: Border.all(
-                                              color: Color.fromRGBO(
+                                              color: const Color.fromRGBO(
                                                   226, 232, 240, 1),
                                             ),
                                           ),
@@ -512,16 +512,15 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
                                       : null;
 
                                   CustomPopupMenuController
-                                      chatBubbleIndividualController =
+                                      chatBubbleController =
                                       CustomPopupMenuController();
 
                                   return item.userId == user!.id
                                       ? LMChatBubble(
                                           key: Key(item.id.toString()),
+                                          menuController: chatBubbleController,
                                           isSent: item.userId == user!.id,
                                           backgroundColor: secondary.shade500,
-                                          menuController:
-                                              chatBubbleIndividualController,
                                           menu: ClipRRect(
                                             child: Container(
                                               decoration: BoxDecoration(
@@ -542,6 +541,8 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
                                                   children: [
                                                     ListTile(
                                                       onTap: () {
+                                                        chatBubbleController
+                                                            .hideMenu();
                                                         int userId =
                                                             item.userId ??
                                                                 item.memberId!;
@@ -563,8 +564,6 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
                                                                 item,
                                                           ),
                                                         );
-                                                        chatBubbleIndividualController
-                                                            .hideMenu();
                                                       },
                                                       leading: const LMIcon(
                                                         type: LMIconType.svg,
@@ -580,6 +579,8 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
                                                     ),
                                                     ListTile(
                                                       onTap: () {
+                                                        chatBubbleController
+                                                            .hideMenu();
                                                         Clipboard.setData(
                                                           ClipboardData(
                                                             text: TaggingHelper
@@ -590,8 +591,6 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
                                                         ).then((value) {
                                                           toast(
                                                               "Copied to clipboard");
-                                                          chatBubbleIndividualController
-                                                              .hideMenu();
                                                         });
                                                       },
                                                       leading: const LMIcon(
@@ -606,68 +605,63 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
                                                         ),
                                                       ),
                                                     ),
-                                                    checkEditPermissions(item)
-                                                        ? ListTile(
-                                                            onTap: () async {
-                                                              _convActionBloc
-                                                                  .add(
-                                                                EditingConversation(
-                                                                  chatroomId:
-                                                                      chatroom!
-                                                                          .id,
-                                                                  conversationId:
-                                                                      item.id,
-                                                                  editConversation:
-                                                                      item,
-                                                                ),
-                                                              );
-                                                              chatBubbleIndividualController
-                                                                  .hideMenu();
-                                                            },
-                                                            leading:
-                                                                const LMIcon(
-                                                              type: LMIconType
-                                                                  .svg,
-                                                              assetPath:
-                                                                  ssEditIcon,
-                                                              size: 24,
-                                                            ),
-                                                            title:
-                                                                const LMTextView(
-                                                              text: "Edit",
-                                                              textStyle:
-                                                                  TextStyle(
-                                                                fontSize: 14,
-                                                              ),
-                                                            ),
-                                                          )
-                                                        : const SizedBox
-                                                            .shrink(),
+
+                                                    // Removed Edit option
+                                                    // checkEditPermissions(item)
+                                                    //     ? ListTile(
+                                                    //         onTap: () async {
+                                                    //           _convActionBloc
+                                                    //               .add(
+                                                    //             EditingConversation(
+                                                    //               chatroomId:
+                                                    //                   chatroom!
+                                                    //                       .id,
+                                                    //               conversationId:
+                                                    //                   item.id,
+                                                    //               editConversation:
+                                                    //                   item,
+                                                    //             ),
+                                                    //           );
+                                                    //         },
+                                                    //         leading:
+                                                    //             const LMIcon(
+                                                    //           type: LMIconType
+                                                    //               .svg,
+                                                    //           assetPath:
+                                                    //               ssEditIcon,
+                                                    //           size: 24,
+                                                    //         ),
+                                                    //         title:
+                                                    //             const LMTextView(
+                                                    //           text: "Edit",
+                                                    //           textStyle:
+                                                    //               TextStyle(
+                                                    //             fontSize: 14,
+                                                    //           ),
+                                                    //         ),
+                                                    //       )
+                                                    //     : const SizedBox
+                                                    //         .shrink(),
                                                     Visibility(
                                                       visible:
                                                           checkDeletePermissions(
                                                               item),
                                                       child: ListTile(
                                                         onTap: () async {
-                                                          final response = await locator<
-                                                                  LikeMindsService>()
-                                                              .deleteConversation(
-                                                                  (DeleteConversationRequestBuilder()
-                                                                        ..conversationIds([
-                                                                          item.id
-                                                                        ])
-                                                                        ..reason(
-                                                                            "Delete"))
-                                                                      .build());
-                                                          if (response
-                                                              .success) {
-                                                            chatBubbleIndividualController
-                                                                .hideMenu();
-                                                            updateDeletedConversation(
-                                                                response.data!);
-                                                            toast(
-                                                                "Message deleted");
-                                                          }
+                                                          chatBubbleController
+                                                              .hideMenu();
+                                                          DeleteConversationRequest
+                                                              request =
+                                                              (DeleteConversationRequestBuilder()
+                                                                    ..conversationIds([
+                                                                      item.id
+                                                                    ])
+                                                                    ..reason(
+                                                                        "Delete"))
+                                                                  .build();
+                                                          _convActionBloc!.add(
+                                                              DeleteConversation(
+                                                                  request));
                                                         },
                                                         leading: const LMIcon(
                                                           type: LMIconType.svg,
@@ -803,16 +797,6 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
                                           sender: userMeta[item.userId ??
                                                   item.memberId] ??
                                               item.member!,
-                                          onLongPress: (conversation) {
-                                            // _startSelection(conversation);
-                                            if (chatBubbleIndividualController
-                                                .menuIsShowing) {
-                                              chatBubbleIndividualController
-                                                  .hideMenu();
-                                            }
-                                            chatBubbleIndividualController
-                                                .showMenu();
-                                          },
                                           mediaWidget:
                                               item.deletedByUserId == null
                                                   ? getContent(item)
@@ -821,9 +805,8 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
                                       : LMChatBubble(
                                           key: Key(item.id.toString()),
                                           isSent: item.userId == user!.id,
+                                          menuController: chatBubbleController,
                                           backgroundColor: secondary.shade100,
-                                          menuController:
-                                              chatBubbleIndividualController,
                                           menu: ClipRRect(
                                             child: Container(
                                               decoration: BoxDecoration(
@@ -844,6 +827,8 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
                                                   children: [
                                                     ListTile(
                                                       onTap: () {
+                                                        chatBubbleController
+                                                            .hideMenu();
                                                         int userId =
                                                             item.userId ??
                                                                 item.memberId!;
@@ -865,8 +850,6 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
                                                                 item,
                                                           ),
                                                         );
-                                                        chatBubbleIndividualController
-                                                            .hideMenu();
                                                       },
                                                       leading: const LMIcon(
                                                         type: LMIconType.svg,
@@ -882,6 +865,8 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
                                                     ),
                                                     ListTile(
                                                       onTap: () {
+                                                        chatBubbleController
+                                                            .hideMenu();
                                                         Clipboard.setData(
                                                           ClipboardData(
                                                             text: TaggingHelper
@@ -892,8 +877,6 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
                                                         ).then((value) {
                                                           toast(
                                                               "Copied to clipboard");
-                                                          chatBubbleIndividualController
-                                                              .hideMenu();
                                                         });
                                                       },
                                                       leading: const LMIcon(
@@ -908,49 +891,49 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
                                                         ),
                                                       ),
                                                     ),
-                                                    checkEditPermissions(item)
-                                                        ? ListTile(
-                                                            onTap: () async {
-                                                              _convActionBloc
-                                                                  .add(
-                                                                EditingConversation(
-                                                                  chatroomId:
-                                                                      chatroom!
-                                                                          .id,
-                                                                  conversationId:
-                                                                      item.id,
-                                                                  editConversation:
-                                                                      item,
-                                                                ),
-                                                              );
-                                                              chatBubbleIndividualController
-                                                                  .hideMenu();
-                                                            },
-                                                            leading:
-                                                                const LMIcon(
-                                                              type: LMIconType
-                                                                  .svg,
-                                                              assetPath:
-                                                                  ssEditIcon,
-                                                              size: 24,
-                                                            ),
-                                                            title:
-                                                                const LMTextView(
-                                                              text: "Edit",
-                                                              textStyle:
-                                                                  TextStyle(
-                                                                fontSize: 14,
-                                                              ),
-                                                            ),
-                                                          )
-                                                        : const SizedBox
-                                                            .shrink(),
+                                                    // checkEditPermissions(item)
+                                                    //     ? ListTile(
+                                                    //         onTap: () async {
+                                                    //           _convActionBloc
+                                                    //               .add(
+                                                    //             EditingConversation(
+                                                    //               chatroomId:
+                                                    //                   chatroom!
+                                                    //                       .id,
+                                                    //               conversationId:
+                                                    //                   item.id,
+                                                    //               editConversation:
+                                                    //                   item,
+                                                    //             ),
+                                                    //           );
+                                                    //         },
+                                                    //         leading:
+                                                    //             const LMIcon(
+                                                    //           type: LMIconType
+                                                    //               .svg,
+                                                    //           assetPath:
+                                                    //               ssEditIcon,
+                                                    //           size: 24,
+                                                    //         ),
+                                                    //         title:
+                                                    //             const LMTextView(
+                                                    //           text: "Edit",
+                                                    //           textStyle:
+                                                    //               TextStyle(
+                                                    //             fontSize: 14,
+                                                    //           ),
+                                                    //         ),
+                                                    //       )
+                                                    //     : const SizedBox
+                                                    //         .shrink(),
                                                     Visibility(
                                                       visible:
                                                           checkDeletePermissions(
                                                               item),
                                                       child: ListTile(
                                                         onTap: () async {
+                                                          chatBubbleController
+                                                              .hideMenu();
                                                           final response = await locator<
                                                                   LikeMindsService>()
                                                               .deleteConversation(
@@ -963,8 +946,6 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
                                                                       .build());
                                                           if (response
                                                               .success) {
-                                                            chatBubbleIndividualController
-                                                                .hideMenu();
                                                             rebuildConversationList
                                                                     .value =
                                                                 !rebuildConversationList
@@ -1104,16 +1085,6 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
                                           sender: userMeta[item.userId ??
                                                   item.memberId] ??
                                               item.member!,
-                                          onLongPress: (conversation) {
-                                            // _startSelection(conversation);
-                                            if (chatBubbleIndividualController
-                                                .menuIsShowing) {
-                                              chatBubbleIndividualController
-                                                  .hideMenu();
-                                            }
-                                            chatBubbleIndividualController
-                                                .showMenu();
-                                          },
                                         );
                                 },
                               ),
@@ -1229,6 +1200,10 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
                       BlocConsumer(
                           bloc: _convActionBloc,
                           listener: (context, state) {
+                            if (state is ConversationDelete) {
+                              updateDeletedConversation(
+                                  state.deleteConversationResponse);
+                            }
                             if (state is LocalConversation) {
                               addLocalConversationToPagedList(
                                   state.conversation);
