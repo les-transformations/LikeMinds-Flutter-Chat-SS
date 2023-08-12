@@ -934,25 +934,18 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
                                                         onTap: () async {
                                                           chatBubbleController
                                                               .hideMenu();
-                                                          final response = await locator<
-                                                                  LikeMindsService>()
-                                                              .deleteConversation(
-                                                                  (DeleteConversationRequestBuilder()
-                                                                        ..conversationIds([
-                                                                          item.id
-                                                                        ])
-                                                                        ..reason(
-                                                                            "Delete"))
-                                                                      .build());
-                                                          if (response
-                                                              .success) {
-                                                            rebuildConversationList
-                                                                    .value =
-                                                                !rebuildConversationList
-                                                                    .value;
-                                                            toast(
-                                                                "Message deleted");
-                                                          }
+                                                          DeleteConversationRequest
+                                                              request =
+                                                              (DeleteConversationRequestBuilder()
+                                                                    ..conversationIds([
+                                                                      item.id
+                                                                    ])
+                                                                    ..reason(
+                                                                        "Delete"))
+                                                                  .build();
+                                                          _convActionBloc.add(
+                                                              DeleteConversation(
+                                                                  request));
                                                         },
                                                         leading: const LMIcon(
                                                           type: LMIconType.svg,
