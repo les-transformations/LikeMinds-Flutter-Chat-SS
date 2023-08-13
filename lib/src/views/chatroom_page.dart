@@ -765,9 +765,11 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
                                                 item.replyConversationObject !=
                                                         null
                                                     ? LMTextView(
-                                                        text: item
-                                                            .replyConversationObject!
-                                                            .member!
+                                                        text: userMeta[item
+                                                                    .replyConversationObject!
+                                                                    .userId ??
+                                                                item.replyConversationObject!
+                                                                    .memberId!]!
                                                             .name,
                                                         overflow: TextOverflow
                                                             .ellipsis,
@@ -1046,9 +1048,11 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
                                                 item.replyConversationObject !=
                                                         null
                                                     ? LMTextView(
-                                                        text: item
-                                                            .replyConversationObject!
-                                                            .member!
+                                                        text: userMeta[item
+                                                                    .replyConversationObject!
+                                                                    .userId ??
+                                                                item.replyConversationObject!
+                                                                    .memberId!]!
                                                             .name,
                                                         overflow: TextOverflow
                                                             .ellipsis,
