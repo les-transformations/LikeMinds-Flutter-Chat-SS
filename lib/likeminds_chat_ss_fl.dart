@@ -40,14 +40,17 @@ class LMChat extends StatelessWidget {
     ));
   }
 
-  static LMChat? _instance;
   static LMChat instance({required LMChatBuilder builder}) {
     if (builder.getUserId == null && builder.getUserName == null) {
       throw Exception(
         'LMChat builder needs to be initialized with User ID, or User Name',
       );
     } else {
-      return _instance ??= LMChat._internal(
+      // TODO: Remove the router.refresh() call
+      // in case the navigation is not working as expected
+      // refresh the route whenever LMChat instance is created
+      router.refresh();
+      return LMChat._internal(
         builder.getUserId!,
         builder.getUserName!,
         builder.getDomain,
@@ -137,7 +140,7 @@ class LMChat extends StatelessWidget {
                 ),
               );
             }
-    
+
             return const SizedBox(
               width: 50,
               height: 50,
