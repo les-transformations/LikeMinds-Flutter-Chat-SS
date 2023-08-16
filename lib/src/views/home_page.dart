@@ -242,7 +242,8 @@ class _HomePageState extends State<HomePage> {
               fontWeight: FontWeight.w500,
             ),
           ),
-          subtitle: (conversation.hasFiles ?? false)
+          subtitle: ((conversation.hasFiles ?? false) &&
+                  conversation.deletedByUserId == null)
               ? getChatItemAttachmentTile(
                   attachmentMeta ?? <Media>[], conversation)
               : LMTextView(
