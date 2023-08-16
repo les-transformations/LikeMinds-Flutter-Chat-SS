@@ -68,7 +68,7 @@ class _MediaForwardState extends State<MediaForward> {
     return WillPopScope(
       onWillPop: () {
         router.pop();
-        return Future.value(true);
+        return Future.value(false);
       },
       child: Scaffold(
         backgroundColor: kWhiteColor,

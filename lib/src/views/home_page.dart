@@ -82,100 +82,106 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: Column(
-        children: [
-          Container(
-            width: 100.w,
-            child: Padding(
-              padding: EdgeInsets.symmetric(
-                horizontal: 4.w,
-                vertical: 1.h,
-              ),
-              child: SafeArea(
-                bottom: false,
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    LMTextView(
-                      text: "Chats",
-                      textStyle:
-                          Theme.of(context).textTheme.headlineSmall!.copyWith(
-                                color: kBlackColor,
-                                fontWeight: FontWeight.w600,
-                              ),
-                    ),
-                    //   communityName ??
-                    // ),
-                    LMProfilePicture(
-                      fallbackText: userName ?? "..",
-                      size: 36,
-                      imageUrl: user?.imageUrl,
-                      backgroundColor: kSecondaryColor,
-                    ),
-                  ],
+    return WillPopScope(
+      onWillPop: () {
+        router.pop();
+        return Future.value(false);
+      },
+      child: Scaffold(
+        body: Column(
+          children: [
+            SizedBox(
+              width: 100.w,
+              child: Padding(
+                padding: EdgeInsets.symmetric(
+                  horizontal: 4.w,
+                  vertical: 1.h,
+                ),
+                child: SafeArea(
+                  bottom: false,
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      LMTextView(
+                        text: "Chats",
+                        textStyle:
+                            Theme.of(context).textTheme.headlineSmall!.copyWith(
+                                  color: kBlackColor,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                      ),
+                      //   communityName ??
+                      // ),
+                      LMProfilePicture(
+                        fallbackText: userName ?? "..",
+                        size: 36,
+                        imageUrl: user?.imageUrl,
+                        backgroundColor: kSecondaryColor,
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ),
-          ),
-          Divider(),
-          Expanded(
-            child: Padding(
-              padding: EdgeInsets.only(top: 1.h),
-              child: BlocConsumer<HomeBloc, HomeState>(
-                bloc: homeBloc,
-                listener: (context, state) {
-                  updatePagingControllers(state);
-                },
-                buildWhen: (previous, current) {
-                  if (previous is HomeLoaded && current is HomeLoading) {
-                    return false;
-                  } else if (previous is UpdateHomeFeed &&
-                      current is HomeLoading) {
-                    return false;
-                  }
-                  return true;
-                },
-                builder: (context, state) {
-                  if (state is HomeLoading) {
-                    return const SkeletonChatRoomList();
-                  } else if (state is HomeError) {
-                    return Center(
-                      child: Text(state.message),
-                    );
-                  } else if (state is HomeLoaded ||
-                      state is UpdateHomeFeed ||
-                      state is UpdatedHomeFeed) {
-                    return SafeArea(
-                      top: false,
-                      child: ValueListenableBuilder(
-                          valueListenable: rebuildPagedList,
-                          builder: (context, _, __) {
-                            return PagedListView<int, LMListItem>(
-                              pagingController: homeFeedPagingController,
-                              padding: EdgeInsets.zero,
-                              physics: const ClampingScrollPhysics(),
-                              builderDelegate:
-                                  PagedChildBuilderDelegate<LMListItem>(
-                                newPageProgressIndicatorBuilder: (_) =>
-                                    const SizedBox(),
-                                noItemsFoundIndicatorBuilder: (context) =>
-                                    const SizedBox(),
-                                itemBuilder: (context, item, index) {
-                                  return item;
-                                },
-                              ),
-                            );
-                          }),
-                    );
-                  }
-                  return const SizedBox();
-                },
+            Divider(),
+            Expanded(
+              child: Padding(
+                padding: EdgeInsets.only(top: 1.h),
+                child: BlocConsumer<HomeBloc, HomeState>(
+                  bloc: homeBloc,
+                  listener: (context, state) {
+                    updatePagingControllers(state);
+                  },
+                  buildWhen: (previous, current) {
+                    if (previous is HomeLoaded && current is HomeLoading) {
+                      return false;
+                    } else if (previous is UpdateHomeFeed &&
+                        current is HomeLoading) {
+                      return false;
+                    }
+                    return true;
+                  },
+                  builder: (context, state) {
+                    if (state is HomeLoading) {
+                      return const SkeletonChatRoomList();
+                    } else if (state is HomeError) {
+                      return Center(
+                        child: Text(state.message),
+                      );
+                    } else if (state is HomeLoaded ||
+                        state is UpdateHomeFeed ||
+                        state is UpdatedHomeFeed) {
+                      return SafeArea(
+                        top: false,
+                        child: ValueListenableBuilder(
+                            valueListenable: rebuildPagedList,
+                            builder: (context, _, __) {
+                              return PagedListView<int, LMListItem>(
+                                pagingController: homeFeedPagingController,
+                                padding: EdgeInsets.zero,
+                                physics: const ClampingScrollPhysics(),
+                                builderDelegate:
+                                    PagedChildBuilderDelegate<LMListItem>(
+                                  newPageProgressIndicatorBuilder: (_) =>
+                                      const SizedBox(),
+                                  noItemsFoundIndicatorBuilder: (context) =>
+                                      const SizedBox(),
+                                  itemBuilder: (context, item, index) {
+                                    return item;
+                                  },
+                                ),
+                              );
+                            }),
+                      );
+                    }
+                    return const SizedBox();
+                  },
+                ),
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
@@ -230,7 +236,7 @@ class _HomePageState extends State<HomePage> {
                 ? "NOT PRODUCING"
                 : chatrooms[i].header,
             maxLines: 1,
-                                        overflow: TextOverflow.ellipsis,
+            overflow: TextOverflow.ellipsis,
             textStyle: const TextStyle(
               fontSize: 16,
               fontWeight: FontWeight.w500,

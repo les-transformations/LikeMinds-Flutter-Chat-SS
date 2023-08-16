@@ -46,10 +46,6 @@ class LMChat extends StatelessWidget {
         'LMChat builder needs to be initialized with User ID, or User Name',
       );
     } else {
-      // TODO: Remove the router.refresh() call
-      // in case the navigation is not working as expected
-      // refresh the route whenever LMChat instance is created
-      router.refresh();
       return LMChat._internal(
         builder.getUserId!,
         builder.getUserName!,

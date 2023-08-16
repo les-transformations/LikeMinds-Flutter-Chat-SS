@@ -347,7 +347,6 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
       value: SystemUiOverlayStyle.dark,
       child: WillPopScope(
         onWillPop: () async {
-          // debugPrint(router.location);
           _chatroomActionBloc.add(
             MarkReadChatroomEvent(chatroomId: widget.chatroomId),
           );
