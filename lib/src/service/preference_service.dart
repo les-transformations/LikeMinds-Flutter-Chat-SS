@@ -31,11 +31,11 @@ class LMPreferenceService extends ILMPreferenceService {
   }
 
   @override
-  void storeUserData(User user) {
+  Future<void> storeUserData(User user) async {
     UserEntity userEntity = user.toEntity();
     Map<String, dynamic> userData = userEntity.toJson();
     String userString = jsonEncode(userData);
-    _sharedPreferences.setString('user', userString);
+    await _sharedPreferences.setString('user', userString);
   }
 
   @override
@@ -55,11 +55,11 @@ class LMPreferenceService extends ILMPreferenceService {
   }
 
   @override
-  void storeMemberRights(MemberStateResponse memberState) {
+  Future<void> storeMemberRights(MemberStateResponse memberState) async {
     MemberStateResponseEntity memberStateEntity = memberState.toEntity();
     Map<String, dynamic> memberStateData = memberStateEntity.toJson();
     String memberStateString = jsonEncode(memberStateData);
-    _sharedPreferences.setString('memberState', memberStateString);
+    await _sharedPreferences.setString('memberState', memberStateString);
   }
 
   @override
@@ -99,11 +99,11 @@ class LMPreferenceService extends ILMPreferenceService {
   }
 
   @override
-  void storeCommunityData(Community community) {
+  Future<void> storeCommunityData(Community community) async {
     CommunityEntity communityEntity = community.toEntity();
     Map<String, dynamic> communityData = communityEntity.toJson();
     String communityString = jsonEncode(communityData);
-    _sharedPreferences.setString('community', communityString);
+    await _sharedPreferences.setString('community', communityString);
   }
 
   @override

@@ -31,11 +31,11 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
           final user = response.data!.initiateUser!.user;
           final memberRights =
               await locator<LikeMindsService>().getMemberState();
-          locator<LMPreferenceService>()
-              .storeUserData(user);
-          locator<LMPreferenceService>()
+          await locator<LMPreferenceService>().storeUserData(user);
+          await locator<LMPreferenceService>()
               .storeCommunityData(response.data!.initiateUser!.community);
-          locator<LMPreferenceService>().storeMemberRights(memberRights.data!);
+          await locator<LMPreferenceService>()
+              .storeMemberRights(memberRights.data!);
           LMNotificationHandler.instance.registerDevice(user.id);
           emit(AuthSuccess(user: response.data!.initiateUser!.user));
         } else {
