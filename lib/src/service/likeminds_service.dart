@@ -1,5 +1,6 @@
 import 'package:likeminds_chat_ss_fl/src/utils/analytics/analytics.dart';
 import 'package:likeminds_chat_fl/likeminds_chat_fl.dart';
+import 'package:likeminds_chat_ss_fl/src/utils/imports.dart';
 
 abstract class ILikeMindsService {
   Future<LMResponse<InitiateUserResponse>> initiateUser(
@@ -67,6 +68,7 @@ class LikeMindsService implements ILikeMindsService {
 
   @override
   Future<LMResponse<LogoutResponse>> logout(LogoutRequest request) {
+    locator<LMPreferenceService>().clearLocalPrefs();
     return client.logout(request);
   }
 

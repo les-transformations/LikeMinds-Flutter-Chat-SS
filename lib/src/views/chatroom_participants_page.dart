@@ -7,6 +7,7 @@ import 'package:likeminds_chat_ss_fl/src/navigation/router.dart';
 import 'package:likeminds_chat_ss_fl/src/utils/analytics/analytics.dart';
 import 'package:likeminds_chat_ss_fl/src/utils/constants/ui_constants.dart';
 import 'package:likeminds_chat_ss_fl/src/utils/imports.dart';
+import 'package:likeminds_chat_ss_fl/src/utils/simple_bloc_observer.dart';
 import 'package:likeminds_chat_ss_fl/src/utils/ui_utils.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:likeminds_chat_fl/likeminds_chat_fl.dart';
@@ -34,6 +35,7 @@ class _ChatroomParticipantsPageState extends State<ChatroomParticipantsPage> {
   @override
   void initState() {
     super.initState();
+    Bloc.observer = SimpleBlocObserver();
     participantsBloc = ParticipantsBloc();
     participantsBloc!.add(
       GetParticipants(

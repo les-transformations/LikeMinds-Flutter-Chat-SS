@@ -1,13 +1,9 @@
-import 'package:flutter/material.dart';
 import 'package:likeminds_chat_ss_fl/src/bloc/home/home_bloc.dart';
 import 'package:likeminds_chat_ss_fl/src/navigation/router.dart';
-import 'package:likeminds_chat_ss_fl/src/service/media_service.dart';
-import 'package:likeminds_chat_ss_fl/src/service/preference_service.dart';
-import 'package:likeminds_chat_ss_fl/src/service/service_locator.dart';
-import 'package:likeminds_chat_ss_fl/src/utils/constants/ui_constants.dart';
 import 'package:likeminds_chat_ss_fl/src/utils/imports.dart';
 import 'package:likeminds_chat_ss_fl/src/utils/media/media_helper.dart';
 import 'package:likeminds_chat_ss_fl/src/utils/realtime/realtime.dart';
+import 'package:likeminds_chat_ss_fl/src/utils/simple_bloc_observer.dart';
 import 'package:likeminds_chat_ss_fl/src/utils/tagging/helpers/tagging_helper.dart';
 import 'package:likeminds_chat_ss_fl/src/widgets/skeleton_list.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
@@ -24,7 +20,6 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  // String? communityName;
   final int pageSize = 50;
   String? userName;
   User? user;
@@ -38,6 +33,7 @@ class _HomePageState extends State<HomePage> {
   @override
   void initState() {
     super.initState();
+    Bloc.observer = SimpleBlocObserver();
     userName = locator<LMPreferenceService>().getUser()!.name;
     homeBloc = BlocProvider.of<HomeBloc>(context);
     homeBloc!.add(

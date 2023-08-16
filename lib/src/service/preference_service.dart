@@ -15,6 +15,7 @@ abstract class ILMPreferenceService {
   void storeCommunityData(Community community);
   Community? getCommunity();
   void clearCommunityData();
+  void clearLocalPrefs();
 }
 
 class LMPreferenceService extends ILMPreferenceService {
@@ -119,5 +120,10 @@ class LMPreferenceService extends ILMPreferenceService {
   @override
   void clearCommunityData() {
     _sharedPreferences.remove('community');
+  }
+
+  @override
+  void clearLocalPrefs() {
+    _sharedPreferences.clear();
   }
 }
