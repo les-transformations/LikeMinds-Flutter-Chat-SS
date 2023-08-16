@@ -319,7 +319,13 @@ class ParticipantItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: () {},
+      onTap: () {
+        if (participant.sdkClientInfo != null ||
+            participant.sdkClientInfo!.userUniqueId != null) {
+          locator<LikeMindsService>().lmCallBack.profileRouteCallback(
+              lmUserId: participant.sdkClientInfo!.userUniqueId!);
+        }
+      },
       child: Container(
         width: getWidth(context),
         height: 8.h,

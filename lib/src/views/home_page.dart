@@ -25,6 +25,7 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   // String? communityName;
+  final int pageSize = 50;
   String? userName;
   User? user;
   HomeBloc? homeBloc;
@@ -37,14 +38,10 @@ class _HomePageState extends State<HomePage> {
   @override
   void initState() {
     super.initState();
-
     userName = locator<LMPreferenceService>().getUser()!.name;
-    // communityName = userLocalPreference.fetchCommunityData()["community_name"];
     homeBloc = BlocProvider.of<HomeBloc>(context);
     homeBloc!.add(
-      InitHomeEvent(
-        page: _pageKey,
-      ),
+      InitHomeEvent(page: _pageKey, pageSize: pageSize),
     );
     _addPaginationListener();
   }
@@ -53,9 +50,7 @@ class _HomePageState extends State<HomePage> {
     homeFeedPagingController.addPageRequestListener(
       (pageKey) {
         homeBloc!.add(
-          InitHomeEvent(
-            page: pageKey,
-          ),
+          InitHomeEvent(page: pageKey, pageSize: pageSize),
         );
       },
     );
@@ -67,7 +62,7 @@ class _HomePageState extends State<HomePage> {
       _pageKey++;
       if (state.response.chatroomsData == null ||
           state.response.chatroomsData!.isEmpty ||
-          state.response.chatroomsData!.length < 50) {
+          state.response.chatroomsData!.length < pageSize) {
         homeFeedPagingController.appendLastPage(chatItems);
       } else {
         homeFeedPagingController.appendPage(chatItems, _pageKey);
@@ -75,6 +70,7 @@ class _HomePageState extends State<HomePage> {
     } else if (state is UpdateHomeFeed) {
       List<LMListItem> chatItems = getChats(context, state.response);
       _pageKey = 2;
+      homeFeedPagingController.itemList?.clear();
       homeFeedPagingController.nextPageKey = _pageKey;
       homeFeedPagingController.itemList = chatItems;
     }
