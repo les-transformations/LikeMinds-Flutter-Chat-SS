@@ -76,7 +76,7 @@ class _MediaPreviewState extends State<MediaPreview> {
     conversation = widget.conversation;
     setupFlickManager();
     return WillPopScope(
-      onWillPop: () {
+      onWillPop: () async {
         router.pop();
         return Future.value(false);
       },
