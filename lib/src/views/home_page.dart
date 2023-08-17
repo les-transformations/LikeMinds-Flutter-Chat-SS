@@ -35,6 +35,7 @@ class _HomePageState extends State<HomePage> {
     super.initState();
     Bloc.observer = SimpleBlocObserver();
     userName = locator<LMPreferenceService>().getUser()!.name;
+    homeFeedPagingController.itemList?.clear();
     homeBloc = BlocProvider.of<HomeBloc>(context);
     homeBloc!.add(
       InitHomeEvent(page: _pageKey, pageSize: pageSize),
@@ -54,6 +55,9 @@ class _HomePageState extends State<HomePage> {
 
   updatePagingControllers(HomeState state) {
     if (state is HomeLoaded) {
+      if (state.page == 1) {
+        homeFeedPagingController.itemList?.clear();
+      }
       List<LMListItem> chatItems = getChats(context, state.response);
       _pageKey++;
       if (state.response.chatroomsData == null ||
@@ -206,7 +210,7 @@ class _HomePageState extends State<HomePage> {
               withTilde: false,
             )}'
           : conversation.deletedByUserId == conversation.userId
-              ? conversation.userId == user.id
+              ? conversation.deletedByUserId == user.id
                   ? 'You deleted this message'
                   : "This message was deleted"
               : "This message was deleted by the CM";

@@ -10,7 +10,7 @@ class InitHomeEvent extends HomeEvent {
   InitHomeEvent({required this.page, required this.pageSize});
 
   @override
-  List<Object?> get props => [page];
+  List<Object?> get props => [page, pageSize];
 }
 
 class GetHomeFeedPage extends HomeEvent {
@@ -27,7 +27,8 @@ class ReloadHomeEvent extends HomeEvent {
 }
 
 class UpdateHomeEvent extends HomeEvent {
-  UpdateHomeEvent();
+  final int pageSize;
+  UpdateHomeEvent({this.pageSize = 50});
   @override
   List<Object?> get props => [];
 }
