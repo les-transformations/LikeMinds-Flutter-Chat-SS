@@ -412,7 +412,7 @@ class _CredScreenState extends State<CredScreen> {
                     // INIT - Get the LMFeed instance and pass the credentials (if any)
                     builder: (context) => lmChat!,
                   );
-                  Navigator.push(context, route);
+                  Navigator.pushReplacement(context, route);
                 },
                 child: Container(
                   width: 200,

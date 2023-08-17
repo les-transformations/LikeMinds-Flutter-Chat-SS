@@ -67,85 +67,82 @@ class LMChat extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     ScreenSize.init(context);
-    return WillPopScope(
-      onWillPop: () async => await Future.value(false),
-      child: Scaffold(
-        backgroundColor: kWhiteColor,
-        body: Center(
-          child: BlocConsumer<AuthBloc, AuthState>(
-            bloc: _authBloc,
-            listener: (context, state) {},
-            builder: (context, state) {
-              if (state is AuthSuccess) {
-                return MultiBlocProvider(
-                  providers: [
-                    BlocProvider<HomeBloc>(
-                      create: (context) => HomeBloc(),
+    return Scaffold(
+      backgroundColor: kWhiteColor,
+      body: Center(
+        child: BlocConsumer<AuthBloc, AuthState>(
+          bloc: _authBloc,
+          listener: (context, state) {},
+          builder: (context, state) {
+            if (state is AuthSuccess) {
+              return MultiBlocProvider(
+                providers: [
+                  BlocProvider<HomeBloc>(
+                    create: (context) => HomeBloc(),
+                  ),
+                  BlocProvider<ConversationBloc>(
+                    create: (context) => ConversationBloc(),
+                  ),
+                  BlocProvider<ChatroomBloc>(
+                    create: (context) => ChatroomBloc(),
+                  )
+                ],
+                child: MaterialApp.router(
+                  routerConfig: router,
+                  debugShowCheckedModeBanner: isDebug,
+                  theme: ThemeData(
+                    colorScheme: ColorScheme.fromSeed(
+                      seedColor: primary,
+                      primary: primary,
+                      secondary: secondary,
                     ),
-                    BlocProvider<ConversationBloc>(
-                      create: (context) => ConversationBloc(),
-                    ),
-                    BlocProvider<ChatroomBloc>(
-                      create: (context) => ChatroomBloc(),
-                    )
-                  ],
-                  child: MaterialApp.router(
-                    routerConfig: router..go('/'),
-                    debugShowCheckedModeBanner: isDebug,
-                    theme: ThemeData(
-                      colorScheme: ColorScheme.fromSeed(
-                        seedColor: primary,
-                        primary: primary,
-                        secondary: secondary,
+                    useMaterial3: true,
+                    fontFamily: 'Montserrat',
+                    textTheme: TextTheme(
+                      displayLarge: TextStyle(
+                        fontSize: 24,
+                        fontWeight: FontWeight.w600,
+                        color: kBlackColor,
                       ),
-                      useMaterial3: true,
-                      fontFamily: 'Montserrat',
-                      textTheme: const TextTheme(
-                        displayLarge: TextStyle(
-                          fontSize: 24,
-                          fontWeight: FontWeight.w600,
-                          color: kBlackColor,
-                        ),
-                        displayMedium: TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.w600,
-                          color: kBlackColor,
-                        ),
-                        displaySmall: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.w600,
-                          color: kBlackColor,
-                        ),
-                        bodyLarge: TextStyle(
-                          fontSize: 14,
-                          fontWeight: FontWeight.w400,
-                          color: kBlackColor,
-                        ),
-                        bodyMedium: TextStyle(
-                          fontSize: 12,
-                          fontWeight: FontWeight.w400,
-                          color: kBlackColor,
-                        ),
-                        bodySmall: TextStyle(
-                          fontSize: 10,
-                          fontWeight: FontWeight.w400,
-                          color: kBlackColor,
-                        ),
+                      displayMedium: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.w600,
+                        color: kBlackColor,
+                      ),
+                      displaySmall: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.w600,
+                        color: kBlackColor,
+                      ),
+                      bodyLarge: TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w400,
+                        color: kBlackColor,
+                      ),
+                      bodyMedium: TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w400,
+                        color: kBlackColor,
+                      ),
+                      bodySmall: TextStyle(
+                        fontSize: 10,
+                        fontWeight: FontWeight.w400,
+                        color: kBlackColor,
                       ),
                     ),
                   ),
-                );
-              }
-
-              return const SizedBox(
-                width: 50,
-                height: 50,
-                child: CircularProgressIndicator(
-                  color: kPrimaryColor,
                 ),
               );
-            },
-          ),
+            }
+
+            return const SizedBox(
+              width: 50,
+              height: 50,
+              child: CircularProgressIndicator(
+                color: kPrimaryColor,
+              ),
+            );
+          },
         ),
       ),
     );
@@ -154,7 +151,7 @@ class LMChat extends StatelessWidget {
 
 initFirebase() async {
   try {
-    // final clientFirebase = Firebase.app();
+    final clientFirebase = Firebase.app();
     final ourFirebase = await Firebase.initializeApp(
       name: 'likeminds_chat',
       options: !isDebug
@@ -192,7 +189,7 @@ initFirebase() async {
                   databaseURL: FbCredsDev.fbDatabaseUrl,
                 ),
     );
-    // debugPrint("Client Firebase - ${clientFirebase.options.appId}");
+    debugPrint("Client Firebase - ${clientFirebase.options.appId}");
     debugPrint("Our Firebase - ${ourFirebase.options.appId}");
   } on FirebaseException catch (e) {
     debugPrint("Make sure you have initialized firebase, ${e.toString()}");

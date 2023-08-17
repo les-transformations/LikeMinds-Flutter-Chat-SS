@@ -343,17 +343,17 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
 
   @override
   Widget build(BuildContext context) {
-    return WillPopScope(
-      onWillPop: () async {
-        _chatroomActionBloc.add(
-          MarkReadChatroomEvent(chatroomId: widget.chatroomId),
-        );
-        BlocProvider.of<HomeBloc>(context).add(UpdateHomeEvent());
-        router.pop();
-        return Future.value(false);
-      },
-      child: AnnotatedRegion<SystemUiOverlayStyle>(
-        value: SystemUiOverlayStyle.dark,
+    return AnnotatedRegion<SystemUiOverlayStyle>(
+      value: SystemUiOverlayStyle.dark,
+      child: WillPopScope(
+        onWillPop: () async {
+          _chatroomActionBloc.add(
+            MarkReadChatroomEvent(chatroomId: widget.chatroomId),
+          );
+          BlocProvider.of<HomeBloc>(context).add(UpdateHomeEvent());
+          router.pop();
+          return false;
+        },
         child: Scaffold(
           backgroundColor: Colors.white,
           floatingActionButton: showScrollButton
