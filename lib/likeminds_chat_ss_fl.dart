@@ -74,8 +74,9 @@ class LMChat extends StatelessWidget {
         if (router.canPop()) {
           router.pop();
           return Future.value(false);
+        } else {
+          return Future.value(true);
         }
-        return Future.value(true);
       },
       child: Scaffold(
         backgroundColor: kWhiteColor,
