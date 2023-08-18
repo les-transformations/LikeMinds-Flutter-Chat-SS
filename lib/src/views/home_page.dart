@@ -297,7 +297,7 @@ class _HomePageState extends State<HomePage> {
     final DateTime now = DateTime.now();
     final DateTime messageTime = DateTime.fromMillisecondsSinceEpoch(_time);
     final Duration difference = now.difference(messageTime);
-    if (difference.inDays > 0) {
+    if (difference.inDays > 0 || now.day != messageTime.day) {
       return DateFormat('dd/MM/yyyy').format(messageTime);
     }
     return DateFormat('kk:mm').format(messageTime);
