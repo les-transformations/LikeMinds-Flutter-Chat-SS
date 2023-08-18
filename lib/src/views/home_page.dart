@@ -112,7 +112,6 @@ class _HomePageState extends State<HomePage> {
                         fallbackText: user!.name,
                         size: 36,
                         imageUrl: user?.imageUrl,
-                        backgroundColor: kSecondaryColor,
                       ),
                     ],
                   ),
@@ -220,7 +219,6 @@ class _HomePageState extends State<HomePage> {
             fallbackText: chatrooms[i].header,
             size: 12.w,
             imageUrl: chatrooms[i].chatroomImageUrl,
-            backgroundColor: kSecondaryColor,
           ),
           title: LMTextView(
             text: chatrooms[i].header.isEmpty
