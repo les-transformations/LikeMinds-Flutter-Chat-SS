@@ -21,7 +21,6 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   final int pageSize = 50;
-  String? userName;
   User? user;
   HomeBloc? homeBloc;
   ValueNotifier<bool> rebuildPagedList = ValueNotifier(false);
@@ -34,7 +33,7 @@ class _HomePageState extends State<HomePage> {
   void initState() {
     super.initState();
     Bloc.observer = SimpleBlocObserver();
-    userName = locator<LMPreferenceService>().getUser()!.name;
+    user = locator<LMPreferenceService>().getUser();
     homeFeedPagingController.itemList?.clear();
     homeBloc = BlocProvider.of<HomeBloc>(context);
     homeBloc!.add(
@@ -110,7 +109,7 @@ class _HomePageState extends State<HomePage> {
                       //   communityName ??
                       // ),
                       LMProfilePicture(
-                        fallbackText: userName ?? "..",
+                        fallbackText: user!.name,
                         size: 36,
                         imageUrl: user?.imageUrl,
                         backgroundColor: kSecondaryColor,
@@ -120,7 +119,7 @@ class _HomePageState extends State<HomePage> {
                 ),
               ),
             ),
-            Divider(),
+            const Divider(),
             Expanded(
               child: Padding(
                 padding: EdgeInsets.only(top: 1.h),
@@ -195,7 +194,7 @@ class _HomePageState extends State<HomePage> {
     for (int i = 0; i < chatrooms.length; i++) {
       final Conversation conversation =
           lastConversations[chatrooms[i].lastConversationId.toString()]!;
-      final User user =
+      final User conversationUser =
           userMeta[conversation.member?.id ?? conversation.userId]!;
       final List<dynamic>? attachment =
           attachmentDynamic?[conversation.id.toString()];
@@ -203,17 +202,13 @@ class _HomePageState extends State<HomePage> {
       final List<Media>? attachmentMeta =
           attachment?.map((e) => Media.fromJson(e)).toList();
       String _message = conversation.deletedByUserId == null
-          ? '${user.name}: ${conversation.state != 0 ? TaggingHelper.extractStateMessage(
+          ? '${conversationUser.name}: ${conversation.state != 0 ? TaggingHelper.extractStateMessage(
               conversation.answer,
             ) : TaggingHelper.convertRouteToTag(
               conversation.answer,
               withTilde: false,
             )}'
-          : conversation.deletedByUserId == conversation.userId
-              ? conversation.deletedByUserId == user.id
-                  ? 'You deleted this message'
-                  : "This message was deleted"
-              : "This message was deleted by the CM";
+          : getDeletedText(conversation, user!);
       chats.add(
         LMListItem(
           // chatroom: chatrooms[i],

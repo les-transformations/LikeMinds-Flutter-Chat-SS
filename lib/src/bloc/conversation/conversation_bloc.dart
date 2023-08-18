@@ -16,9 +16,10 @@ class ConversationBloc extends Bloc<ConversationEvent, ConversationState> {
   int? lastConversationId;
 
   ConversationBloc() : super(ConversationInitial()) {
-    on<InitConversations>((event, emit) {
-      debugPrint("Conversations initiated");
-      int chatroomId = event.chatroomId;
+    on<InitConversations>(
+      (event, emit) {
+        debugPrint("Conversations initiated");
+        int chatroomId = event.chatroomId;
         lastConversationId = event.conversationId;
 
         realTime.onValue.listen(
@@ -37,7 +38,8 @@ class ConversationBloc extends Bloc<ConversationEvent, ConversationState> {
             }
           },
         );
-    },);
+      },
+    );
     on<ConversationEvent>((event, emit) async {
       if (event is LoadConversations) {
         if (event.getConversationRequest.page > 1) {
@@ -89,8 +91,9 @@ class ConversationBloc extends Bloc<ConversationEvent, ConversationState> {
         );
       },
     );
-    on<UpdateConversations>((event, emit) async {
-      if (lastConversationId != null &&
+    on<UpdateConversations>(
+      (event, emit) async {
+        if (lastConversationId != null &&
             event.conversationId != lastConversationId) {
           int maxTimestamp = DateTime.now().millisecondsSinceEpoch;
           final response = await locator<LikeMindsService>()
@@ -105,21 +108,21 @@ class ConversationBloc extends Bloc<ConversationEvent, ConversationState> {
                   .build());
           if (response.success) {
             GetConversationResponse conversationResponse = response.data!;
-          conversationResponse.conversationData!.forEach((element) {
-            element.member = conversationResponse
-                .userMeta?[element.userId ?? element.memberId];
-          });
-          conversationResponse.conversationData!.forEach((element) {
-            String? replyId = element.replyId == null
-                ? element.replyConversation?.toString()
-                : element.replyId.toString();
-            element.replyConversationObject =
-                conversationResponse.conversationMeta?[replyId];
-            element.replyConversationObject?.member =
-                conversationResponse.userMeta?[
-                    element.replyConversationObject?.userId ??
-                        element.replyConversationObject?.memberId];
-          });
+            conversationResponse.conversationData!.forEach((element) {
+              element.member = conversationResponse
+                  .userMeta?[element.userId ?? element.memberId];
+            });
+            conversationResponse.conversationData!.forEach((element) {
+              String? replyId = element.replyId == null
+                  ? element.replyConversation?.toString()
+                  : element.replyId.toString();
+              element.replyConversationObject =
+                  conversationResponse.conversationMeta?[replyId];
+              element.replyConversationObject?.member =
+                  conversationResponse.userMeta?[
+                      element.replyConversationObject?.userId ??
+                          element.replyConversationObject?.memberId];
+            });
             Conversation realTimeConversation =
                 response.data!.conversationData!.first;
             if (response.data!.conversationMeta != null &&
@@ -138,7 +141,8 @@ class ConversationBloc extends Bloc<ConversationEvent, ConversationState> {
             lastConversationId = event.conversationId;
           }
         }
-    },);
+      },
+    );
   }
 
   mapPostMultiMediaConversation(
@@ -288,6 +292,7 @@ class ConversationBloc extends Bloc<ConversationEvent, ConversationState> {
         answer: event.postConversationRequest.text,
         chatroomId: event.postConversationRequest.chatroomId,
         createdAt: "",
+        userId: user.id,
         header: "",
         date: "${dateTime.day} ${dateTime.month} ${dateTime.year}",
         replyId: event.postConversationRequest.replyId,
