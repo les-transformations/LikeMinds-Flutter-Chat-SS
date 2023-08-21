@@ -25,7 +25,7 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
           final response = await locator<LikeMindsService>()
               .getHomeFeed((GetHomeFeedRequestBuilder()
                     ..page(event.page)
-                    ..pageSize(50))
+                    ..pageSize(event.pageSize))
                   .build());
           if (response.success) {
             response.data?.conversationMeta?.forEach((key, value) {
@@ -36,7 +36,7 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
               value.member = user;
             });
 
-            emit(HomeLoaded(response: response.data!));
+            emit(HomeLoaded(response: response.data!, page: event.page));
           } else {
             HomeError(response.errorMessage!);
           }
@@ -45,7 +45,7 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
           final response = await locator<LikeMindsService>()
               .getHomeFeed((GetHomeFeedRequestBuilder()
                     ..page(1)
-                    ..pageSize(50))
+                    ..pageSize(event.pageSize))
                   .build());
           if (response.success) {
             emit(UpdatedHomeFeed());

@@ -11,7 +11,7 @@ dependencies:
   flutter:
     sdk: flutter
 
-  likeminds_chat_fl: 
+  likeminds_chat_fl: 1.4.0
 
   likeminds_chat_ui_fl:
     path: ../LikeMinds-Flutter-Chat-UI

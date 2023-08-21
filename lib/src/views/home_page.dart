@@ -1,13 +1,9 @@
-import 'package:flutter/material.dart';
 import 'package:likeminds_chat_ss_fl/src/bloc/home/home_bloc.dart';
 import 'package:likeminds_chat_ss_fl/src/navigation/router.dart';
-import 'package:likeminds_chat_ss_fl/src/service/media_service.dart';
-import 'package:likeminds_chat_ss_fl/src/service/preference_service.dart';
-import 'package:likeminds_chat_ss_fl/src/service/service_locator.dart';
-import 'package:likeminds_chat_ss_fl/src/utils/constants/ui_constants.dart';
 import 'package:likeminds_chat_ss_fl/src/utils/imports.dart';
 import 'package:likeminds_chat_ss_fl/src/utils/media/media_helper.dart';
 import 'package:likeminds_chat_ss_fl/src/utils/realtime/realtime.dart';
+import 'package:likeminds_chat_ss_fl/src/utils/simple_bloc_observer.dart';
 import 'package:likeminds_chat_ss_fl/src/utils/tagging/helpers/tagging_helper.dart';
 import 'package:likeminds_chat_ss_fl/src/widgets/skeleton_list.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
@@ -24,8 +20,7 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  // String? communityName;
-  String? userName;
+  final int pageSize = 50;
   User? user;
   HomeBloc? homeBloc;
   ValueNotifier<bool> rebuildPagedList = ValueNotifier(false);
@@ -37,14 +32,12 @@ class _HomePageState extends State<HomePage> {
   @override
   void initState() {
     super.initState();
-
-    userName = locator<LMPreferenceService>().getUser()!.name;
-    // communityName = userLocalPreference.fetchCommunityData()["community_name"];
+    Bloc.observer = SimpleBlocObserver();
+    user = locator<LMPreferenceService>().getUser();
+    homeFeedPagingController.itemList?.clear();
     homeBloc = BlocProvider.of<HomeBloc>(context);
     homeBloc!.add(
-      InitHomeEvent(
-        page: _pageKey,
-      ),
+      InitHomeEvent(page: _pageKey, pageSize: pageSize),
     );
     _addPaginationListener();
   }
@@ -53,9 +46,7 @@ class _HomePageState extends State<HomePage> {
     homeFeedPagingController.addPageRequestListener(
       (pageKey) {
         homeBloc!.add(
-          InitHomeEvent(
-            page: pageKey,
-          ),
+          InitHomeEvent(page: pageKey, pageSize: pageSize),
         );
       },
     );
@@ -63,11 +54,14 @@ class _HomePageState extends State<HomePage> {
 
   updatePagingControllers(HomeState state) {
     if (state is HomeLoaded) {
+      if (state.page == 1) {
+        homeFeedPagingController.itemList?.clear();
+      }
       List<LMListItem> chatItems = getChats(context, state.response);
       _pageKey++;
       if (state.response.chatroomsData == null ||
           state.response.chatroomsData!.isEmpty ||
-          state.response.chatroomsData!.length < 50) {
+          state.response.chatroomsData!.length < pageSize) {
         homeFeedPagingController.appendLastPage(chatItems);
       } else {
         homeFeedPagingController.appendPage(chatItems, _pageKey);
@@ -75,6 +69,7 @@ class _HomePageState extends State<HomePage> {
     } else if (state is UpdateHomeFeed) {
       List<LMListItem> chatItems = getChats(context, state.response);
       _pageKey = 2;
+      homeFeedPagingController.itemList?.clear();
       homeFeedPagingController.nextPageKey = _pageKey;
       homeFeedPagingController.itemList = chatItems;
     }
@@ -82,100 +77,105 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: Column(
-        children: [
-          Container(
-            width: 100.w,
-            child: Padding(
-              padding: EdgeInsets.symmetric(
-                horizontal: 4.w,
-                vertical: 1.h,
-              ),
-              child: SafeArea(
-                bottom: false,
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    LMTextView(
-                      text: "Chats",
-                      textStyle:
-                          Theme.of(context).textTheme.headlineSmall!.copyWith(
-                                color: kBlackColor,
-                                fontWeight: FontWeight.w600,
-                              ),
-                    ),
-                    //   communityName ??
-                    // ),
-                    LMProfilePicture(
-                      fallbackText: userName ?? "..",
-                      size: 36,
-                      imageUrl: user?.imageUrl,
-                      backgroundColor: kSecondaryColor,
-                    ),
-                  ],
+    return WillPopScope(
+      onWillPop: () {
+        router.pop();
+        return Future.value(false);
+      },
+      child: Scaffold(
+        body: Column(
+          children: [
+            SizedBox(
+              width: 100.w,
+              child: Padding(
+                padding: EdgeInsets.symmetric(
+                  horizontal: 4.w,
+                  vertical: 1.h,
+                ),
+                child: SafeArea(
+                  bottom: false,
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      LMTextView(
+                        text: "Chats",
+                        textStyle:
+                            Theme.of(context).textTheme.headlineSmall!.copyWith(
+                                  color: kBlackColor,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                      ),
+                      //   communityName ??
+                      // ),
+                      LMProfilePicture(
+                        fallbackText: user!.name,
+                        size: 36,
+                        imageUrl: user?.imageUrl,
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ),
-          ),
-          Divider(),
-          Expanded(
-            child: Padding(
-              padding: EdgeInsets.only(top: 1.h),
-              child: BlocConsumer<HomeBloc, HomeState>(
-                bloc: homeBloc,
-                listener: (context, state) {
-                  updatePagingControllers(state);
-                },
-                buildWhen: (previous, current) {
-                  if (previous is HomeLoaded && current is HomeLoading) {
-                    return false;
-                  } else if (previous is UpdateHomeFeed &&
-                      current is HomeLoading) {
-                    return false;
-                  }
-                  return true;
-                },
-                builder: (context, state) {
-                  if (state is HomeLoading) {
-                    return const SkeletonChatRoomList();
-                  } else if (state is HomeError) {
-                    return Center(
-                      child: Text(state.message),
-                    );
-                  } else if (state is HomeLoaded ||
-                      state is UpdateHomeFeed ||
-                      state is UpdatedHomeFeed) {
-                    return SafeArea(
-                      top: false,
-                      child: ValueListenableBuilder(
-                          valueListenable: rebuildPagedList,
-                          builder: (context, _, __) {
-                            return PagedListView<int, LMListItem>(
-                              pagingController: homeFeedPagingController,
-                              padding: EdgeInsets.zero,
-                              physics: const ClampingScrollPhysics(),
-                              builderDelegate:
-                                  PagedChildBuilderDelegate<LMListItem>(
-                                newPageProgressIndicatorBuilder: (_) =>
-                                    const SizedBox(),
-                                noItemsFoundIndicatorBuilder: (context) =>
-                                    const SizedBox(),
-                                itemBuilder: (context, item, index) {
-                                  return item;
-                                },
-                              ),
-                            );
-                          }),
-                    );
-                  }
-                  return const SizedBox();
-                },
+            const Divider(),
+            Expanded(
+              child: Padding(
+                padding: EdgeInsets.only(top: 1.h),
+                child: BlocConsumer<HomeBloc, HomeState>(
+                  bloc: homeBloc,
+                  listener: (context, state) {
+                    updatePagingControllers(state);
+                  },
+                  buildWhen: (previous, current) {
+                    if (previous is HomeLoaded && current is HomeLoading) {
+                      return false;
+                    } else if (previous is UpdateHomeFeed &&
+                        current is HomeLoading) {
+                      return false;
+                    }
+                    return true;
+                  },
+                  builder: (context, state) {
+                    if (state is HomeLoading) {
+                      return const SkeletonChatRoomList();
+                    } else if (state is HomeError) {
+                      return Center(
+                        child: Text(state.message),
+                      );
+                    } else if (state is HomeLoaded ||
+                        state is UpdateHomeFeed ||
+                        state is UpdatedHomeFeed) {
+                      return SafeArea(
+                        top: false,
+                        child: ValueListenableBuilder(
+                            valueListenable: rebuildPagedList,
+                            builder: (context, _, __) {
+                              return PagedListView<int, LMListItem>(
+                                pagingController: homeFeedPagingController,
+                                padding: EdgeInsets.zero,
+                                physics: const ClampingScrollPhysics(),
+                                builderDelegate:
+                                    PagedChildBuilderDelegate<LMListItem>(
+                                  newPageProgressIndicatorBuilder: (_) =>
+                                      const SizedBox(),
+                                  noItemsFoundIndicatorBuilder: (context) =>
+                                      const SizedBox(),
+                                  itemBuilder: (context, item, index) {
+                                    return item;
+                                  },
+                                ),
+                              );
+                            }),
+                      );
+                    }
+                    return const SizedBox();
+                  },
+                ),
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
@@ -193,7 +193,7 @@ class _HomePageState extends State<HomePage> {
     for (int i = 0; i < chatrooms.length; i++) {
       final Conversation conversation =
           lastConversations[chatrooms[i].lastConversationId.toString()]!;
-      final User user =
+      final User conversationUser =
           userMeta[conversation.member?.id ?? conversation.userId]!;
       final List<dynamic>? attachment =
           attachmentDynamic?[conversation.id.toString()];
@@ -201,17 +201,13 @@ class _HomePageState extends State<HomePage> {
       final List<Media>? attachmentMeta =
           attachment?.map((e) => Media.fromJson(e)).toList();
       String _message = conversation.deletedByUserId == null
-          ? '${user.name}: ${conversation.state != 0 ? TaggingHelper.extractStateMessage(
+          ? '${conversationUser.name}: ${conversation.state != 0 ? TaggingHelper.extractStateMessage(
               conversation.answer,
             ) : TaggingHelper.convertRouteToTag(
               conversation.answer,
               withTilde: false,
             )}'
-          : conversation.deletedByUserId == conversation.userId
-              ? conversation.userId == user.id
-                  ? 'You deleted this message'
-                  : "This message was deleted"
-              : "This message was deleted by the CM";
+          : getDeletedText(conversation, user!);
       chats.add(
         LMListItem(
           // chatroom: chatrooms[i],
@@ -223,20 +219,20 @@ class _HomePageState extends State<HomePage> {
             fallbackText: chatrooms[i].header,
             size: 12.w,
             imageUrl: chatrooms[i].chatroomImageUrl,
-            backgroundColor: kSecondaryColor,
           ),
           title: LMTextView(
             text: chatrooms[i].header.isEmpty
                 ? "NOT PRODUCING"
                 : chatrooms[i].header,
             maxLines: 1,
-                                        overflow: TextOverflow.ellipsis,
+            overflow: TextOverflow.ellipsis,
             textStyle: const TextStyle(
               fontSize: 16,
               fontWeight: FontWeight.w500,
             ),
           ),
-          subtitle: (conversation.hasFiles ?? false)
+          subtitle: ((conversation.hasFiles ?? false) &&
+                  conversation.deletedByUserId == null)
               ? getChatItemAttachmentTile(
                   attachmentMeta ?? <Media>[], conversation)
               : LMTextView(
@@ -299,7 +295,7 @@ class _HomePageState extends State<HomePage> {
     final DateTime now = DateTime.now();
     final DateTime messageTime = DateTime.fromMillisecondsSinceEpoch(_time);
     final Duration difference = now.difference(messageTime);
-    if (difference.inDays > 0) {
+    if (difference.inDays > 0 || now.day != messageTime.day) {
       return DateFormat('dd/MM/yyyy').format(messageTime);
     }
     return DateFormat('kk:mm').format(messageTime);

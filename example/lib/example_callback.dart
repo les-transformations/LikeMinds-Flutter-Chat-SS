@@ -17,4 +17,9 @@ class ExampleCallback extends LMSdkCallback {
   void logoutCallback() {
     debugPrint("EXAMPLE: logoutCallback");
   }
+
+  @override
+  void profileRouteCallback({required String lmUserId}) {
+    debugPrint("LM User ID caught in callback : $lmUserId");
+  }
 }
