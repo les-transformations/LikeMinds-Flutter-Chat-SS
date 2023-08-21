@@ -55,7 +55,7 @@ class LMChat extends StatelessWidget {
 
   static void setupLMChat({
     required String apiKey,
-    required LMSdkCallback lmCallBack,
+    LMSDKCallback? lmCallBack,
   }) {
     setupChat(
       apiKey: apiKey,
@@ -64,7 +64,9 @@ class LMChat extends StatelessWidget {
     initFirebase();
   }
 
-  static void logout() {}
+  static void logout() {
+    locator<LikeMindsService>().logout(LogoutRequestBuilder().build());
+  }
 
   @override
   Widget build(BuildContext context) {

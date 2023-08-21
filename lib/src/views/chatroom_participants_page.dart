@@ -324,7 +324,7 @@ class ParticipantItem extends StatelessWidget {
       onTap: () {
         if (participant.sdkClientInfo != null &&
             participant.sdkClientInfo!.userUniqueId != null) {
-          locator<LikeMindsService>().lmCallBack.profileRouteCallback(
+          locator<LikeMindsService>().lmCallBack?.profileRouteCallback(
               lmUserId: participant.sdkClientInfo!.userUniqueId!);
         }
       },
