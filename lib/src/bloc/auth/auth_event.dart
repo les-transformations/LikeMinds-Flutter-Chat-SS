@@ -5,7 +5,7 @@ abstract class AuthEvent extends Equatable {}
 
 class InitAuthEvent extends AuthEvent {
   final String apiKey;
-  final LMSdkCallback callback;
+  final LMSDKCallback? callback;
 
   InitAuthEvent({
     required this.apiKey,

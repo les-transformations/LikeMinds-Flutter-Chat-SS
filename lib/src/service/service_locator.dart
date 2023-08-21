@@ -5,7 +5,7 @@ import 'package:likeminds_chat_fl/likeminds_chat_fl.dart';
 
 final GetIt locator = GetIt.instance;
 
-void setupChat({required String apiKey, required LMSdkCallback lmCallBack}) {
+void setupChat({required String apiKey, LMSDKCallback? lmCallBack}) {
   locator.registerSingleton(LikeMindsService(
     apiKey: apiKey,
     lmCallBack: lmCallBack,

@@ -41,12 +41,12 @@ abstract class ILikeMindsService {
 
 class LikeMindsService implements ILikeMindsService {
   final String apiKey;
-  final LMSdkCallback lmCallBack;
+  final LMSDKCallback? lmCallBack;
   late final LMChatClient client;
 
   LikeMindsService({
     required this.apiKey,
-    required this.lmCallBack,
+    this.lmCallBack,
   }) {
     client = (LMChatClientBuilder()
           ..apiKey(apiKey)
