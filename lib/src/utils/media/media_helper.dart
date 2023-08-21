@@ -37,16 +37,16 @@ const List<String> mediaExtentions = [
 String getDeletedText(Conversation conversation, User user) {
   return conversation.deletedByUserId == conversation.userId
       ? conversation.deletedByUserId == user.id
-          ? 'You deleted this message'
-          : "This message was deleted"
-      : "This message was deleted by the CM";
+          ? 'This message was deleted'
+          : "This message was deleted by the user"
+      : "This message was deleted by the admin";
 }
 
-Widget getDeletedTextWidget(Conversation conversation, User user) {
+LMTextView getDeletedTextWidget(Conversation conversation, User user,
+    {int? maxLines}) {
   return LMTextView(
     text: getDeletedText(conversation, user),
-    overflow: TextOverflow.ellipsis,
-    maxLines: 1,
+    maxLines: maxLines,
     textStyle: const TextStyle(
       color: Colors.black,
       fontSize: 12,

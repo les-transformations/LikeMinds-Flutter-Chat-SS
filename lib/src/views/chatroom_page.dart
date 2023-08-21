@@ -564,6 +564,11 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
                                           menuController: chatBubbleController,
                                           isSent: item.userId == user!.id,
                                           backgroundColor: secondary.shade500,
+                                          deletedText:
+                                              item.deletedByUserId != null
+                                                  ? getDeletedTextWidget(
+                                                      item, user!)
+                                                  : null,
                                           menu: ClipRRect(
                                             child: Container(
                                               decoration: BoxDecoration(
@@ -812,6 +817,11 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
                                         )
                                       : LMChatBubble(
                                           currentUser: user!,
+                                          deletedText:
+                                              item.deletedByUserId != null
+                                                  ? getDeletedTextWidget(
+                                                      item, user!)
+                                                  : null,
                                           key: Key(item.id.toString()),
                                           isSent: item.userId == user!.id,
                                           menuController: chatBubbleController,
