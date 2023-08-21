@@ -64,85 +64,97 @@ class LMChat extends StatelessWidget {
     initFirebase();
   }
 
+  static void logout() {}
+
   @override
   Widget build(BuildContext context) {
     ScreenSize.init(context);
-    return Scaffold(
-      backgroundColor: kWhiteColor,
-      body: Center(
-        child: BlocConsumer<AuthBloc, AuthState>(
-          bloc: _authBloc,
-          listener: (context, state) {},
-          builder: (context, state) {
-            if (state is AuthSuccess) {
-              return MultiBlocProvider(
-                providers: [
-                  BlocProvider<HomeBloc>(
-                    create: (context) => HomeBloc(),
-                  ),
-                  BlocProvider<ConversationBloc>(
-                    create: (context) => ConversationBloc(),
-                  ),
-                  BlocProvider<ChatroomBloc>(
-                    create: (context) => ChatroomBloc(),
-                  )
-                ],
-                child: MaterialApp.router(
-                  routerConfig: router,
-                  debugShowCheckedModeBanner: isDebug,
-                  theme: ThemeData(
-                    colorScheme: ColorScheme.fromSeed(
-                      seedColor: primary,
-                      primary: primary,
-                      secondary: secondary,
+    return WillPopScope(
+      onWillPop: () {
+        if (router.canPop()) {
+          router.pop();
+          return Future.value(false);
+        } else {
+          return Future.value(true);
+        }
+      },
+      child: Scaffold(
+        backgroundColor: kWhiteColor,
+        body: Center(
+          child: BlocConsumer<AuthBloc, AuthState>(
+            bloc: _authBloc,
+            listener: (context, state) {},
+            builder: (context, state) {
+              if (state is AuthSuccess) {
+                return MultiBlocProvider(
+                  providers: [
+                    BlocProvider<HomeBloc>(
+                      create: (context) => HomeBloc(),
                     ),
-                    useMaterial3: true,
-                    fontFamily: 'Montserrat',
-                    textTheme: TextTheme(
-                      displayLarge: TextStyle(
-                        fontSize: 24,
-                        fontWeight: FontWeight.w600,
-                        color: kBlackColor,
+                    BlocProvider<ConversationBloc>(
+                      create: (context) => ConversationBloc(),
+                    ),
+                    BlocProvider<ChatroomBloc>(
+                      create: (context) => ChatroomBloc(),
+                    )
+                  ],
+                  child: MaterialApp.router(
+                    routerConfig: router,
+                    debugShowCheckedModeBanner: isDebug,
+                    theme: ThemeData(
+                      colorScheme: ColorScheme.fromSeed(
+                        seedColor: primary,
+                        primary: primary,
+                        secondary: secondary,
                       ),
-                      displayMedium: TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.w600,
-                        color: kBlackColor,
-                      ),
-                      displaySmall: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.w600,
-                        color: kBlackColor,
-                      ),
-                      bodyLarge: TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w400,
-                        color: kBlackColor,
-                      ),
-                      bodyMedium: TextStyle(
-                        fontSize: 12,
-                        fontWeight: FontWeight.w400,
-                        color: kBlackColor,
-                      ),
-                      bodySmall: TextStyle(
-                        fontSize: 10,
-                        fontWeight: FontWeight.w400,
-                        color: kBlackColor,
+                      useMaterial3: true,
+                      fontFamily: 'Montserrat',
+                      textTheme: TextTheme(
+                        displayLarge: TextStyle(
+                          fontSize: 24,
+                          fontWeight: FontWeight.w600,
+                          color: kBlackColor,
+                        ),
+                        displayMedium: TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.w600,
+                          color: kBlackColor,
+                        ),
+                        displaySmall: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.w600,
+                          color: kBlackColor,
+                        ),
+                        bodyLarge: TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w400,
+                          color: kBlackColor,
+                        ),
+                        bodyMedium: TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w400,
+                          color: kBlackColor,
+                        ),
+                        bodySmall: TextStyle(
+                          fontSize: 10,
+                          fontWeight: FontWeight.w400,
+                          color: kBlackColor,
+                        ),
                       ),
                     ),
                   ),
+                );
+              }
+
+              return const SizedBox(
+                width: 50,
+                height: 50,
+                child: CircularProgressIndicator(
+                  color: kPrimaryColor,
                 ),
               );
-            }
-
-            return const SizedBox(
-              width: 50,
-              height: 50,
-              child: CircularProgressIndicator(
-                color: kPrimaryColor,
-              ),
-            );
-          },
+            },
+          ),
         ),
       ),
     );
