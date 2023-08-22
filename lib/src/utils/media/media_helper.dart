@@ -38,8 +38,8 @@ String getDeletedText(Conversation conversation, User user) {
   return conversation.deletedByUserId == conversation.userId
       ? conversation.deletedByUserId == user.id
           ? 'This message was deleted'
-          : "This message was deleted by the user"
-      : "This message was deleted by the admin";
+          : "This message was deleted by user"
+      : "This message was deleted by Admin";
 }
 
 LMTextView getDeletedTextWidget(Conversation conversation, User user,
