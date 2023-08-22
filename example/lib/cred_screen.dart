@@ -405,14 +405,17 @@ class _CredScreenState extends State<CredScreen> {
                       builder: LMChatBuilder()
                         ..userId(userId)
                         ..userName(username)
-                        ..defaultChatroom(defaultChatroom),
+                        ..defaultChatroom(defaultChatroom)
+                        ..backButtonCallback(() {
+                          Navigator.of(context).pop();
+                        }),
                     );
                   }
                   MaterialPageRoute route = MaterialPageRoute(
                     // INIT - Get the LMFeed instance and pass the credentials (if any)
                     builder: (context) => lmChat!,
                   );
-                  Navigator.pushReplacement(context, route);
+                  Navigator.push(context, route);
                 },
                 child: Container(
                   width: 200,

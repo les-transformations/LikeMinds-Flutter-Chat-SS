@@ -1,5 +1,6 @@
 import 'package:likeminds_chat_ss_fl/src/utils/analytics/analytics.dart';
 import 'package:likeminds_chat_fl/likeminds_chat_fl.dart';
+import 'package:likeminds_chat_ss_fl/src/utils/imports.dart';
 
 abstract class ILikeMindsService {
   Future<LMResponse<InitiateUserResponse>> initiateUser(
@@ -40,12 +41,12 @@ abstract class ILikeMindsService {
 
 class LikeMindsService implements ILikeMindsService {
   final String apiKey;
-  final LMSdkCallback lmCallBack;
+  final LMSDKCallback? lmCallBack;
   late final LMChatClient client;
 
   LikeMindsService({
     required this.apiKey,
-    required this.lmCallBack,
+    this.lmCallBack,
   }) {
     client = (LMChatClientBuilder()
           ..apiKey(apiKey)
@@ -67,6 +68,7 @@ class LikeMindsService implements ILikeMindsService {
 
   @override
   Future<LMResponse<LogoutResponse>> logout(LogoutRequest request) {
+    locator<LMPreferenceService>().clearLocalPrefs();
     return client.logout(request);
   }
 

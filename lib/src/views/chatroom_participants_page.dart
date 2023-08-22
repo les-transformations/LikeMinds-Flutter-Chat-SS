@@ -3,9 +3,11 @@ import 'dart:async';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:likeminds_chat_ss_fl/src/bloc/participants/participants_bloc.dart';
+import 'package:likeminds_chat_ss_fl/src/navigation/router.dart';
 import 'package:likeminds_chat_ss_fl/src/utils/analytics/analytics.dart';
 import 'package:likeminds_chat_ss_fl/src/utils/constants/ui_constants.dart';
 import 'package:likeminds_chat_ss_fl/src/utils/imports.dart';
+import 'package:likeminds_chat_ss_fl/src/utils/simple_bloc_observer.dart';
 import 'package:likeminds_chat_ss_fl/src/utils/ui_utils.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:likeminds_chat_fl/likeminds_chat_fl.dart';
@@ -33,6 +35,7 @@ class _ChatroomParticipantsPageState extends State<ChatroomParticipantsPage> {
   @override
   void initState() {
     super.initState();
+    Bloc.observer = SimpleBlocObserver();
     participantsBloc = ParticipantsBloc();
     participantsBloc!.add(
       GetParticipants(
@@ -96,7 +99,11 @@ class _ChatroomParticipantsPageState extends State<ChatroomParticipantsPage> {
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
                       rebuildSearchBar.value
-                          ? const BackButton()
+                          ? BackButton(
+                              onPressed: () {
+                                router.pop(context);
+                              },
+                            )
                           : const SizedBox(),
                       rebuildSearchBar.value
                           ? kHorizontalPaddingXLarge
@@ -305,10 +312,18 @@ class ParticipantItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: () {},
+      onTap: () {
+        if (participant.sdkClientInfo != null &&
+            participant.sdkClientInfo!.userUniqueId != null) {
+          locator<LikeMindsService>().lmCallBack?.profileRouteCallback(
+              lmUserId: participant.sdkClientInfo!.userUniqueId!);
+        }
+      },
+      behavior: HitTestBehavior.opaque,
       child: Container(
         width: getWidth(context),
         height: 8.h,
+        color: Colors.transparent,
         padding: EdgeInsets.symmetric(horizontal: 6.w),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.start,

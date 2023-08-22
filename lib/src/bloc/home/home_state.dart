@@ -9,9 +9,10 @@ class HomeLoading extends HomeState {}
 
 class HomeLoaded extends HomeState {
   // final List<ChatItem> chats;
+  final int page;
   final GetHomeFeedResponse response;
 
-  HomeLoaded({required this.response});
+  HomeLoaded({required this.response, required this.page});
 }
 
 class UpdateHomeFeed extends HomeState {

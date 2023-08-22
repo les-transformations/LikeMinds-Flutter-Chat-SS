@@ -1,3 +1,4 @@
+import 'package:likeminds_chat_ss_fl/src/navigation/router.dart';
 import 'package:likeminds_chat_ss_fl/src/utils/imports.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:video_player/video_player.dart';
@@ -55,7 +56,7 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
                     color: Colors.white,
                   ),
                   onPressed: () {
-                    Navigator.pop(context);
+                    router.pop();
                   },
                 ),
                 Text(

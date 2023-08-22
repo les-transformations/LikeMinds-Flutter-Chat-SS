@@ -1,13 +1,11 @@
-import 'package:flutter/material.dart';
+import 'package:likeminds_chat_ss_fl/src/bloc/chatroom/chatroom_bloc.dart';
+import 'package:likeminds_chat_ss_fl/src/bloc/chatroom_action/chatroom_action_bloc.dart';
 import 'package:likeminds_chat_ss_fl/src/bloc/home/home_bloc.dart';
 import 'package:likeminds_chat_ss_fl/src/navigation/router.dart';
-import 'package:likeminds_chat_ss_fl/src/service/media_service.dart';
-import 'package:likeminds_chat_ss_fl/src/service/preference_service.dart';
-import 'package:likeminds_chat_ss_fl/src/service/service_locator.dart';
-import 'package:likeminds_chat_ss_fl/src/utils/constants/ui_constants.dart';
 import 'package:likeminds_chat_ss_fl/src/utils/imports.dart';
 import 'package:likeminds_chat_ss_fl/src/utils/media/media_helper.dart';
 import 'package:likeminds_chat_ss_fl/src/utils/realtime/realtime.dart';
+import 'package:likeminds_chat_ss_fl/src/utils/simple_bloc_observer.dart';
 import 'package:likeminds_chat_ss_fl/src/utils/tagging/helpers/tagging_helper.dart';
 import 'package:likeminds_chat_ss_fl/src/widgets/skeleton_list.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
@@ -24,8 +22,7 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  // String? communityName;
-  String? userName;
+  final int pageSize = 50;
   User? user;
   HomeBloc? homeBloc;
   ValueNotifier<bool> rebuildPagedList = ValueNotifier(false);
@@ -37,14 +34,12 @@ class _HomePageState extends State<HomePage> {
   @override
   void initState() {
     super.initState();
-
-    userName = locator<LMPreferenceService>().getUser()!.name;
-    // communityName = userLocalPreference.fetchCommunityData()["community_name"];
+    Bloc.observer = SimpleBlocObserver();
+    user = locator<LMPreferenceService>().getUser();
+    homeFeedPagingController.itemList?.clear();
     homeBloc = BlocProvider.of<HomeBloc>(context);
     homeBloc!.add(
-      InitHomeEvent(
-        page: _pageKey,
-      ),
+      InitHomeEvent(page: _pageKey, pageSize: pageSize),
     );
     _addPaginationListener();
   }
@@ -53,9 +48,7 @@ class _HomePageState extends State<HomePage> {
     homeFeedPagingController.addPageRequestListener(
       (pageKey) {
         homeBloc!.add(
-          InitHomeEvent(
-            page: pageKey,
-          ),
+          InitHomeEvent(page: pageKey, pageSize: pageSize),
         );
       },
     );
@@ -63,11 +56,14 @@ class _HomePageState extends State<HomePage> {
 
   updatePagingControllers(HomeState state) {
     if (state is HomeLoaded) {
+      if (state.page == 1) {
+        homeFeedPagingController.itemList?.clear();
+      }
       List<LMListItem> chatItems = getChats(context, state.response);
       _pageKey++;
       if (state.response.chatroomsData == null ||
           state.response.chatroomsData!.isEmpty ||
-          state.response.chatroomsData!.length < 50) {
+          state.response.chatroomsData!.length < pageSize) {
         homeFeedPagingController.appendLastPage(chatItems);
       } else {
         homeFeedPagingController.appendPage(chatItems, _pageKey);
@@ -75,6 +71,7 @@ class _HomePageState extends State<HomePage> {
     } else if (state is UpdateHomeFeed) {
       List<LMListItem> chatItems = getChats(context, state.response);
       _pageKey = 2;
+      homeFeedPagingController.itemList?.clear();
       homeFeedPagingController.nextPageKey = _pageKey;
       homeFeedPagingController.itemList = chatItems;
     }
@@ -85,7 +82,7 @@ class _HomePageState extends State<HomePage> {
     return Scaffold(
       body: Column(
         children: [
-          Container(
+          SizedBox(
             width: 100.w,
             child: Padding(
               padding: EdgeInsets.symmetric(
@@ -106,20 +103,18 @@ class _HomePageState extends State<HomePage> {
                                 fontWeight: FontWeight.w600,
                               ),
                     ),
-                    //   communityName ??
-                    // ),
+                    // const Spacer(),
                     LMProfilePicture(
-                      fallbackText: userName ?? "..",
+                      fallbackText: user!.name,
                       size: 36,
                       imageUrl: user?.imageUrl,
-                      backgroundColor: kSecondaryColor,
                     ),
                   ],
                 ),
               ),
             ),
           ),
-          Divider(),
+          const Divider(),
           Expanded(
             child: Padding(
               padding: EdgeInsets.only(top: 1.h),
@@ -193,7 +188,7 @@ class _HomePageState extends State<HomePage> {
     for (int i = 0; i < chatrooms.length; i++) {
       final Conversation conversation =
           lastConversations[chatrooms[i].lastConversationId.toString()]!;
-      final User user =
+      final User conversationUser =
           userMeta[conversation.member?.id ?? conversation.userId]!;
       final List<dynamic>? attachment =
           attachmentDynamic?[conversation.id.toString()];
@@ -201,42 +196,40 @@ class _HomePageState extends State<HomePage> {
       final List<Media>? attachmentMeta =
           attachment?.map((e) => Media.fromJson(e)).toList();
       String _message = conversation.deletedByUserId == null
-          ? '${user.name}: ${conversation.state != 0 ? TaggingHelper.extractStateMessage(
+          ? '${conversationUser.name}: ${conversation.state != 0 ? TaggingHelper.extractStateMessage(
               conversation.answer,
             ) : TaggingHelper.convertRouteToTag(
               conversation.answer,
               withTilde: false,
             )}'
-          : conversation.deletedByUserId == conversation.userId
-              ? conversation.userId == user.id
-                  ? 'You deleted this message'
-                  : "This message was deleted"
-              : "This message was deleted by the CM";
+          : getDeletedText(conversation, user!);
       chats.add(
         LMListItem(
           // chatroom: chatrooms[i],
           onTap: () {
             LMRealtime.instance.chatroomId = chatrooms[i].id;
-            router.push("/chatroom/${chatrooms[i].id}");
+            router.push("/chatroom/${chatrooms[i].id}").whenComplete(() {
+              BlocProvider.of<HomeBloc>(context).add(UpdateHomeEvent());
+            });
           },
           avatar: LMProfilePicture(
             fallbackText: chatrooms[i].header,
             size: 12.w,
             imageUrl: chatrooms[i].chatroomImageUrl,
-            backgroundColor: kSecondaryColor,
           ),
           title: LMTextView(
             text: chatrooms[i].header.isEmpty
                 ? "NOT PRODUCING"
                 : chatrooms[i].header,
             maxLines: 1,
-                                        overflow: TextOverflow.ellipsis,
+            overflow: TextOverflow.ellipsis,
             textStyle: const TextStyle(
               fontSize: 16,
               fontWeight: FontWeight.w500,
             ),
           ),
-          subtitle: (conversation.hasFiles ?? false)
+          subtitle: ((conversation.hasFiles ?? false) &&
+                  conversation.deletedByUserId == null)
               ? getChatItemAttachmentTile(
                   attachmentMeta ?? <Media>[], conversation)
               : LMTextView(
@@ -299,7 +292,7 @@ class _HomePageState extends State<HomePage> {
     final DateTime now = DateTime.now();
     final DateTime messageTime = DateTime.fromMillisecondsSinceEpoch(_time);
     final Duration difference = now.difference(messageTime);
-    if (difference.inDays > 0) {
+    if (difference.inDays > 0 || now.day != messageTime.day) {
       return DateFormat('dd/MM/yyyy').format(messageTime);
     }
     return DateFormat('kk:mm').format(messageTime);

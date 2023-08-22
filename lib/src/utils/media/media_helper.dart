@@ -34,6 +34,26 @@ const List<String> mediaExtentions = [
   ...videoExtentions,
 ];
 
+String getDeletedText(Conversation conversation, User user) {
+  return conversation.deletedByUserId == conversation.userId
+      ? conversation.deletedByUserId == user.id
+          ? 'This message was deleted'
+          : "This message was deleted by user"
+      : "This message was deleted by Admin";
+}
+
+LMTextView getDeletedTextWidget(Conversation conversation, User user,
+    {int? maxLines}) {
+  return LMTextView(
+    text: getDeletedText(conversation, user),
+    maxLines: maxLines,
+    textStyle: const TextStyle(
+      color: Colors.black,
+      fontSize: 12,
+    ),
+  );
+}
+
 Widget getChatItemAttachmentTile(
     List<Media> mediaFiles, Conversation conversation) {
   String answerText =

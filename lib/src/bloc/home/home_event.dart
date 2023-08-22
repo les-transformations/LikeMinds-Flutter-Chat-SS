@@ -5,11 +5,12 @@ abstract class HomeEvent extends Equatable {}
 
 class InitHomeEvent extends HomeEvent {
   final int page;
+  final int pageSize;
 
-  InitHomeEvent({required this.page});
+  InitHomeEvent({required this.page, required this.pageSize});
 
   @override
-  List<Object?> get props => [page];
+  List<Object?> get props => [page, pageSize];
 }
 
 class GetHomeFeedPage extends HomeEvent {
@@ -26,7 +27,8 @@ class ReloadHomeEvent extends HomeEvent {
 }
 
 class UpdateHomeEvent extends HomeEvent {
-  UpdateHomeEvent();
+  final int pageSize;
+  UpdateHomeEvent({this.pageSize = 50});
   @override
   List<Object?> get props => [];
 }
