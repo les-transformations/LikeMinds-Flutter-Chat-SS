@@ -27,8 +27,10 @@ Future<void> _handleNotification(RemoteMessage message) async {
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  SystemChrome.setPreferredOrientations(
-      [DeviceOrientation.portraitUp, DeviceOrientation.portraitDown]);
+  SystemChrome.setPreferredOrientations([
+    DeviceOrientation.portraitUp,
+    DeviceOrientation.portraitDown,
+  ]);
   await setupNotifications();
   LMChat.setupLMChat(
     apiKey: !isDebug ? EnvProd.apiKey : EnvDev.apiKey,

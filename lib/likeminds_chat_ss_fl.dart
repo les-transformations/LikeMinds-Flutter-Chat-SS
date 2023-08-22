@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:cupertino_will_pop_scope/cupertino_will_pop_scope.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:likeminds_chat_fl/likeminds_chat_fl.dart';
@@ -9,6 +10,7 @@ import 'package:likeminds_chat_ss_fl/src/bloc/conversation/conversation_bloc.dar
 import 'package:likeminds_chat_ss_fl/src/bloc/home/home_bloc.dart';
 import 'package:likeminds_chat_ss_fl/src/navigation/router.dart';
 import 'package:likeminds_chat_ss_fl/src/utils/imports.dart';
+import 'package:likeminds_chat_ss_fl/src/utils/lm_willpop.dart';
 import 'package:likeminds_chat_ui_fl/likeminds_chat_ui_fl.dart';
 
 import 'src/utils/credentials/firebase_credentials.dart';
@@ -22,6 +24,7 @@ class LMChat extends StatelessWidget {
   final String _userName;
   final String? _domain;
   final int? _defaultChatroom;
+  final VoidCallback? _backButtonCallback;
 
   final AuthBloc _authBloc = AuthBloc();
 
@@ -30,6 +33,7 @@ class LMChat extends StatelessWidget {
     this._userName,
     this._domain,
     this._defaultChatroom,
+    this._backButtonCallback,
   ) {
     debugPrint('LMChat initialized');
     _authBloc.add(LoginEvent(
@@ -49,6 +53,7 @@ class LMChat extends StatelessWidget {
         builder.getUserName!,
         builder.getDomain,
         builder.getDefaultChatroom,
+        builder.getBackButtonCallback,
       );
     }
   }
@@ -71,15 +76,9 @@ class LMChat extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     ScreenSize.init(context);
-    return WillPopScope(
-      onWillPop: () {
-        if (router.canPop()) {
-          router.pop();
-          return Future.value(false);
-        } else {
-          return Future.value(true);
-        }
-      },
+    return LMCustomWillPop(
+      onWillPop: true,
+      backButtonCallback: _backButtonCallback,
       child: Scaffold(
         backgroundColor: kWhiteColor,
         body: Center(
@@ -109,9 +108,16 @@ class LMChat extends StatelessWidget {
                         primary: primary,
                         secondary: secondary,
                       ),
+                      pageTransitionsTheme: const PageTransitionsTheme(
+                        builders: {
+                          TargetPlatform.android: ZoomPageTransitionsBuilder(),
+                          TargetPlatform.iOS:
+                              CupertinoWillPopScopePageTransionsBuilder(),
+                        },
+                      ),
                       useMaterial3: true,
                       fontFamily: 'Montserrat',
-                      textTheme: TextTheme(
+                      textTheme: const TextTheme(
                         displayLarge: TextStyle(
                           fontSize: 24,
                           fontWeight: FontWeight.w600,
@@ -216,6 +222,10 @@ class LMChatBuilder {
   String? _domain;
   int? _defaultChatroom;
 
+  // TEMP callback for a back button to manage exit
+  // of chat instance gracefully.
+  VoidCallback? _backButtonCallback;
+
   LMChatBuilder();
 
   void userId(String userId) => _userId = userId;
@@ -223,9 +233,12 @@ class LMChatBuilder {
   void domain(String domain) => _domain = domain;
   void defaultChatroom(int? defaultChatroomId) =>
       _defaultChatroom = defaultChatroomId;
+  void backButtonCallback(VoidCallback? backButtonCallback) =>
+      _backButtonCallback = backButtonCallback;
 
   String? get getUserId => _userId;
   String? get getUserName => _userName;
   String? get getDomain => _domain;
   int? get getDefaultChatroom => _defaultChatroom;
+  VoidCallback? get getBackButtonCallback => _backButtonCallback;
 }
