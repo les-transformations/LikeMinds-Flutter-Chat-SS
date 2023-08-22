@@ -405,7 +405,10 @@ class _CredScreenState extends State<CredScreen> {
                       builder: LMChatBuilder()
                         ..userId(userId)
                         ..userName(username)
-                        ..defaultChatroom(defaultChatroom),
+                        ..defaultChatroom(defaultChatroom)
+                        ..backButtonCallback(() {
+                          Navigator.of(context).pop();
+                        }),
                     );
                   }
                   MaterialPageRoute route = MaterialPageRoute(
