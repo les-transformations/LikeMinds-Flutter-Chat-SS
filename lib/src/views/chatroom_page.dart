@@ -1,3 +1,4 @@
+import 'package:cupertino_will_pop_scope/cupertino_will_pop_scope.dart';
 import 'package:custom_pop_up_menu/custom_pop_up_menu.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -383,17 +384,19 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
 
   @override
   Widget build(BuildContext context) {
-    return AnnotatedRegion<SystemUiOverlayStyle>(
-      value: SystemUiOverlayStyle.dark,
-      child: WillPopScope(
-        onWillPop: () async {
-          _chatroomActionBloc.add(
-            MarkReadChatroomEvent(chatroomId: widget.chatroomId),
-          );
-          BlocProvider.of<HomeBloc>(context).add(UpdateHomeEvent());
-          router.pop();
-          return false;
-        },
+    return ConditionalWillPopScope(
+      shouldAddCallback: false,
+      onWillPop: () {
+        _chatroomActionBloc.add(
+          MarkReadChatroomEvent(chatroomId: widget.chatroomId),
+        );
+        BlocProvider.of<HomeBloc>(context).add(UpdateHomeEvent());
+        // router.pop();
+        // router.pop();
+        return Future.value(true);
+      },
+      child: AnnotatedRegion<SystemUiOverlayStyle>(
+        value: SystemUiOverlayStyle.dark,
         child: Scaffold(
           backgroundColor: Colors.white,
           floatingActionButton: showScrollButton

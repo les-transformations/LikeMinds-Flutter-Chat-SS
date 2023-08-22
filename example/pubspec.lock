@@ -129,14 +129,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.0.3"
-  chewie:
-    dependency: transitive
-    description:
-      name: chewie
-      sha256: "745e81e84c6d7f3835f89f85bb49771c0a66099e4caf8f8e9e9a372bc66fb2c1"
-      url: "https://pub.dev"
-    source: hosted
-    version: "1.5.0"
   clock:
     dependency: transitive
     description:
@@ -209,6 +201,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.0.5"
+  cupertino_will_pop_scope:
+    dependency: transitive
+    description:
+      name: cupertino_will_pop_scope
+      sha256: d312103538bee026428d785cc3c06093b34c2793249229b1ddc49a1d8a43901f
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.2.1"
   curl_logger_dio_interceptor:
     dependency: transitive
     description:
@@ -550,6 +550,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.0.15"
+  flutter_portal:
+    dependency: transitive
+    description:
+      name: flutter_portal
+      sha256: "4601b3dc24f385b3761721bd852a3f6c09cddd4e943dd184ed58ee1f43006257"
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.1.4"
   flutter_svg:
     dependency: transitive
     description:
@@ -752,27 +760,26 @@ packages:
     source: hosted
     version: "1.3.0"
   likeminds_chat_fl:
-    dependency: "direct main"
+    dependency: transitive
     description:
-      name: likeminds_chat_fl
-      sha256: "17d32584cbcb9456a417001de87a4a82237edab57cec2bc442337414b9ceeccc"
-      url: "https://pub.dev"
-    source: hosted
-    version: "1.3.0"
+      path: "../../LikeMinds-Flutter-GroupChat-SDK"
+      relative: true
+    source: path
+    version: "1.5.0"
   likeminds_chat_ss_fl:
     dependency: "direct main"
     description:
       path: ".."
       relative: true
     source: path
-    version: "0.0.1"
+    version: "1.0.2"
   likeminds_chat_ui_fl:
     dependency: transitive
     description:
       path: "../../LikeMinds-Flutter-Chat-UI"
       relative: true
     source: path
-    version: "0.0.1"
+    version: "1.0.1"
   lints:
     dependency: transitive
     description:

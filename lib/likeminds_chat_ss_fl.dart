@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:cupertino_will_pop_scope/cupertino_will_pop_scope.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:likeminds_chat_fl/likeminds_chat_fl.dart';
@@ -71,14 +72,16 @@ class LMChat extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     ScreenSize.init(context);
-    return WillPopScope(
+    return ConditionalWillPopScope(
+      shouldAddCallback: true,
       onWillPop: () {
-        if (router.canPop()) {
-          router.pop();
-          return Future.value(false);
-        } else {
-          return Future.value(true);
-        }
+        // if (router.canPop()) {
+        //   router.pop();
+        //   return Future.value(false);
+        // } else {
+        //   return Future.value(true);
+        // }
+        return Future.value(true);
       },
       child: Scaffold(
         backgroundColor: kWhiteColor,
@@ -108,6 +111,13 @@ class LMChat extends StatelessWidget {
                         seedColor: primary,
                         primary: primary,
                         secondary: secondary,
+                      ),
+                      pageTransitionsTheme: const PageTransitionsTheme(
+                        builders: {
+                          TargetPlatform.android: ZoomPageTransitionsBuilder(),
+                          TargetPlatform.iOS:
+                              CupertinoWillPopScopePageTransionsBuilder(),
+                        },
                       ),
                       useMaterial3: true,
                       fontFamily: 'Montserrat',
