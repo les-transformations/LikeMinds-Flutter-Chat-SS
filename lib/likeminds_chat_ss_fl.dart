@@ -75,13 +75,13 @@ class LMChat extends StatelessWidget {
     return ConditionalWillPopScope(
       shouldAddCallback: true,
       onWillPop: () {
-        // if (router.canPop()) {
-        //   router.pop();
-        //   return Future.value(false);
-        // } else {
-        //   return Future.value(true);
-        // }
-        return Future.value(true);
+        if (router.canPop()) {
+          router.pop();
+          return Future.value(false);
+        } else {
+          return Future.value(true);
+        }
+        // return Future.value(true);
       },
       child: Scaffold(
         backgroundColor: kWhiteColor,

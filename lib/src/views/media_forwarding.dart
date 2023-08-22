@@ -65,31 +65,25 @@ class _MediaForwardState extends State<MediaForward> {
     mediaList = widget.media;
 
     chatActionBloc = BlocProvider.of<ConversationBloc>(context);
-    return WillPopScope(
-      onWillPop: () {
-        router.pop();
-        return Future.value(false);
-      },
-      child: Scaffold(
+    return Scaffold(
+      backgroundColor: kWhiteColor,
+      appBar: AppBar(
         backgroundColor: kWhiteColor,
-        appBar: AppBar(
-          backgroundColor: kWhiteColor,
-          leading: IconButton(
-            onPressed: () {
-              router.pop();
-            },
-            icon: const Icon(
-              Icons.arrow_back,
-            ),
+        leading: IconButton(
+          onPressed: () {
+            router.pop();
+          },
+          icon: const Icon(
+            Icons.arrow_back,
           ),
-          elevation: 0,
         ),
-        body: ValueListenableBuilder(
-            valueListenable: rebuildCurr,
-            builder: (context, _, __) {
-              return getMediaPreview();
-            }),
+        elevation: 0,
       ),
+      body: ValueListenableBuilder(
+          valueListenable: rebuildCurr,
+          builder: (context, _, __) {
+            return getMediaPreview();
+          }),
     );
   }
 
