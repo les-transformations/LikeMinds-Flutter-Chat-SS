@@ -111,8 +111,7 @@ class LMChat extends StatelessWidget {
                       pageTransitionsTheme: const PageTransitionsTheme(
                         builders: {
                           TargetPlatform.android: ZoomPageTransitionsBuilder(),
-                          TargetPlatform.iOS:
-                              CupertinoWillPopScopePageTransionsBuilder(),
+                          TargetPlatform.iOS: CupertinoWillPopScopePageTransionsBuilder(),
                         },
                       ),
                       useMaterial3: true,
@@ -171,7 +170,7 @@ class LMChat extends StatelessWidget {
 
 initFirebase() async {
   try {
-    final clientFirebase = Firebase.app();
+    // final clientFirebase = Firebase.app();
     final ourFirebase = await Firebase.initializeApp(
       name: 'likeminds_chat',
       options: !isDebug
@@ -209,7 +208,7 @@ initFirebase() async {
                   databaseURL: FbCredsDev.fbDatabaseUrl,
                 ),
     );
-    debugPrint("Client Firebase - ${clientFirebase.options.appId}");
+    // debugPrint("Client Firebase - ${clientFirebase.options.appId}");
     debugPrint("Our Firebase - ${ourFirebase.options.appId}");
   } on FirebaseException catch (e) {
     debugPrint("Make sure you have initialized firebase, ${e.toString()}");
@@ -231,10 +230,8 @@ class LMChatBuilder {
   void userId(String userId) => _userId = userId;
   void userName(String userName) => _userName = userName;
   void domain(String domain) => _domain = domain;
-  void defaultChatroom(int? defaultChatroomId) =>
-      _defaultChatroom = defaultChatroomId;
-  void backButtonCallback(VoidCallback? backButtonCallback) =>
-      _backButtonCallback = backButtonCallback;
+  void defaultChatroom(int? defaultChatroomId) => _defaultChatroom = defaultChatroomId;
+  void backButtonCallback(VoidCallback? backButtonCallback) => _backButtonCallback = backButtonCallback;
 
   String? get getUserId => _userId;
   String? get getUserName => _userName;
