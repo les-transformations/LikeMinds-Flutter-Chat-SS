@@ -62,22 +62,24 @@ class LMNotificationHandler {
   /// and is needed to be handled, i.e. shown and routed to the appropriate screen
   Future<void> handleNotification(RemoteMessage message, bool show) async {
     debugPrint("--- Notification received in LEVEL 2 ---");
-    message.toMap().forEach((key, value) {
-      debugPrint("$key: $value");
-      if (key == "data") {
-        message.data.forEach((key, value) {
-          debugPrint("$key: $value");
-        });
-      }
-    });
+    if (message.data["category"].contains("Chat")) {
+      message.toMap().forEach((key, value) {
+        debugPrint("$key: $value");
+        if (key == "data") {
+          message.data.forEach((key, value) {
+            debugPrint("$key: $value");
+          });
+        }
+      });
 
-    // First, check if the message contains a data payload.
-    if (show && message.data.isNotEmpty) {
-      //Add LM check for showing LM notifications
-      showNotification(message);
-    } else if (message.data.isNotEmpty) {
-      // Second, extract the notification data and routes to the appropriate screen
-      routeNotification(message);
+      // First, check if the message contains a data payload.
+      if (show && message.data.isNotEmpty) {
+        //Add LM check for showing LM notifications
+        showNotification(message);
+      } else if (message.data.isNotEmpty) {
+        // Second, extract the notification data and routes to the appropriate screen
+        routeNotification(message);
+      }
     }
   }
 
@@ -122,6 +124,7 @@ class LMNotificationHandler {
           onTap: () {
             routeNotification(message);
           },
+          behavior: HitTestBehavior.opaque,
           child: Column(
             mainAxisAlignment: MainAxisAlignment.start,
             crossAxisAlignment: CrossAxisAlignment.start,
