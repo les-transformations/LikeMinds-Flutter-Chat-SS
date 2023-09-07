@@ -1,6 +1,6 @@
 name: likeminds_chat_ss_fl
 description: Flutter library for Suraasa+LikeMinds chat.
-version: 1.0.5
+version: 1.0.6
 publish_to: none
 
 environment:
