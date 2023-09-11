@@ -48,6 +48,7 @@ class LMChat extends StatelessWidget {
         'LMChat builder needs to be initialized with User ID, or User Name',
       );
     } else {
+      router.go('/');
       return LMChat._internal(
         builder.getUserId!,
         builder.getUserName!,
@@ -101,6 +102,9 @@ class LMChat extends StatelessWidget {
                   ],
                   child: MaterialApp.router(
                     routerConfig: router,
+                    // routeInformationParser: router.routeInformationParser,
+                    // routeInformationProvider: router.routeInformationProvider,
+                    // routerDelegate: router.routerDelegate,
                     debugShowCheckedModeBanner: isDebug,
                     theme: ThemeData(
                       colorScheme: ColorScheme.fromSeed(
@@ -171,7 +175,7 @@ class LMChat extends StatelessWidget {
 
 initFirebase() async {
   try {
-    final clientFirebase = Firebase.app();
+    // final clientFirebase = Firebase.app();
     final ourFirebase = await Firebase.initializeApp(
       name: 'likeminds_chat',
       options: !isDebug
@@ -209,7 +213,7 @@ initFirebase() async {
                   databaseURL: FbCredsDev.fbDatabaseUrl,
                 ),
     );
-    debugPrint("Client Firebase - ${clientFirebase.options.appId}");
+    // debugPrint("Client Firebase - ${clientFirebase.options.appId}");
     debugPrint("Our Firebase - ${ourFirebase.options.appId}");
   } on FirebaseException catch (e) {
     debugPrint("Make sure you have initialized firebase, ${e.toString()}");
