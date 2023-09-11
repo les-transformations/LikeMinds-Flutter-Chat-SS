@@ -33,3 +33,4 @@ migrate_working_dir/
 .pub/
 build/
 .vscode
+example/pubspec.lock
