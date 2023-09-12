@@ -110,6 +110,7 @@ class LMNotificationHandler {
 
     if (host == "collabcard") {
       final path = "/chatroom/${queryParams["collabcard_id"]}/";
+      router.push('/');
       router.push(path);
     }
   }

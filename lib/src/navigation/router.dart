@@ -26,6 +26,7 @@ const mediaForwardRoute = '/media_forward/:chatroomId';
 const mediaPreviewRoute = '/media_preview';
 
 final router = GoRouter(
+  initialLocation: '/',
   routes: [
     GoRoute(
         path: startRoute,
@@ -41,8 +42,7 @@ final router = GoRouter(
                 create: (context) => ChatroomBloc()
                   ..add(
                     InitChatroomEvent((GetChatroomRequestBuilder()
-                          ..chatroomId(
-                              int.parse(state.pathParameters['id'] ?? "0")))
+                          ..chatroomId(int.parse(state.pathParameters['id'] ?? "0")))
                         .build()),
                   ),
               ),

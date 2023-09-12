@@ -48,6 +48,7 @@ class LMChat extends StatelessWidget {
         'LMChat builder needs to be initialized with User ID, or User Name',
       );
     } else {
+      router.go('/');
       return LMChat._internal(
         builder.getUserId!,
         builder.getUserName!,
@@ -101,6 +102,9 @@ class LMChat extends StatelessWidget {
                   ],
                   child: MaterialApp.router(
                     routerConfig: router,
+                    // routeInformationParser: router.routeInformationParser,
+                    // routeInformationProvider: router.routeInformationProvider,
+                    // routerDelegate: router.routerDelegate,
                     debugShowCheckedModeBanner: isDebug,
                     theme: ThemeData(
                       colorScheme: ColorScheme.fromSeed(
