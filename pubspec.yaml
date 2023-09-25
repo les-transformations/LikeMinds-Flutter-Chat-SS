@@ -11,7 +11,8 @@ dependencies:
   flutter:
     sdk: flutter
 
-  likeminds_chat_fl: 1.5.0
+  likeminds_chat_fl:
+    path: ../LikeMinds-Flutter-GroupChat-SDK
 
   likeminds_chat_ui_fl:
     path: ../LikeMinds-Flutter-Chat-UI
@@ -46,6 +47,7 @@ dependencies:
   flutter_portal: 
 
   cupertino_will_pop_scope:
+  url_launcher: ^6.1.14
 
 dev_dependencies:
   flutter_test:

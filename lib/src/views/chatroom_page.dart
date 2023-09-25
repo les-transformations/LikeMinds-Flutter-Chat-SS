@@ -30,6 +30,7 @@ import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:likeminds_chat_fl/likeminds_chat_fl.dart';
 import 'package:likeminds_chat_ui_fl/likeminds_chat_ui_fl.dart';
 import 'package:overlay_support/overlay_support.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class ChatRoomPage extends StatefulWidget {
   const ChatRoomPage({
@@ -372,6 +373,7 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
         communityId: chatroom!.communityId!,
         createdAt: state.postConversationResponse.conversation!.createdAt,
         header: state.postConversationResponse.conversation!.header,
+        ogTags: state.postConversationResponse.conversation!.ogTags,
       ),
     );
 
@@ -1299,12 +1301,27 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
         !conversation.attachmentsUploaded!) {
       // If conversation has media but not uploaded yet
       // show local files
+      Widget? mediaWidget;
+
       if (mediaFiles[conversation.temporaryId] == null ||
           mediaFiles[conversation.temporaryId]!.isEmpty) {
         // return expandableText;
-        return null;
+        if (conversation.ogTags != null) {
+          return LMLinkPreview(
+              onTap: () {
+                launchUrl(
+                  Uri.parse(conversation.ogTags?['url'] ?? ''),
+                  mode: LaunchMode.externalApplication,
+                );
+              },
+              linkModel: MediaModel(
+                  mediaType: LMMediaType.link,
+                  ogTags: OgTags.fromEntity(
+                      OgTagsEntity.fromJson(conversation.ogTags))));
+        } else {
+          return null;
+        }
       }
-      Widget? mediaWidget;
       if (mediaFiles[conversation.temporaryId]!.first.mediaType ==
               MediaType.photo ||
           mediaFiles[conversation.temporaryId]!.first.mediaType ==
@@ -1315,6 +1332,20 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
           MediaType.document) {
         mediaWidget =
             documentPreviewFactory(mediaFiles[conversation.temporaryId]!);
+      } else if (mediaFiles[conversation.temporaryId]!.first.mediaType ==
+          MediaType.link) {
+        mediaWidget = LMLinkPreview(
+            onTap: () {
+              launchUrl(
+                Uri.parse(
+                    mediaFiles[conversation.temporaryId]!.first.ogTags?.url ??
+                        ''),
+                mode: LaunchMode.externalApplication,
+              );
+            },
+            linkModel: MediaModel(
+                mediaType: LMMediaType.link,
+                ogTags: mediaFiles[conversation.temporaryId]!.first.ogTags));
       } else {
         mediaWidget = null;
       }
@@ -1365,10 +1396,21 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
       } else if (conversationAttachments.first.mediaType ==
           MediaType.document) {
         mediaWidget = documentPreviewFactory(conversationAttachments);
+      } else if (conversation.ogTags != null) {
+        mediaWidget = LMLinkPreview(
+            onTap: () {
+              launchUrl(
+                Uri.parse(conversation.ogTags?['url'] ?? ''),
+                mode: LaunchMode.externalApplication,
+              );
+            },
+            linkModel: MediaModel(
+                mediaType: LMMediaType.link,
+                ogTags: OgTags.fromEntity(
+                    OgTagsEntity.fromJson(conversation.ogTags))));
       } else {
         mediaWidget = null;
       }
-
       return Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
