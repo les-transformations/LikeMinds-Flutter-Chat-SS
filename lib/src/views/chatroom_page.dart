@@ -1298,7 +1298,7 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
                 );
               },
               linkModel: MediaModel(
-                  mediaType: LmMediaType.link,
+                  mediaType: LMMediaType.link,
                   ogTags: OgTags.fromEntity(
                       OgTagsEntity.fromJson(conversation.ogTags))));
         } else {
@@ -1327,7 +1327,7 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
               );
             },
             linkModel: MediaModel(
-                mediaType: LmMediaType.link,
+                mediaType: LMMediaType.link,
                 ogTags: mediaFiles[conversation.temporaryId]!.first.ogTags));
       } else {
         mediaWidget = null;
@@ -1388,7 +1388,7 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
               );
             },
             linkModel: MediaModel(
-                mediaType: LmMediaType.link,
+                mediaType: LMMediaType.link,
                 ogTags: OgTags.fromEntity(
                     OgTagsEntity.fromJson(conversation.ogTags))));
       } else {

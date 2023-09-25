@@ -121,7 +121,7 @@ class _ChatBarState extends State<ChatBar> {
       if (response.success == true) {
         OgTags? responseTags = response.data!.ogTags;
         linkModel = MediaModel(
-          mediaType: LmMediaType.link,
+          mediaType: LMMediaType.link,
           link: previewLink,
           ogTags: OgTags(
             description: responseTags!.description,
