@@ -1,4 +1,4 @@
-import 'dart:developer';
+import 'dart:math' as math;
 
 import 'package:cupertino_will_pop_scope/cupertino_will_pop_scope.dart';
 import 'package:custom_pop_up_menu/custom_pop_up_menu.dart';
@@ -746,7 +746,6 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
                                                                 TextButton(
                                                                   onPressed:
                                                                       () {
-                                                                    log("button tap");
                                                                     Navigator.pop(
                                                                         context);
                                                                   },
@@ -1113,7 +1112,6 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
                                                                 TextButton(
                                                                   onPressed:
                                                                       () {
-                                                                    log("button tap");
                                                                     Navigator.pop(
                                                                         context);
                                                                   },
@@ -1382,7 +1380,9 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
                               ],
                             ),
                           ),
-                          const Divider(),
+                          const Divider(
+                            height: 1,
+                          ),
                           BlocListener<ChatroomActionBloc, ChatroomActionState>(
                             listener: (context, state) {
                               if (state is ChatroomTopicSet) {
@@ -1397,6 +1397,15 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
                               builder: (context, value, child) {
                                 if (chatroom!.topic != null && showChatTopic) {
                                   return LMChatRoomTopic(
+                                      backGroundColor: secondary.shade100,
+                                      leading: const VerticalDivider(
+                                        color: kPrimaryColor,
+                                        thickness: 3,
+                                      ),
+                                      trailing: Transform.rotate(
+                                        angle: math.pi / 4,
+                                        child: const Icon(Icons.push_pin_outlined),
+                                      ),
                                       conversation: tmpTopic ?? chatroom!.topic,
                                       onTap: () {});
                                 } else {
