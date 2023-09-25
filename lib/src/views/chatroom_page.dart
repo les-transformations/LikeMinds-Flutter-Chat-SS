@@ -74,7 +74,7 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
   ValueNotifier showConversationActions = ValueNotifier(false);
   ValueNotifier<bool> rebuildChatTopic = ValueNotifier(true);
   bool showChatTopic = true;
-  Conversation? tmpTopic;
+  Conversation? localTopic;
 
   ScrollController scrollController = ScrollController();
   PagingController<int, Conversation> pagedListController =
@@ -724,8 +724,8 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
                                                       onTap: () async {
                                                         chatBubbleController
                                                             .hideMenu();
-                                                        if ((tmpTopic != null &&
-                                                                tmpTopic!.id ==
+                                                        if ((localTopic != null &&
+                                                                localTopic!.id ==
                                                                     item.id) ||
                                                             (chatroom!.topic !=
                                                                     null &&
@@ -1090,8 +1090,8 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
                                                       onTap: () async {
                                                         chatBubbleController
                                                             .hideMenu();
-                                                        if ((tmpTopic != null &&
-                                                                tmpTopic!.id ==
+                                                        if ((localTopic != null &&
+                                                                localTopic!.id ==
                                                                     item.id) ||
                                                             (chatroom!.topic !=
                                                                     null &&
@@ -1386,7 +1386,7 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
                           BlocListener<ChatroomActionBloc, ChatroomActionState>(
                             listener: (context, state) {
                               if (state is ChatroomTopicSet) {
-                                tmpTopic = state.topic;
+                                localTopic = state.topic;
                                 if (!showChatTopic) showChatTopic = true;
                                 rebuildChatTopic.value =
                                     !rebuildChatTopic.value;
@@ -1406,7 +1406,7 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
                                         angle: math.pi / 4,
                                         child: const Icon(Icons.push_pin_outlined),
                                       ),
-                                      conversation: tmpTopic ?? chatroom!.topic,
+                                      conversation: localTopic ?? chatroom!.topic,
                                       onTap: () {});
                                 } else {
                                   return const SizedBox.shrink();
