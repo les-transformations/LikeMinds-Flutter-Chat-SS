@@ -53,7 +53,8 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
   User? user;
 
   int currentTime = DateTime.now().millisecondsSinceEpoch;
-  Map<String, List<Media>> conversationAttachmentsMeta = <String, List<Media>>{};
+  Map<String, List<Media>> conversationAttachmentsMeta =
+      <String, List<Media>>{};
   Map<String, Conversation> conversationMeta = <String, Conversation>{};
   Map<String, List<Media>> mediaFiles = <String, List<Media>>{};
   Map<int, User?> userMeta = <int, User?>{};
@@ -61,14 +62,16 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
   bool showScrollButton = false;
   int lastConversationId = 0;
   List<Conversation> selectedConversations = <Conversation>[];
-  final CustomPopupMenuController _customMenuController = CustomPopupMenuController();
+  final CustomPopupMenuController _customMenuController =
+      CustomPopupMenuController();
 
   ValueNotifier rebuildConversationList = ValueNotifier(false);
   ValueNotifier rebuildChatBar = ValueNotifier(false);
   ValueNotifier showConversationActions = ValueNotifier(false);
 
   ScrollController scrollController = ScrollController();
-  PagingController<int, Conversation> pagedListController = PagingController<int, Conversation>(firstPageKey: 1);
+  PagingController<int, Conversation> pagedListController =
+      PagingController<int, Conversation>(firstPageKey: 1);
 
   int _page = 1;
   ModalRoute? _route;
@@ -138,10 +141,12 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
   }
 
   void _showScrollToBottomButton() {
-    if (scrollController.position.pixels > scrollController.position.viewportDimension) {
+    if (scrollController.position.pixels >
+        scrollController.position.viewportDimension) {
       _showButton();
     }
-    if (scrollController.position.pixels < scrollController.position.viewportDimension) {
+    if (scrollController.position.pixels <
+        scrollController.position.viewportDimension) {
       _hideButton();
     }
   }
@@ -164,16 +169,20 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
 
       if (state.getConversationResponse.conversationMeta != null &&
           state.getConversationResponse.conversationMeta!.isNotEmpty) {
-        conversationMeta.addAll(state.getConversationResponse.conversationMeta!);
+        conversationMeta
+            .addAll(state.getConversationResponse.conversationMeta!);
       }
 
       if (state.getConversationResponse.conversationAttachmentsMeta != null &&
-          state.getConversationResponse.conversationAttachmentsMeta!.isNotEmpty) {
-        Map<String, List<Media>> getConversationAttachmentData =
-            state.getConversationResponse.conversationAttachmentsMeta!.map((key, value) {
+          state.getConversationResponse.conversationAttachmentsMeta!
+              .isNotEmpty) {
+        Map<String, List<Media>> getConversationAttachmentData = state
+            .getConversationResponse.conversationAttachmentsMeta!
+            .map((key, value) {
           return MapEntry(
             key,
-            (value as List<dynamic>?)?.map((e) => Media.fromJson(e)).toList() ?? [],
+            (value as List<dynamic>?)?.map((e) => Media.fromJson(e)).toList() ??
+                [],
           );
         });
         conversationAttachmentsMeta.addAll(getConversationAttachmentData);
@@ -182,9 +191,11 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
       if (state.getConversationResponse.userMeta != null) {
         userMeta.addAll(state.getConversationResponse.userMeta!);
       }
-      List<Conversation>? conversationData = state.getConversationResponse.conversationData;
+      List<Conversation>? conversationData =
+          state.getConversationResponse.conversationData;
       filterOutStateMessage(conversationData!);
-      conversationData = addTimeStampInConversationList(conversationData, chatroom!.communityId!);
+      conversationData = addTimeStampInConversationList(
+          conversationData, chatroom!.communityId!);
       if (state.getConversationResponse.conversationData == null ||
           state.getConversationResponse.conversationData!.isEmpty ||
           state.getConversationResponse.conversationData!.length < 500) {
@@ -205,7 +216,8 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
       }
       mediaFiles[state.postConversation.temporaryId!] = state.mediaFiles;
 
-      List<Conversation> conversationList = pagedListController.itemList ?? <Conversation>[];
+      List<Conversation> conversationList =
+          pagedListController.itemList ?? <Conversation>[];
 
       conversationList.insert(0, state.postConversation);
 
@@ -228,11 +240,15 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
   }
 
   void addLocalConversationToPagedList(Conversation conversation) {
-    List<Conversation> conversationList = pagedListController.itemList ?? <Conversation>[];
+    List<Conversation> conversationList =
+        pagedListController.itemList ?? <Conversation>[];
 
-    if (conversation.replyId != null && !conversationMeta.containsKey(conversation.replyId.toString())) {
+    if (conversation.replyId != null &&
+        !conversationMeta.containsKey(conversation.replyId.toString())) {
       Conversation? replyConversation = pagedListController.itemList
-          ?.firstWhere((element) => element.id == (conversation.replyId ?? conversation.replyConversation));
+          ?.firstWhere((element) =>
+              element.id ==
+              (conversation.replyId ?? conversation.replyConversation));
       if (replyConversation != null) {
         conversationMeta[conversation.replyId.toString()] = replyConversation;
       }
@@ -250,13 +266,16 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
   }
 
   void updateEditedConversation(Conversation editedConversation) {
-    List<Conversation> conversationList = pagedListController.itemList ?? <Conversation>[];
-    int index = conversationList.indexWhere((element) => element.id == editedConversation.id);
+    List<Conversation> conversationList =
+        pagedListController.itemList ?? <Conversation>[];
+    int index = conversationList
+        .indexWhere((element) => element.id == editedConversation.id);
     if (index != -1) {
       conversationList[index] = editedConversation;
     }
 
-    if (conversationMeta.isNotEmpty && conversationMeta.containsKey(editedConversation.id.toString())) {
+    if (conversationMeta.isNotEmpty &&
+        conversationMeta.containsKey(editedConversation.id.toString())) {
       conversationMeta[editedConversation.id.toString()] = editedConversation;
     }
     pagedListController.itemList = conversationList;
@@ -264,12 +283,17 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
   }
 
   void addConversationToPagedList(Conversation conversation) {
-    List<Conversation> conversationList = pagedListController.itemList ?? <Conversation>[];
+    List<Conversation> conversationList =
+        pagedListController.itemList ?? <Conversation>[];
 
-    int index = conversationList.indexWhere((element) => element.temporaryId == conversation.temporaryId);
-    if (conversation.replyId != null && !conversationMeta.containsKey(conversation.replyId.toString())) {
+    int index = conversationList.indexWhere(
+        (element) => element.temporaryId == conversation.temporaryId);
+    if (conversation.replyId != null &&
+        !conversationMeta.containsKey(conversation.replyId.toString())) {
       Conversation? replyConversation = pagedListController.itemList
-          ?.firstWhere((element) => element.id == (conversation.replyId ?? conversation.replyConversation));
+          ?.firstWhere((element) =>
+              element.id ==
+              (conversation.replyId ?? conversation.replyConversation));
       if (replyConversation != null) {
         conversationMeta[conversation.replyId.toString()] = replyConversation;
       }
@@ -315,14 +339,19 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
     if (!userMeta.containsKey(user!.id)) {
       userMeta[user!.id] = user;
     }
-    if (!conversationAttachmentsMeta.containsKey(state.postConversationResponse.conversation!.id)) {
+    if (!conversationAttachmentsMeta
+        .containsKey(state.postConversationResponse.conversation!.id)) {
       List<Media> putMediaAttachment = state.putMediaResponse;
-      conversationAttachmentsMeta['${state.postConversationResponse.conversation!.id}'] = putMediaAttachment;
+      conversationAttachmentsMeta[
+              '${state.postConversationResponse.conversation!.id}'] =
+          putMediaAttachment;
     }
-    List<Conversation> conversationList = pagedListController.itemList ?? <Conversation>[];
+    List<Conversation> conversationList =
+        pagedListController.itemList ?? <Conversation>[];
 
-    conversationList
-        .removeWhere((element) => element.temporaryId == state.postConversationResponse.conversation!.temporaryId);
+    conversationList.removeWhere((element) =>
+        element.temporaryId ==
+        state.postConversationResponse.conversation!.temporaryId);
 
     mediaFiles.remove(state.postConversationResponse.conversation!.temporaryId);
 
@@ -353,13 +382,18 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
   }
 
   void updateDeletedConversation(DeleteConversationResponse response) {
-    List<Conversation> conversationList = pagedListController.itemList ?? <Conversation>[];
-    int index = conversationList.indexWhere((element) => element.id == response.conversations!.first.id);
+    List<Conversation> conversationList =
+        pagedListController.itemList ?? <Conversation>[];
+    int index = conversationList.indexWhere(
+        (element) => element.id == response.conversations!.first.id);
     if (index != -1) {
       conversationList[index].deletedByUserId = user!.id;
     }
-    if (conversationMeta.isNotEmpty && conversationMeta.containsKey(response.conversations!.first.id.toString())) {
-      conversationMeta[response.conversations!.first.id.toString()]!.deletedByUserId = user!.id;
+    if (conversationMeta.isNotEmpty &&
+        conversationMeta
+            .containsKey(response.conversations!.first.id.toString())) {
+      conversationMeta[response.conversations!.first.id.toString()]!
+          .deletedByUserId = user!.id;
     }
     pagedListController.itemList = conversationList;
     scrollController.animateTo(
@@ -420,8 +454,10 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
             listener: (context, state) {
               if (state is ChatroomLoaded) {
                 chatroom = state.getChatroomResponse.chatroom!;
-                lastConversationId = state.getChatroomResponse.lastConversationId ?? 0;
-                _chatroomActionBloc.add(MarkReadChatroomEvent(chatroomId: chatroom!.id));
+                lastConversationId =
+                    state.getChatroomResponse.lastConversationId ?? 0;
+                _chatroomActionBloc
+                    .add(MarkReadChatroomEvent(chatroomId: chatroom!.id));
                 _conversationBloc.add(InitConversations(
                   chatroomId: chatroom!.id,
                   conversationId: lastConversationId,
@@ -446,7 +482,8 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
                   builder: (context, _, __) {
                     return BlocConsumer<ConversationBloc, ConversationState>(
                         bloc: _conversationBloc,
-                        listener: (context, state) => updatePagingControllers(state),
+                        listener: (context, state) =>
+                            updatePagingControllers(state),
                         builder: (context, state) {
                           return PagedListView(
                             pagingController: pagedListController,
@@ -455,10 +492,14 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
                             padding: const EdgeInsets.symmetric(vertical: 10),
                             reverse: true,
                             scrollDirection: Axis.vertical,
-                            builderDelegate: PagedChildBuilderDelegate<Conversation>(
-                              noItemsFoundIndicatorBuilder: (context) => const SizedBox(height: 10),
-                              firstPageProgressIndicatorBuilder: (context) => const SkeletonChatList(),
-                              newPageProgressIndicatorBuilder: (context) => Padding(
+                            builderDelegate:
+                                PagedChildBuilderDelegate<Conversation>(
+                              noItemsFoundIndicatorBuilder: (context) =>
+                                  const SizedBox(height: 10),
+                              firstPageProgressIndicatorBuilder: (context) =>
+                                  const SkeletonChatList(),
+                              newPageProgressIndicatorBuilder: (context) =>
+                                  Padding(
                                 padding: EdgeInsets.symmetric(vertical: 1.h),
                                 child: const Column(
                                   children: [
@@ -469,9 +510,11 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
                                 ),
                               ),
                               animateTransitions: true,
-                              transitionDuration: const Duration(milliseconds: 500),
+                              transitionDuration:
+                                  const Duration(milliseconds: 500),
                               itemBuilder: (context, item, index) {
-                                if (item.isTimeStamp != null && item.isTimeStamp! ||
+                                if (item.isTimeStamp != null &&
+                                        item.isTimeStamp! ||
                                     item.state != 0 && item.state != null) {
                                   return Row(
                                     mainAxisAlignment: MainAxisAlignment.center,
@@ -490,18 +533,23 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
                                         ),
                                         decoration: BoxDecoration(
                                           color: kWhiteColor.withOpacity(0.5),
-                                          borderRadius: BorderRadius.circular(18),
+                                          borderRadius:
+                                              BorderRadius.circular(18),
                                           border: Border.all(
-                                            color: const Color.fromRGBO(226, 232, 240, 1),
+                                            color: const Color.fromRGBO(
+                                                226, 232, 240, 1),
                                           ),
                                         ),
                                         alignment: Alignment.center,
                                         child: LMTextView(
-                                          text: TaggingHelper.extractStateMessage(item.answer),
+                                          text:
+                                              TaggingHelper.extractStateMessage(
+                                                  item.answer),
                                           textAlign: TextAlign.center,
                                           textStyle: const TextStyle(
                                             fontSize: 10,
-                                            color: Color.fromRGBO(100, 116, 139, 1),
+                                            color: Color.fromRGBO(
+                                                100, 116, 139, 1),
                                           ),
                                         ),
                                       )
@@ -510,14 +558,18 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
                                 }
 
                                 final replyAttachments = item.replyId != null
-                                    ? conversationAttachmentsMeta.containsKey(item.replyId.toString())
-                                        ? conversationAttachmentsMeta[item.replyId.toString()]
+                                    ? conversationAttachmentsMeta.containsKey(
+                                            item.replyId.toString())
+                                        ? conversationAttachmentsMeta[
+                                            item.replyId.toString()]
                                         : null
                                     : null;
 
-                                Conversation? replyConversation = conversationMeta[item.replyId.toString()];
+                                Conversation? replyConversation =
+                                    conversationMeta[item.replyId.toString()];
 
-                                CustomPopupMenuController chatBubbleController = CustomPopupMenuController();
+                                CustomPopupMenuController chatBubbleController =
+                                    CustomPopupMenuController();
 
                                 return item.userId == user!.id
                                     ? LMChatBubble(
@@ -526,13 +578,16 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
                                         menuController: chatBubbleController,
                                         isSent: item.userId == user!.id,
                                         backgroundColor: secondary.shade500,
-                                        deletedText:
-                                            item.deletedByUserId != null ? getDeletedTextWidget(item, user!) : null,
+                                        deletedText: item.deletedByUserId !=
+                                                null
+                                            ? getDeletedTextWidget(item, user!)
+                                            : null,
                                         menu: ClipRRect(
                                           child: Container(
                                             decoration: BoxDecoration(
                                               color: Colors.white,
-                                              borderRadius: BorderRadius.circular(6),
+                                              borderRadius:
+                                                  BorderRadius.circular(6),
                                             ),
                                             constraints: BoxConstraints(
                                               minWidth: 42.w,
@@ -541,23 +596,31 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
                                             // color: Colors.white,
                                             child: IntrinsicWidth(
                                               child: Column(
-                                                crossAxisAlignment: CrossAxisAlignment.stretch,
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.stretch,
                                                 children: [
                                                   ListTile(
                                                     onTap: () {
-                                                      chatBubbleController.hideMenu();
-                                                      int userId = item.userId ?? item.memberId!;
+                                                      chatBubbleController
+                                                          .hideMenu();
+                                                      int userId =
+                                                          item.userId ??
+                                                              item.memberId!;
                                                       if (userId == user!.id) {
                                                         item.member = user!;
                                                       }
-                                                      if (item.deletedByUserId != null) {
+                                                      if (item.deletedByUserId !=
+                                                          null) {
                                                         return;
                                                       }
                                                       _convActionBloc.add(
                                                         ReplyConversation(
-                                                          chatroomId: chatroom!.id,
-                                                          conversationId: item.id,
-                                                          replyConversation: item,
+                                                          chatroomId:
+                                                              chatroom!.id,
+                                                          conversationId:
+                                                              item.id,
+                                                          replyConversation:
+                                                              item,
                                                         ),
                                                       );
                                                     },
@@ -575,13 +638,18 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
                                                   ),
                                                   ListTile(
                                                     onTap: () {
-                                                      chatBubbleController.hideMenu();
+                                                      chatBubbleController
+                                                          .hideMenu();
                                                       Clipboard.setData(
                                                         ClipboardData(
-                                                          text: TaggingHelper.convertRouteToTag(item.answer) ?? '',
+                                                          text: TaggingHelper
+                                                                  .convertRouteToTag(
+                                                                      item.answer) ??
+                                                              '',
                                                         ),
                                                       ).then((value) {
-                                                        toast("Copied to clipboard");
+                                                        toast(
+                                                            "Copied to clipboard");
                                                       });
                                                     },
                                                     leading: const LMIcon(
@@ -597,16 +665,24 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
                                                     ),
                                                   ),
                                                   Visibility(
-                                                    visible: checkDeletePermissions(item),
+                                                    visible:
+                                                        checkDeletePermissions(
+                                                            item),
                                                     child: ListTile(
                                                       onTap: () async {
-                                                        chatBubbleController.hideMenu();
-                                                        DeleteConversationRequest request =
+                                                        chatBubbleController
+                                                            .hideMenu();
+                                                        DeleteConversationRequest
+                                                            request =
                                                             (DeleteConversationRequestBuilder()
-                                                                  ..conversationIds([item.id])
-                                                                  ..reason("Delete"))
+                                                                  ..conversationIds(
+                                                                      [item.id])
+                                                                  ..reason(
+                                                                      "Delete"))
                                                                 .build();
-                                                        _convActionBloc!.add(DeleteConversation(request));
+                                                        _convActionBloc!.add(
+                                                            DeleteConversation(
+                                                                request));
                                                       },
                                                       leading: const LMIcon(
                                                         type: LMIconType.svg,
@@ -628,7 +704,8 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
                                           ),
                                         ),
                                         onReply: (replyingTo) {
-                                          int userId = item.userId ?? item.memberId!;
+                                          int userId =
+                                              item.userId ?? item.memberId!;
                                           if (userId == user!.id) {
                                             item.member = user!;
                                           }
@@ -644,15 +721,18 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
                                           );
                                         },
                                         outsideFooter: Row(
-                                          mainAxisAlignment: MainAxisAlignment.end,
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.end,
                                           children: [
                                             Visibility(
-                                              visible: item.isEdited != null && item.isEdited!,
+                                              visible: item.isEdited != null &&
+                                                  item.isEdited!,
                                               child: const LMTextView(
                                                 text: "Edited • ",
                                                 textStyle: TextStyle(
                                                   fontSize: 10,
-                                                  color: Color.fromRGBO(71, 85, 105, 1),
+                                                  color: Color.fromRGBO(
+                                                      71, 85, 105, 1),
                                                 ),
                                               ),
                                             ),
@@ -660,7 +740,8 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
                                               text: item.createdAt,
                                               textStyle: const TextStyle(
                                                 fontSize: 10,
-                                                color: Color.fromRGBO(71, 85, 105, 1),
+                                                color: Color.fromRGBO(
+                                                    71, 85, 105, 1),
                                               ),
                                             ),
                                           ],
@@ -669,7 +750,9 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
                                           conversation: item,
                                           textStyle: TextStyle(
                                             fontSize: 14,
-                                            color: Theme.of(context).colorScheme.onPrimary,
+                                            color: Theme.of(context)
+                                                .colorScheme
+                                                .onPrimary,
                                           ),
                                           tagStyle: TextStyle(
                                             fontSize: 14,
@@ -693,14 +776,19 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
                                         conversation: item,
                                         replyingTo: replyConversation,
                                         replyItem: LMReplyItem(
-                                          replyToConversation: replyConversation,
+                                          replyToConversation:
+                                              replyConversation,
                                           borderRadius: 10,
                                           title: replyConversation != null
                                               ? LMTextView(
-                                                  text:
-                                                      userMeta[replyConversation.userId ?? replyConversation.memberId!]!
-                                                          .name,
-                                                  overflow: TextOverflow.ellipsis,
+                                                  text: userMeta[
+                                                          replyConversation
+                                                                  .userId ??
+                                                              replyConversation
+                                                                  .memberId!]!
+                                                      .name,
+                                                  overflow:
+                                                      TextOverflow.ellipsis,
                                                   maxLines: 1,
                                                   textStyle: const TextStyle(
                                                     color: kPrimaryColor,
@@ -709,24 +797,36 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
                                                   ),
                                                 )
                                               : null,
-                                          backgroundColor: Theme.of(context).colorScheme.onPrimary.withOpacity(0.7),
+                                          backgroundColor: Theme.of(context)
+                                              .colorScheme
+                                              .onPrimary
+                                              .withOpacity(0.7),
                                           subtitle: replyConversation != null
-                                              ? replyConversation.deletedByUserId != null
-                                                  ? getDeletedTextWidget(replyConversation, user!)
+                                              ? replyConversation
+                                                          .deletedByUserId !=
+                                                      null
+                                                  ? getDeletedTextWidget(
+                                                      replyConversation, user!)
                                                   : getChatItemAttachmentTile(
                                                       replyAttachments ?? [],
                                                       replyConversation,
                                                     )
                                               : null,
                                         ),
-                                        sender: userMeta[item.userId ?? item.memberId] ?? item.member!,
+                                        sender: userMeta[
+                                                item.userId ?? item.memberId] ??
+                                            item.member!,
                                         mediaWidget:
-                                            item.deletedByUserId == null ? getContent(item) : const SizedBox.shrink(),
+                                            item.deletedByUserId == null
+                                                ? getContent(item)
+                                                : const SizedBox.shrink(),
                                       )
                                     : LMChatBubble(
                                         currentUser: user!,
-                                        deletedText:
-                                            item.deletedByUserId != null ? getDeletedTextWidget(item, user!) : null,
+                                        deletedText: item.deletedByUserId !=
+                                                null
+                                            ? getDeletedTextWidget(item, user!)
+                                            : null,
                                         key: Key(item.id.toString()),
                                         isSent: item.userId == user!.id,
                                         menuController: chatBubbleController,
@@ -735,7 +835,8 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
                                           child: Container(
                                             decoration: BoxDecoration(
                                               color: Colors.white,
-                                              borderRadius: BorderRadius.circular(6),
+                                              borderRadius:
+                                                  BorderRadius.circular(6),
                                             ),
                                             constraints: BoxConstraints(
                                               minWidth: 42.w,
@@ -744,23 +845,31 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
                                             // color: Colors.white,
                                             child: IntrinsicWidth(
                                               child: Column(
-                                                crossAxisAlignment: CrossAxisAlignment.stretch,
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.stretch,
                                                 children: [
                                                   ListTile(
                                                     onTap: () {
-                                                      chatBubbleController.hideMenu();
-                                                      int userId = item.userId ?? item.memberId!;
+                                                      chatBubbleController
+                                                          .hideMenu();
+                                                      int userId =
+                                                          item.userId ??
+                                                              item.memberId!;
                                                       if (userId == user!.id) {
                                                         item.member = user!;
                                                       }
-                                                      if (item.deletedByUserId != null) {
+                                                      if (item.deletedByUserId !=
+                                                          null) {
                                                         return;
                                                       }
                                                       _convActionBloc.add(
                                                         ReplyConversation(
-                                                          chatroomId: chatroom!.id,
-                                                          conversationId: item.id,
-                                                          replyConversation: item,
+                                                          chatroomId:
+                                                              chatroom!.id,
+                                                          conversationId:
+                                                              item.id,
+                                                          replyConversation:
+                                                              item,
                                                         ),
                                                       );
                                                     },
@@ -778,13 +887,18 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
                                                   ),
                                                   ListTile(
                                                     onTap: () {
-                                                      chatBubbleController.hideMenu();
+                                                      chatBubbleController
+                                                          .hideMenu();
                                                       Clipboard.setData(
                                                         ClipboardData(
-                                                          text: TaggingHelper.convertRouteToTag(item.answer) ?? '',
+                                                          text: TaggingHelper
+                                                                  .convertRouteToTag(
+                                                                      item.answer) ??
+                                                              '',
                                                         ),
                                                       ).then((value) {
-                                                        toast("Copied to clipboard");
+                                                        toast(
+                                                            "Copied to clipboard");
                                                       });
                                                     },
                                                     leading: const LMIcon(
@@ -835,16 +949,24 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
                                                   //     : const SizedBox
                                                   //         .shrink(),
                                                   Visibility(
-                                                    visible: checkDeletePermissions(item),
+                                                    visible:
+                                                        checkDeletePermissions(
+                                                            item),
                                                     child: ListTile(
                                                       onTap: () async {
-                                                        chatBubbleController.hideMenu();
-                                                        DeleteConversationRequest request =
+                                                        chatBubbleController
+                                                            .hideMenu();
+                                                        DeleteConversationRequest
+                                                            request =
                                                             (DeleteConversationRequestBuilder()
-                                                                  ..conversationIds([item.id])
-                                                                  ..reason("Delete"))
+                                                                  ..conversationIds(
+                                                                      [item.id])
+                                                                  ..reason(
+                                                                      "Delete"))
                                                                 .build();
-                                                        _convActionBloc.add(DeleteConversation(request));
+                                                        _convActionBloc.add(
+                                                            DeleteConversation(
+                                                                request));
                                                       },
                                                       leading: const LMIcon(
                                                         type: LMIconType.svg,
@@ -866,7 +988,8 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
                                           ),
                                         ),
                                         onReply: (replyingTo) {
-                                          int userId = item.userId ?? item.memberId!;
+                                          int userId =
+                                              item.userId ?? item.memberId!;
                                           if (userId == user!.id) {
                                             item.member = user!;
                                           }
@@ -890,17 +1013,22 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
                                           text: item.member!.name,
                                           textStyle: const TextStyle(
                                             fontSize: 10,
-                                            color: Color.fromRGBO(71, 85, 105, 1),
+                                            color:
+                                                Color.fromRGBO(71, 85, 105, 1),
                                           ),
                                         ),
                                         outsideFooter: LMTextView(
                                           text: item.createdAt,
                                           textStyle: const TextStyle(
                                             fontSize: 10,
-                                            color: Color.fromRGBO(71, 85, 105, 1),
+                                            color:
+                                                Color.fromRGBO(71, 85, 105, 1),
                                           ),
                                         ),
-                                        mediaWidget: item.deletedByUserId == null ? getContent(item) : null,
+                                        mediaWidget:
+                                            item.deletedByUserId == null
+                                                ? getContent(item)
+                                                : null,
                                         content: LMChatContent(
                                           conversation: item,
                                           visibleLines: 2,
@@ -929,15 +1057,20 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
                                         conversation: item,
                                         replyingTo: replyConversation,
                                         replyItem: LMReplyItem(
-                                          replyToConversation: replyConversation,
+                                          replyToConversation:
+                                              replyConversation,
                                           borderRadius: 10,
                                           highlightColor: secondary,
                                           title: replyConversation != null
                                               ? LMTextView(
-                                                  text:
-                                                      userMeta[replyConversation.userId ?? replyConversation.memberId!]!
-                                                          .name,
-                                                  overflow: TextOverflow.ellipsis,
+                                                  text: userMeta[
+                                                          replyConversation
+                                                                  .userId ??
+                                                              replyConversation
+                                                                  .memberId!]!
+                                                      .name,
+                                                  overflow:
+                                                      TextOverflow.ellipsis,
                                                   maxLines: 1,
                                                   textStyle: const TextStyle(
                                                     color: kPrimaryColor,
@@ -947,16 +1080,24 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
                                                 )
                                               : null,
                                           subtitle: replyConversation != null
-                                              ? replyConversation.deletedByUserId != null
-                                                  ? getDeletedTextWidget(replyConversation, user!)
+                                              ? replyConversation
+                                                          .deletedByUserId !=
+                                                      null
+                                                  ? getDeletedTextWidget(
+                                                      replyConversation, user!)
                                                   : getChatItemAttachmentTile(
                                                       replyAttachments ?? [],
                                                       replyConversation,
                                                     )
                                               : null,
-                                          backgroundColor: Theme.of(context).colorScheme.onPrimary.withOpacity(0.7),
+                                          backgroundColor: Theme.of(context)
+                                              .colorScheme
+                                              .onPrimary
+                                              .withOpacity(0.7),
                                         ),
-                                        sender: userMeta[item.userId ?? item.memberId] ?? item.member!,
+                                        sender: userMeta[
+                                                item.userId ?? item.memberId] ??
+                                            item.member!,
                                       );
                               },
                             ),
@@ -992,9 +1133,11 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
                                 BackButton(
                                   onPressed: () {
                                     _chatroomActionBloc.add(
-                                      MarkReadChatroomEvent(chatroomId: widget.chatroomId),
+                                      MarkReadChatroomEvent(
+                                          chatroomId: widget.chatroomId),
                                     );
-                                    BlocProvider.of<HomeBloc>(context).add(UpdateHomeEvent());
+                                    BlocProvider.of<HomeBloc>(context)
+                                        .add(UpdateHomeEvent());
 
                                     router.pop();
                                   },
@@ -1014,33 +1157,53 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
                                 ),
                                 SizedBox(width: 2.w),
                                 Expanded(
-                                  child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    children: [
-                                      LMTextView(
-                                        text: chatroom!.header,
-                                        maxLines: 1,
-                                        overflow: TextOverflow.ellipsis,
-                                        textStyle: const TextStyle(
-                                          fontSize: 14,
-                                          fontWeight: FontWeight.w500,
+                                  child: GestureDetector(
+                                    behavior: HitTestBehavior.opaque,
+                                    onTap: () {
+                                      chatroom != null
+                                          ? showBottomSheet(
+                                              context: context,
+                                              builder: (context) {
+                                                return LMGroupDetailBottomSheet(
+                                                  chatRoom: chatroom!,
+                                                  backgroundColor: Colors.white
+                                                      .withOpacity(0.9),
+                                                );
+                                              },
+                                            )
+                                          : {};
+                                    },
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        LMTextView(
+                                          text: chatroom!.header,
+                                          maxLines: 1,
+                                          overflow: TextOverflow.ellipsis,
+                                          textStyle: const TextStyle(
+                                            fontSize: 14,
+                                            fontWeight: FontWeight.w500,
+                                          ),
                                         ),
-                                      ),
-                                      kVerticalPaddingXSmall,
-                                      LMTextView(
-                                        text: '${chatroom!.participantCount} participants',
-                                        maxLines: 1,
-                                        overflow: TextOverflow.ellipsis,
-                                        textStyle: const TextStyle(
-                                          fontSize: 12,
+                                        kVerticalPaddingXSmall,
+                                        LMTextView(
+                                          text:
+                                              '${chatroom!.participantCount} participants',
+                                          maxLines: 1,
+                                          overflow: TextOverflow.ellipsis,
+                                          textStyle: const TextStyle(
+                                            fontSize: 12,
+                                          ),
                                         ),
-                                      ),
-                                    ],
+                                      ],
+                                    ),
                                   ),
                                 ),
                                 ChatroomMenu(
                                   chatroom: chatroom!,
-                                  chatroomActions: state.getChatroomResponse.chatroomActions!,
+                                  chatroomActions: state
+                                      .getChatroomResponse.chatroomActions!,
                                 ),
                                 kHorizontalPaddingMedium,
                               ],
@@ -1069,11 +1232,13 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
                         bloc: _convActionBloc,
                         listener: (context, state) {
                           if (state is ConversationDelete) {
-                            updateDeletedConversation(state.deleteConversationResponse);
+                            updateDeletedConversation(
+                                state.deleteConversationResponse);
                           }
 
                           if (state is ConversationEdited) {
-                            updateEditedConversation(state.editConversationResponse.conversation!);
+                            updateEditedConversation(
+                                state.editConversationResponse.conversation!);
                           }
                           if (state is ReplyConversationState) {
                             rebuildChatBar.value = !rebuildChatBar.value;
@@ -1099,8 +1264,11 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
                                     chatroom: chatroom!,
                                     replyToConversation: state.conversation,
                                     replyConversationAttachments:
-                                        conversationAttachmentsMeta.containsKey(state.conversation.id.toString())
-                                            ? conversationAttachmentsMeta['${state.conversation.id}']
+                                        conversationAttachmentsMeta.containsKey(
+                                                state.conversation.id
+                                                    .toString())
+                                            ? conversationAttachmentsMeta[
+                                                '${state.conversation.id}']
                                             : null,
                                     scrollToBottom: _scrollToBottom,
                                     userMeta: userMeta,
@@ -1127,19 +1295,26 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
   }
 
   Widget? getContent(Conversation conversation) {
-    if (conversation.attachmentsUploaded == null || !conversation.attachmentsUploaded!) {
+    if (conversation.attachmentsUploaded == null ||
+        !conversation.attachmentsUploaded!) {
       // If conversation has media but not uploaded yet
       // show local files
-      if (mediaFiles[conversation.temporaryId] == null || mediaFiles[conversation.temporaryId]!.isEmpty) {
+      if (mediaFiles[conversation.temporaryId] == null ||
+          mediaFiles[conversation.temporaryId]!.isEmpty) {
         // return expandableText;
         return null;
       }
       Widget? mediaWidget;
-      if (mediaFiles[conversation.temporaryId]!.first.mediaType == MediaType.photo ||
-          mediaFiles[conversation.temporaryId]!.first.mediaType == MediaType.video) {
-        mediaWidget = getImageFileMessage(context, mediaFiles[conversation.temporaryId]!);
-      } else if (mediaFiles[conversation.temporaryId]!.first.mediaType == MediaType.document) {
-        mediaWidget = documentPreviewFactory(mediaFiles[conversation.temporaryId]!);
+      if (mediaFiles[conversation.temporaryId]!.first.mediaType ==
+              MediaType.photo ||
+          mediaFiles[conversation.temporaryId]!.first.mediaType ==
+              MediaType.video) {
+        mediaWidget =
+            getImageFileMessage(context, mediaFiles[conversation.temporaryId]!);
+      } else if (mediaFiles[conversation.temporaryId]!.first.mediaType ==
+          MediaType.document) {
+        mediaWidget =
+            documentPreviewFactory(mediaFiles[conversation.temporaryId]!);
       } else {
         mediaWidget = null;
       }
@@ -1160,15 +1335,19 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
               )
             ],
           ),
-          conversation.answer.isEmpty ? const SizedBox.shrink() : kVerticalPaddingXSmall,
+          conversation.answer.isEmpty
+              ? const SizedBox.shrink()
+              : kVerticalPaddingXSmall,
         ],
       );
-    } else if (conversation.attachmentsUploaded != null || conversation.attachmentsUploaded!) {
+    } else if (conversation.attachmentsUploaded != null ||
+        conversation.attachmentsUploaded!) {
       // If conversation has media and uploaded
       // show uploaded files
-      final conversationAttachments = conversationAttachmentsMeta.containsKey(conversation.id.toString())
-          ? conversationAttachmentsMeta['${conversation.id}']
-          : null;
+      final conversationAttachments =
+          conversationAttachmentsMeta.containsKey(conversation.id.toString())
+              ? conversationAttachmentsMeta['${conversation.id}']
+              : null;
       if (conversationAttachments == null) {
         return null;
       }
@@ -1183,7 +1362,8 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
           conversation,
           userMeta,
         );
-      } else if (conversationAttachments.first.mediaType == MediaType.document) {
+      } else if (conversationAttachments.first.mediaType ==
+          MediaType.document) {
         mediaWidget = documentPreviewFactory(conversationAttachments);
       } else {
         mediaWidget = null;
@@ -1193,7 +1373,9 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
           mediaWidget ?? const SizedBox.shrink(),
-          conversation.answer.isEmpty ? const SizedBox.shrink() : kVerticalPaddingXSmall,
+          conversation.answer.isEmpty
+              ? const SizedBox.shrink()
+              : kVerticalPaddingXSmall,
         ],
       );
     }
