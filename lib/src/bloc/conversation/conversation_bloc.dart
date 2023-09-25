@@ -153,19 +153,21 @@ class ConversationBloc extends Bloc<ConversationEvent, ConversationState> {
       DateTime dateTime = DateTime.now();
       User user = locator<LMPreferenceService>().getUser()!;
       Conversation conversation = Conversation(
-        answer: event.postConversationRequest.text,
-        chatroomId: event.postConversationRequest.chatroomId,
-        createdAt: "",
-        header: "",
-        date: "${dateTime.day} ${dateTime.month} ${dateTime.year}",
-        replyId: event.postConversationRequest.replyId,
-        attachmentCount: event.postConversationRequest.attachmentCount,
-        hasFiles: event.postConversationRequest.hasFiles,
-        member: user,
-        temporaryId: event.postConversationRequest.temporaryId,
-        id: 1,
-        userId: user.id,
-      );
+          answer: event.postConversationRequest.text,
+          chatroomId: event.postConversationRequest.chatroomId,
+          createdAt: "",
+          header: "",
+          date: "${dateTime.day} ${dateTime.month} ${dateTime.year}",
+          replyId: event.postConversationRequest.replyId,
+          attachmentCount: event.postConversationRequest.attachmentCount,
+          hasFiles: event.postConversationRequest.hasFiles,
+          member: user,
+          temporaryId: event.postConversationRequest.temporaryId,
+          id: 1,
+          userId: user.id,
+          ogTags: event.postConversationRequest.ogTags,
+          );
+
       emit(
         MultiMediaConversationLoading(
           conversation,
@@ -180,81 +182,91 @@ class ConversationBloc extends Bloc<ConversationEvent, ConversationState> {
       if (response.success) {
         PostConversationResponse postConversationResponse = response.data!;
         if (postConversationResponse.success) {
-          List<Media> fileLink = [];
-          int length = event.mediaFiles.length;
-          for (int i = 0; i < length; i++) {
-            Media media = event.mediaFiles[i];
-            String? url = await mediaService.uploadFile(
-              media.mediaFile!,
-              event.postConversationRequest.chatroomId,
-              postConversationResponse.conversation!.id,
-            );
-            String? thumbnailUrl;
-            if (media.mediaType == MediaType.video) {
-              // If the thumbnail file is not present in media object
-              // then generate the thumbnail and upload it to the server
-              if (media.thumbnailFile == null) {
-                await getVideoThumbnail(media);
-              }
-              thumbnailUrl = await mediaService.uploadFile(
-                media.thumbnailFile!,
+          if (event.mediaFiles.length==1 && event.mediaFiles.first.mediaType == MediaType.link) {
+             emit(
+            MultiMediaConversationPosted(
+              postConversationResponse,
+              event.mediaFiles,
+            ),
+          );
+          } else {
+            List<Media> fileLink = [];
+            int length = event.mediaFiles.length;
+            for (int i = 0; i < length; i++) {
+              Media media = event.mediaFiles[i];
+              String? url = await mediaService.uploadFile(
+                media.mediaFile!,
                 event.postConversationRequest.chatroomId,
                 postConversationResponse.conversation!.id,
               );
-            }
-
-            if (url == null) {
-              throw 'Error uploading file';
-            } else {
-              String attachmentType = mapMediaTypeToString(media.mediaType);
-              PutMediaRequest putMediaRequest = (PutMediaRequestBuilder()
-                    ..conversationId(postConversationResponse.conversation!.id)
-                    ..filesCount(length)
-                    ..index(i)
-                    ..height(media.height)
-                    ..width(media.width)
-                    ..meta({
-                      'size': media.size,
-                      'number_of_page': media.pageCount,
-                    })
-                    ..type(attachmentType)
-                    ..thumbnailUrl(thumbnailUrl)
-                    ..url(url))
-                  .build();
-              LMResponse<PutMediaResponse> uploadFileResponse =
-                  await locator<LikeMindsService>()
-                      .putMultimedia(putMediaRequest);
-              if (!uploadFileResponse.success) {
-                emit(
-                  MultiMediaConversationError(
-                    uploadFileResponse.errorMessage!,
-                    event.postConversationRequest.temporaryId,
-                  ),
+              String? thumbnailUrl;
+              if (media.mediaType == MediaType.video) {
+                // If the thumbnail file is not present in media object
+                // then generate the thumbnail and upload it to the server
+                if (media.thumbnailFile == null) {
+                  await getVideoThumbnail(media);
+                }
+                thumbnailUrl = await mediaService.uploadFile(
+                  media.thumbnailFile!,
+                  event.postConversationRequest.chatroomId,
+                  postConversationResponse.conversation!.id,
                 );
+              }
+
+              if (url == null) {
+                throw 'Error uploading file';
               } else {
-                if (!uploadFileResponse.data!.success) {
+                String attachmentType = mapMediaTypeToString(media.mediaType);
+                PutMediaRequest putMediaRequest = (PutMediaRequestBuilder()
+                      ..conversationId(
+                          postConversationResponse.conversation!.id)
+                      ..filesCount(length)
+                      ..index(i)
+                      ..height(media.height)
+                      ..width(media.width)
+                      ..meta({
+                        'size': media.size,
+                        'number_of_page': media.pageCount,
+                      })
+                      ..type(attachmentType)
+                      ..thumbnailUrl(thumbnailUrl)
+                      ..url(url))
+                    .build();
+                LMResponse<PutMediaResponse> uploadFileResponse =
+                    await locator<LikeMindsService>()
+                        .putMultimedia(putMediaRequest);
+                if (!uploadFileResponse.success) {
                   emit(
                     MultiMediaConversationError(
-                      uploadFileResponse.data!.errorMessage!,
+                      uploadFileResponse.errorMessage!,
                       event.postConversationRequest.temporaryId,
                     ),
                   );
                 } else {
-                  Media mediaItem = Media.fromJson(putMediaRequest.toJson());
-                  mediaItem.mediaFile = media.mediaFile;
-                  mediaItem.thumbnailFile = media.thumbnailFile;
-                  fileLink.add(mediaItem);
+                  if (!uploadFileResponse.data!.success) {
+                    emit(
+                      MultiMediaConversationError(
+                        uploadFileResponse.data!.errorMessage!,
+                        event.postConversationRequest.temporaryId,
+                      ),
+                    );
+                  } else {
+                    Media mediaItem = Media.fromJson(putMediaRequest.toJson());
+                    mediaItem.mediaFile = media.mediaFile;
+                    mediaItem.thumbnailFile = media.thumbnailFile;
+                    fileLink.add(mediaItem);
+                  }
                 }
               }
             }
+            lastConversationId = response.data!.conversation!.id;
+            emit(
+              MultiMediaConversationPosted(
+                postConversationResponse,
+                fileLink,
+              ),
+            );
           }
-          lastConversationId = response.data!.conversation!.id;
-          emit(
-            MultiMediaConversationPosted(
-              postConversationResponse,
-              fileLink,
-            ),
-          );
         } else {
           emit(
             MultiMediaConversationError(

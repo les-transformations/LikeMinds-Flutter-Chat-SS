@@ -37,6 +37,7 @@ abstract class ILikeMindsService {
   Future<LMResponse<GetParticipantsResponse>> getParticipants(
       GetParticipantsRequest request);
   Future<LMResponse<TagResponseModel>> getTaggingList(TagRequestModel request);
+  Future<LMResponse<DecodeUrlResponse>> decodeUrl(DecodeUrlRequest request);
 }
 
 class LikeMindsService implements ILikeMindsService {
@@ -164,5 +165,11 @@ class LikeMindsService implements ILikeMindsService {
   @override
   Future<LMResponse<TagResponseModel>> getTaggingList(TagRequestModel request) {
     return client.getTaggingList(request);
+  }
+
+  @override
+  Future<LMResponse<DecodeUrlResponse>> decodeUrl(
+      DecodeUrlRequest request) async {
+    return await client.decodeUrl(request);
   }
 }
