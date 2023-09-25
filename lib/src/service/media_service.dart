@@ -83,7 +83,7 @@ class Media {
         width: json['width'] as int?,
         thumbnailUrl: json['thumbnail_url'] as String?,
         pageCount: json['meta']['number_of_page'] as int?,
-        ogTags: OgTags.fromEntity(OgTagsEntity.fromJson(json['ogTags']??{}))
+        ogTags: OgTags.fromEntity(OgTagsEntity.fromJson(json['og_tags']??{}))
       );
 }
 
