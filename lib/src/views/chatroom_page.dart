@@ -1,6 +1,9 @@
+import 'dart:developer';
+
 import 'package:cupertino_will_pop_scope/cupertino_will_pop_scope.dart';
 import 'package:custom_pop_up_menu/custom_pop_up_menu.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:likeminds_chat_ss_fl/src/bloc/chatroom/chatroom_bloc.dart';
@@ -69,6 +72,9 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
   ValueNotifier rebuildConversationList = ValueNotifier(false);
   ValueNotifier rebuildChatBar = ValueNotifier(false);
   ValueNotifier showConversationActions = ValueNotifier(false);
+  ValueNotifier<bool> rebuildChatTopic = ValueNotifier(true);
+  bool showChatTopic = true;
+  Conversation? tmpTopic;
 
   ScrollController scrollController = ScrollController();
   PagingController<int, Conversation> pagedListController =
@@ -84,6 +90,7 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
     _addPaginationListener();
     scrollController.addListener(() {
       _showScrollToBottomButton();
+      _handleChatTopic();
     });
     // chatActionBloc = BlocProvider.of<ChatActionBloc>(context);
     // conversationBloc = ConversationBloc();
@@ -131,6 +138,21 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
         );
       },
     );
+  }
+
+  void _handleChatTopic() {
+    if (scrollController.position.userScrollDirection ==
+        ScrollDirection.forward) {
+      if (!showChatTopic) {
+        rebuildChatTopic.value = !rebuildChatTopic.value;
+        showChatTopic = true;
+      }
+    } else {
+      if (showChatTopic) {
+        rebuildChatTopic.value = !rebuildChatTopic.value;
+        showChatTopic = false;
+      }
+    }
   }
 
   void _scrollToBottom() {
@@ -522,10 +544,10 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
                                     mainAxisAlignment: MainAxisAlignment.center,
                                     children: [
                                       Container(
-                                        // width: item.isTimeStamp == null ||
-                                        //         !item.isTimeStamp!
-                                        //     ? 70.w
-                                        //     : 35.w,
+                                        width: item.isTimeStamp == null ||
+                                                !item.isTimeStamp!
+                                            ? 80.w
+                                            : 35.w,
                                         margin: const EdgeInsets.symmetric(
                                           vertical: 5,
                                         ),
@@ -553,6 +575,8 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
                                             color: Color.fromRGBO(
                                                 100, 116, 139, 1),
                                           ),
+                                          maxLines: 2,
+                                          overflow: TextOverflow.ellipsis,
                                         ),
                                       )
                                     ],
@@ -601,6 +625,32 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
                                                 crossAxisAlignment:
                                                     CrossAxisAlignment.stretch,
                                                 children: [
+                                                  if (user!.id ==
+                                                          chatroom!
+                                                              .member!.id ||
+                                                      user!.state == 1)
+                                                    ListTile(
+                                                      onTap: () {
+                                                        chatBubbleController
+                                                            .hideMenu();
+                                                        _chatroomActionBloc.add(
+                                                          SetChatroomTopicEvent(
+                                                            chatroomId:
+                                                                chatroom!.id,
+                                                            conversationId:
+                                                                item.id,
+                                                            topic: item,
+                                                          ),
+                                                        );
+                                                      },
+                                                      title: const LMTextView(
+                                                        text:
+                                                            "Set as current topic",
+                                                        textStyle: TextStyle(
+                                                          fontSize: 14,
+                                                        ),
+                                                      ),
+                                                    ),
                                                   ListTile(
                                                     onTap: () {
                                                       chatBubbleController
@@ -674,17 +724,72 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
                                                       onTap: () async {
                                                         chatBubbleController
                                                             .hideMenu();
-                                                        DeleteConversationRequest
-                                                            request =
-                                                            (DeleteConversationRequestBuilder()
-                                                                  ..conversationIds(
-                                                                      [item.id])
-                                                                  ..reason(
-                                                                      "Delete"))
-                                                                .build();
-                                                        _convActionBloc!.add(
-                                                            DeleteConversation(
-                                                                request));
+                                                        if ((tmpTopic != null &&
+                                                                tmpTopic!.id ==
+                                                                    item.id) ||
+                                                            (chatroom!.topic !=
+                                                                    null &&
+                                                                item.id ==
+                                                                    chatroom!
+                                                                        .topic!
+                                                                        .id)) {
+                                                          showDialog(
+                                                            context: context,
+                                                            builder:
+                                                                (context) =>
+                                                                    AlertDialog(
+                                                              title: const Text(
+                                                                  "Delete Message?"),
+                                                              content: const Text(
+                                                                  "Are you sure you want to delete this message? The message has been set as current topic of this chatroom"),
+                                                              actions: [
+                                                                TextButton(
+                                                                  onPressed:
+                                                                      () {
+                                                                    log("button tap");
+                                                                    Navigator.pop(
+                                                                        context);
+                                                                  },
+                                                                  child: const LMTextView(
+                                                                      text:
+                                                                          "CANCEL"),
+                                                                ),
+                                                                TextButton(
+                                                                  onPressed:
+                                                                      () {
+                                                                    DeleteConversationRequest
+                                                                        request =
+                                                                        (DeleteConversationRequestBuilder()
+                                                                              ..conversationIds([
+                                                                                item.id
+                                                                              ])
+                                                                              ..reason("Delete"))
+                                                                            .build();
+                                                                    _convActionBloc.add(
+                                                                        DeleteConversation(
+                                                                            request));
+                                                                  },
+                                                                  child: const LMTextView(
+                                                                      text:
+                                                                          "DELETE"),
+                                                                ),
+                                                              ],
+                                                            ),
+                                                          );
+                                                        } else {
+                                                          DeleteConversationRequest
+                                                              request =
+                                                              (DeleteConversationRequestBuilder()
+                                                                    ..conversationIds([
+                                                                      item.id
+                                                                    ])
+                                                                    ..reason(
+                                                                        "Delete"))
+                                                                  .build();
+                                                          _convActionBloc.add(
+                                                              DeleteConversation(
+                                                                  request));
+                                                        }
                                                       },
                                                       leading: const LMIcon(
                                                         type: LMIconType.svg,
@@ -850,6 +955,34 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
                                                 crossAxisAlignment:
                                                     CrossAxisAlignment.stretch,
                                                 children: [
+                                                  if (user!.id ==
+                                                          chatroom!
+                                                              .member!.id ||
+                                                      user!.state == 1)
+                                                    ListTile(
+                                                      onTap: () {
+                                                        chatBubbleController
+                                                            .hideMenu();
+
+                                                        _chatroomActionBloc.add(
+                                                          SetChatroomTopicEvent(
+                                                            chatroomId:
+                                                                chatroom!.id,
+                                                            conversationId:
+                                                                item.id,
+                                                            topic: item,
+                                                          ),
+                                                        );
+                                                        // tmpTopic = item;
+                                                      },
+                                                      title: const LMTextView(
+                                                        text:
+                                                            "Set as current topic",
+                                                        textStyle: TextStyle(
+                                                          fontSize: 14,
+                                                        ),
+                                                      ),
+                                                    ),
                                                   ListTile(
                                                     onTap: () {
                                                       chatBubbleController
@@ -958,17 +1091,72 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
                                                       onTap: () async {
                                                         chatBubbleController
                                                             .hideMenu();
-                                                        DeleteConversationRequest
-                                                            request =
-                                                            (DeleteConversationRequestBuilder()
-                                                                  ..conversationIds(
-                                                                      [item.id])
-                                                                  ..reason(
-                                                                      "Delete"))
-                                                                .build();
-                                                        _convActionBloc.add(
-                                                            DeleteConversation(
-                                                                request));
+                                                        if ((tmpTopic != null &&
+                                                                tmpTopic!.id ==
+                                                                    item.id) ||
+                                                            (chatroom!.topic !=
+                                                                    null &&
+                                                                item.id ==
+                                                                    chatroom!
+                                                                        .topic!
+                                                                        .id)) {
+                                                          showDialog(
+                                                            context: context,
+                                                            builder:
+                                                                (context) =>
+                                                                    AlertDialog(
+                                                              title: const Text(
+                                                                  "Delete Message?"),
+                                                              content: const Text(
+                                                                  "Are you sure you want to delete this message? The message has been set as current topic of this chatroom"),
+                                                              actions: [
+                                                                TextButton(
+                                                                  onPressed:
+                                                                      () {
+                                                                    log("button tap");
+                                                                    Navigator.pop(
+                                                                        context);
+                                                                  },
+                                                                  child: const LMTextView(
+                                                                      text:
+                                                                          "CANCEL"),
+                                                                ),
+                                                                TextButton(
+                                                                  onPressed:
+                                                                      () {
+                                                                    DeleteConversationRequest
+                                                                        request =
+                                                                        (DeleteConversationRequestBuilder()
+                                                                              ..conversationIds([
+                                                                                item.id
+                                                                              ])
+                                                                              ..reason("Delete"))
+                                                                            .build();
+                                                                    _convActionBloc.add(
+                                                                        DeleteConversation(
+                                                                            request));
+                                                                  },
+                                                                  child: const LMTextView(
+                                                                      text:
+                                                                          "DELETE"),
+                                                                ),
+                                                              ],
+                                                            ),
+                                                          );
+                                                        } else {
+                                                          DeleteConversationRequest
+                                                              request =
+                                                              (DeleteConversationRequestBuilder()
+                                                                    ..conversationIds([
+                                                                      item.id
+                                                                    ])
+                                                                    ..reason(
+                                                                        "Delete"))
+                                                                  .build();
+                                                          _convActionBloc.add(
+                                                              DeleteConversation(
+                                                                  request));
+                                                        }
                                                       },
                                                       leading: const LMIcon(
                                                         type: LMIconType.svg,
@@ -1195,6 +1383,28 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
                             ),
                           ),
                           const Divider(),
+                          BlocListener<ChatroomActionBloc, ChatroomActionState>(
+                            listener: (context, state) {
+                              if (state is ChatroomTopicSet) {
+                                tmpTopic = state.topic;
+                                if (!showChatTopic) showChatTopic = true;
+                                rebuildChatTopic.value =
+                                    !rebuildChatTopic.value;
+                              }
+                            },
+                            child: ValueListenableBuilder(
+                              valueListenable: rebuildChatTopic,
+                              builder: (context, value, child) {
+                                if (chatroom!.topic != null && showChatTopic) {
+                                  return LMChatRoomTopic(
+                                      conversation: tmpTopic ?? chatroom!.topic,
+                                      onTap: () {});
+                                } else {
+                                  return const SizedBox.shrink();
+                                }
+                              },
+                            ),
+                          ),
                         ],
                       ),
                     ),
@@ -1298,7 +1508,7 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
                 );
               },
               linkModel: MediaModel(
-                  mediaType: LmMediaType.link,
+                  mediaType: LMMediaType.link,
                   ogTags: OgTags.fromEntity(
                       OgTagsEntity.fromJson(conversation.ogTags))));
         } else {
@@ -1327,7 +1537,7 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
               );
             },
             linkModel: MediaModel(
-                mediaType: LmMediaType.link,
+                mediaType: LMMediaType.link,
                 ogTags: mediaFiles[conversation.temporaryId]!.first.ogTags));
       } else {
         mediaWidget = null;
@@ -1388,7 +1598,7 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
               );
             },
             linkModel: MediaModel(
-                mediaType: LmMediaType.link,
+                mediaType: LMMediaType.link,
                 ogTags: OgTags.fromEntity(
                     OgTagsEntity.fromJson(conversation.ogTags))));
       } else {

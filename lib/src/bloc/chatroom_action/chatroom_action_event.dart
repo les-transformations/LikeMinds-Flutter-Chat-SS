@@ -50,14 +50,16 @@ class MuteChatroomEvent extends ChatroomActionEvent {
 class SetChatroomTopicEvent extends ChatroomActionEvent {
   final int chatroomId;
   final int conversationId;
+  final Conversation topic;
 
   SetChatroomTopicEvent({
     required this.chatroomId,
     required this.conversationId,
+    required this.topic,
   });
 
   @override
-  List<Object> get props => [chatroomId];
+  List<Object> get props => [chatroomId, conversationId, topic];
 }
 
 class ShareChatroomUrlEvent extends ChatroomActionEvent {
