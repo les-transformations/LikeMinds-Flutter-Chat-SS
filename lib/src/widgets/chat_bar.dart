@@ -69,6 +69,7 @@ class _ChatBarState extends State<ChatBar> {
   MediaModel? linkModel;
   bool showLinkPreview =
       true; // if set to false link preview should not be displayed
+  bool isActiveLink = true;
   Timer? _debounce;
 
   @override
@@ -101,16 +102,17 @@ class _ChatBarState extends State<ChatBar> {
   }
 
   void _onTextChanged(String message) {
-    if (!showLinkPreview) return;
+    // if (!showLinkPreview) return;
+    isActiveLink = true;
     if (_debounce?.isActive ?? false) {
       _debounce?.cancel();
     }
-    _debounce = Timer(const Duration(milliseconds: 500), () {
-      handleTextLinks(message);
+    _debounce = Timer(const Duration(milliseconds: 500), ()  {
+       handleTextLinks(message);
     });
   }
 
-  void handleTextLinks(String text) async {
+  Future<void> handleTextLinks(String text) async {
     String link = getFirstValidLinkFromString(text);
     if (link.isNotEmpty) {
       previewLink = link;
@@ -136,14 +138,17 @@ class _ChatBarState extends State<ChatBar> {
             'link': previewLink,
           },
         );
-        rebuildLinkPreview.value = true;
-        // if (media.isEmpty) {
-        //   rebuildLinkPreview.value = !rebuildLinkPreview.value;
-        // }
+        rebuildLinkPreview.value = !rebuildLinkPreview.value;
+      } else {
+        linkModel = null;
+        if(isActiveLink) {
+          rebuildLinkPreview.value = !rebuildLinkPreview.value;
+        }
       }
     } else if (link.isEmpty) {
+      showLinkPreview=true;
       linkModel = null;
-      rebuildLinkPreview.value = false;
+      rebuildLinkPreview.value = !rebuildLinkPreview.value;
     }
   }
 
@@ -211,12 +216,13 @@ class _ChatBarState extends State<ChatBar> {
         ValueListenableBuilder(
             valueListenable: rebuildLinkPreview,
             builder: ((context, value, child) {
-              return linkModel != null && showLinkPreview
+              return linkModel != null && showLinkPreview && isActiveLink
                   ? Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 18.0),
                       child: Stack(
                         children: [
                           LMLinkPreview(
+                            height: 120,
                             linkModel: linkModel,
                             backgroundColor: secondary.shade100,
                             showLinkUrl: false,
@@ -257,7 +263,9 @@ class _ChatBarState extends State<ChatBar> {
                             child: GestureDetector(
                               onTap: () {
                                 showLinkPreview = false;
-                                rebuildLinkPreview.value = false;
+                                linkModel =null;
+                                rebuildLinkPreview.value =
+                                    !rebuildLinkPreview.value;
                               },
                               child: const CloseButtonIcon(),
                             ),
@@ -681,6 +689,7 @@ class _ChatBarState extends State<ChatBar> {
                                         string, userTags);
                                     result = result?.trim();
                                     if (editConversation != null) {
+                                      linkModel = null;
                                       chatActionBloc!.add(EditConversation(
                                           (EditConversationRequestBuilder()
                                                 ..conversationId(
@@ -690,16 +699,18 @@ class _ChatBarState extends State<ChatBar> {
                                           replyConversation: editConversation!
                                               .replyConversationObject));
                                       linkModel = null;
+                                      isActiveLink = false;
                                       rebuildLinkPreview.value =
                                           !rebuildLinkPreview.value;
+                                      if (!showLinkPreview) {
+                                        showLinkPreview = true;
+                                      }
                                       widget.scrollToBottom();
                                     } else {
                                       // Fluttertoast.showToast(msg: "Send message");
-                                      if (showLinkPreview &&
+                                      if (isActiveLink &&
+                                          showLinkPreview &&
                                           linkModel != null) {
-                                        // showLinkPreview = false;
-                                        rebuildLinkPreview.value =
-                                            !rebuildLinkPreview.value;
                                         conversationBloc!.add(
                                             PostMultiMediaConversation(
                                                 (PostConversationRequestBuilder()
@@ -723,6 +734,12 @@ class _ChatBarState extends State<ChatBar> {
                                                   ogTags: linkModel!.ogTags)
                                             ]));
                                         linkModel = null;
+                                        isActiveLink = false;
+                                        rebuildLinkPreview.value =
+                                            !rebuildLinkPreview.value;
+                                        if (!showLinkPreview) {
+                                          showLinkPreview = true;
+                                        }
                                         widget.scrollToBottom();
                                       } else {
                                         conversationBloc!.add(
@@ -744,8 +761,12 @@ class _ChatBarState extends State<ChatBar> {
                                         );
                                       }
                                       linkModel = null;
+                                      isActiveLink = false;
                                       rebuildLinkPreview.value =
                                           !rebuildLinkPreview.value;
+                                      if (!showLinkPreview) {
+                                        showLinkPreview = true;
+                                      }
                                       widget.scrollToBottom();
                                     }
                                     if (widget.chatroom.isGuest ?? false) {
