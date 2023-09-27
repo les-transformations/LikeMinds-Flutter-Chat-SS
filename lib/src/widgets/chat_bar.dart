@@ -107,8 +107,8 @@ class _ChatBarState extends State<ChatBar> {
     if (_debounce?.isActive ?? false) {
       _debounce?.cancel();
     }
-    _debounce = Timer(const Duration(milliseconds: 500), ()  {
-       handleTextLinks(message);
+    _debounce = Timer(const Duration(milliseconds: 500), () {
+      handleTextLinks(message);
     });
   }
 
@@ -138,15 +138,16 @@ class _ChatBarState extends State<ChatBar> {
             'link': previewLink,
           },
         );
+        showLinkPreview = true;
         rebuildLinkPreview.value = !rebuildLinkPreview.value;
       } else {
         linkModel = null;
-        if(isActiveLink) {
+        if (isActiveLink) {
           rebuildLinkPreview.value = !rebuildLinkPreview.value;
         }
       }
     } else if (link.isEmpty) {
-      showLinkPreview=true;
+      showLinkPreview = false;
       linkModel = null;
       rebuildLinkPreview.value = !rebuildLinkPreview.value;
     }
@@ -263,7 +264,7 @@ class _ChatBarState extends State<ChatBar> {
                             child: GestureDetector(
                               onTap: () {
                                 showLinkPreview = false;
-                                linkModel =null;
+                                linkModel = null;
                                 rebuildLinkPreview.value =
                                     !rebuildLinkPreview.value;
                               },
