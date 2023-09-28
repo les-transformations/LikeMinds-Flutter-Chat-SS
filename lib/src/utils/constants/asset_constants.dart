@@ -17,6 +17,7 @@ const String ssDeleteIcon =
 const String ssEditIcon = 'packages/likeminds_chat_ss_fl/assets/icons/edit.svg';
 const String ssReplyIcon =
     'packages/likeminds_chat_ss_fl/assets/icons/reply.svg';
+const String ssPinIcon = 'packages/likeminds_chat_ss_fl/assets/icons/pin.svg';
 const String ssSelectIcon =
     'packages/likeminds_chat_ss_fl/assets/icons/select.svg';
 const String ssAttachmentIcon =

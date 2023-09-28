@@ -1,6 +1,7 @@
 import 'dart:collection';
 
 import 'package:likeminds_chat_fl/likeminds_chat_fl.dart';
+import 'package:likeminds_chat_ss_fl/src/utils/tagging/helpers/tagging_helper.dart';
 
 List<Conversation>? addTimeStampInConversationList(
     List<Conversation>? conversationList, int communityId) {
@@ -38,4 +39,23 @@ List<Conversation>? addTimeStampInConversationList(
     },
   );
   return conversationListWithTimeStamp;
+}
+
+/// Helps us handle the state message addition to the list locally on
+/// new chatroom topic selection by creating it using the [User] and [Conversation]
+/// params - [User] loggedInUser, [Conversation] newTopic
+Conversation conversationToLocalTopicStateMessage(
+    User loggedInUser, Conversation newTopic) {
+  Conversation stateMessage;
+  String mockBackendMessage = newTopic.answer.isNotEmpty
+      ? "${loggedInUser.name} changed current topic to ${TaggingHelper.extractStateMessage(newTopic.answer)}"
+      : "${loggedInUser.name} set a media message as current topic";
+  stateMessage = Conversation(
+    answer: mockBackendMessage,
+    createdAt: DateTime.now().millisecondsSinceEpoch.toString(),
+    header: null,
+    id: 0,
+    state: 1,
+  );
+  return stateMessage;
 }

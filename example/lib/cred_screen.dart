@@ -25,6 +25,10 @@ class MyApp extends StatelessWidget {
     loadFonts();
     return Sizer(
       builder: (context, orientation, deviceType) => OverlaySupport.global(
+        toastTheme: ToastThemeData(
+          background: Colors.black.withOpacity(0.6),
+          textColor: Colors.white,
+        ),
         child: MaterialApp(
           title: 'Chat App for UI + SDK package',
           debugShowCheckedModeBanner: main.isDebug,

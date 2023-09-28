@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 import 'dart:ui' as ui;
 
@@ -20,6 +21,7 @@ import 'package:likeminds_chat_ss_fl/src/utils/tagging/tagging_textfield_ta.dart
 import 'package:image_picker/image_picker.dart';
 import 'package:likeminds_chat_fl/likeminds_chat_fl.dart';
 import 'package:overlay_support/overlay_support.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class ChatBar extends StatefulWidget {
   final ChatRoom chatroom;
@@ -62,6 +64,14 @@ class _ChatBarState extends State<ChatBar> {
   List<UserTag> userTags = [];
   String? result;
 
+  ValueNotifier<bool> rebuildLinkPreview = ValueNotifier(false);
+  String previewLink = '';
+  MediaModel? linkModel;
+  bool showLinkPreview =
+      true; // if set to false link preview should not be displayed
+  bool isActiveLink = true;
+  Timer? _debounce;
+
   @override
   void initState() {
     Bloc.observer = SimpleBlocObserver();
@@ -87,7 +97,60 @@ class _ChatBarState extends State<ChatBar> {
     _textEditingController.dispose();
     _focusNode.dispose();
     replyToConversation = null;
+    _debounce?.cancel();
     super.dispose();
+  }
+
+  void _onTextChanged(String message) {
+    // if (!showLinkPreview) return;
+    isActiveLink = true;
+    if (_debounce?.isActive ?? false) {
+      _debounce?.cancel();
+    }
+    _debounce = Timer(const Duration(milliseconds: 500), () {
+      handleTextLinks(message);
+    });
+  }
+
+  Future<void> handleTextLinks(String text) async {
+    String link = getFirstValidLinkFromString(text);
+    if (link.isNotEmpty) {
+      previewLink = link;
+      DecodeUrlRequest request =
+          (DecodeUrlRequestBuilder()..url(previewLink)).build();
+      LMResponse<DecodeUrlResponse> response =
+          await locator<LikeMindsService>().decodeUrl(request);
+      if (response.success == true) {
+        OgTags? responseTags = response.data!.ogTags;
+        linkModel = MediaModel(
+          mediaType: LMMediaType.link,
+          link: previewLink,
+          ogTags: OgTags(
+            description: responseTags!.description,
+            image: responseTags.image,
+            title: responseTags.title,
+            url: responseTags.url,
+          ),
+        );
+        LMAnalytics.get().track(
+          AnalyticsKeys.attachmentsUploaded,
+          {
+            'link': previewLink,
+          },
+        );
+        showLinkPreview = true;
+        rebuildLinkPreview.value = !rebuildLinkPreview.value;
+      } else {
+        linkModel = null;
+        if (isActiveLink) {
+          rebuildLinkPreview.value = !rebuildLinkPreview.value;
+        }
+      }
+    } else if (link.isEmpty) {
+      showLinkPreview = false;
+      linkModel = null;
+      rebuildLinkPreview.value = !rebuildLinkPreview.value;
+    }
   }
 
   bool checkIfAnnouncementChannel() {
@@ -151,6 +214,68 @@ class _ChatBarState extends State<ChatBar> {
         editConversation != null && checkIfAnnouncementChannel()
             ? _getEditConversation()
             : const SizedBox(),
+        ValueListenableBuilder(
+            valueListenable: rebuildLinkPreview,
+            builder: ((context, value, child) {
+              return linkModel != null && showLinkPreview && isActiveLink
+                  ? Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 18.0),
+                      child: Stack(
+                        children: [
+                          LMLinkPreview(
+                            height: 120,
+                            linkModel: linkModel,
+                            backgroundColor: secondary.shade100,
+                            showLinkUrl: false,
+                            onTap: () {
+                              launchUrl(
+                                Uri.parse(linkModel?.ogTags?.url ?? ''),
+                                mode: LaunchMode.externalApplication,
+                              );
+                            },
+                            border: Border.all(
+                              width: 1,
+                              color: secondary.shade100,
+                            ),
+                            title: LMTextView(
+                              text: linkModel?.ogTags?.title ?? "--",
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              textStyle: const TextStyle(
+                                fontWeight: FontWeight.w600,
+                                color: kBlackColor,
+                                height: 1.30,
+                              ),
+                            ),
+                            subtitle: LMTextView(
+                              text: linkModel?.ogTags?.description ?? "--",
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              textStyle: const TextStyle(
+                                color: kBlackColor,
+                                fontWeight: FontWeight.w400,
+                                height: 1.30,
+                              ),
+                            ),
+                          ),
+                          Positioned(
+                            top: 5,
+                            right: 5,
+                            child: GestureDetector(
+                              onTap: () {
+                                showLinkPreview = false;
+                                linkModel = null;
+                                rebuildLinkPreview.value =
+                                    !rebuildLinkPreview.value;
+                              },
+                              child: const CloseButtonIcon(),
+                            ),
+                          )
+                        ],
+                      ),
+                    )
+                  : const SizedBox();
+            })),
         Container(
           width: 100.w,
           color: kWhiteColor,
@@ -201,7 +326,7 @@ class _ChatBarState extends State<ChatBar> {
                                 'tagged_user_name': tag.name,
                               });
                             },
-                            onChange: (value) {},
+                            onChange: _onTextChanged,
                             controller: _textEditingController,
                             decoration: InputDecoration(
                               border: InputBorder.none,
@@ -565,6 +690,7 @@ class _ChatBarState extends State<ChatBar> {
                                         string, userTags);
                                     result = result?.trim();
                                     if (editConversation != null) {
+                                      linkModel = null;
                                       chatActionBloc!.add(EditConversation(
                                           (EditConversationRequestBuilder()
                                                 ..conversationId(
@@ -573,26 +699,75 @@ class _ChatBarState extends State<ChatBar> {
                                               .build(),
                                           replyConversation: editConversation!
                                               .replyConversationObject));
+                                      linkModel = null;
+                                      isActiveLink = false;
+                                      rebuildLinkPreview.value =
+                                          !rebuildLinkPreview.value;
+                                      if (!showLinkPreview) {
+                                        showLinkPreview = true;
+                                      }
                                       widget.scrollToBottom();
                                     } else {
                                       // Fluttertoast.showToast(msg: "Send message");
-                                      conversationBloc!.add(
-                                        PostConversation(
-                                            postConversationRequest:
+                                      if (isActiveLink &&
+                                          showLinkPreview &&
+                                          linkModel != null) {
+                                        conversationBloc!.add(
+                                            PostMultiMediaConversation(
                                                 (PostConversationRequestBuilder()
                                                       ..chatroomId(
                                                           widget.chatroom.id)
+                                                      ..temporaryId(DateTime
+                                                              .now()
+                                                          .millisecondsSinceEpoch
+                                                          .toString())
                                                       ..text(result!)
                                                       ..replyId(
                                                           replyToConversation
                                                               ?.id)
-                                                      ..temporaryId(DateTime
-                                                              .now()
-                                                          .millisecondsSinceEpoch
-                                                          .toString()))
+                                                      ..ogTags(
+                                                          linkModel!.ogTags!)
+                                                      ..shareLink(linkModel!.link!))
                                                     .build(),
-                                            repliedTo: replyToConversation),
-                                      );
+                                                [
+                                              Media(
+                                                  mediaType: MediaType.link,
+                                                  ogTags: linkModel!.ogTags)
+                                            ]));
+                                        linkModel = null;
+                                        isActiveLink = false;
+                                        rebuildLinkPreview.value =
+                                            !rebuildLinkPreview.value;
+                                        if (!showLinkPreview) {
+                                          showLinkPreview = true;
+                                        }
+                                        widget.scrollToBottom();
+                                      } else {
+                                        conversationBloc!.add(
+                                          PostConversation(
+                                              postConversationRequest:
+                                                  (PostConversationRequestBuilder()
+                                                        ..chatroomId(
+                                                            widget.chatroom.id)
+                                                        ..text(result!)
+                                                        ..replyId(
+                                                            replyToConversation
+                                                                ?.id)
+                                                        ..temporaryId(DateTime
+                                                                .now()
+                                                            .millisecondsSinceEpoch
+                                                            .toString()))
+                                                      .build(),
+                                              repliedTo: replyToConversation),
+                                        );
+                                      }
+                                      linkModel = null;
+                                      isActiveLink = false;
+                                      rebuildLinkPreview.value =
+                                          !rebuildLinkPreview.value;
+                                      if (!showLinkPreview) {
+                                        showLinkPreview = true;
+                                      }
                                       widget.scrollToBottom();
                                     }
                                     if (widget.chatroom.isGuest ?? false) {

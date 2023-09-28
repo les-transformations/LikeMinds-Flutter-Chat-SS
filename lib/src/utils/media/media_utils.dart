@@ -137,6 +137,7 @@ Widget getImageMessage(
     return GestureDetector(
       onTap: onTap,
       child: Row(
+        mainAxisSize: MainAxisSize.min,
         children: <Widget>[
           getChatBubbleImage(
             conversationAttachments[0],
@@ -156,6 +157,7 @@ Widget getImageMessage(
     return GestureDetector(
       onTap: onTap,
       child: Row(
+        mainAxisSize: MainAxisSize.min,
         children: <Widget>[
           getChatBubbleImage(
             conversationAttachments[0],
@@ -202,8 +204,10 @@ Widget getImageMessage(
     return GestureDetector(
       onTap: onTap,
       child: Column(
+        mainAxisSize: MainAxisSize.min,
         children: [
           Row(
+            mainAxisSize: MainAxisSize.min,
             children: <Widget>[
               getChatBubbleImage(
                 conversationAttachments[0],
@@ -220,6 +224,7 @@ Widget getImageMessage(
           ),
           kVerticalPaddingSmall,
           Row(
+            mainAxisSize: MainAxisSize.min,
             children: <Widget>[
               getChatBubbleImage(
                 conversationAttachments[2],
@@ -243,6 +248,7 @@ Widget getImageMessage(
       child: Column(
         children: [
           Row(
+            mainAxisSize: MainAxisSize.min,
             children: <Widget>[
               getChatBubbleImage(
                 conversationAttachments[0],
@@ -259,6 +265,7 @@ Widget getImageMessage(
           ),
           kVerticalPaddingSmall,
           Row(
+            mainAxisSize: MainAxisSize.min,
             children: <Widget>[
               getChatBubbleImage(
                 conversationAttachments[2],
@@ -359,6 +366,7 @@ Widget getImageFileMessage(BuildContext context, List<Media> mediaFiles) {
   } else if (mediaFiles.length == 2) {
     return GestureDetector(
       child: Row(
+        mainAxisSize: MainAxisSize.min,
         children: <Widget>[
           getFileImageTile(
             mediaFiles[0],
@@ -377,6 +385,7 @@ Widget getImageFileMessage(BuildContext context, List<Media> mediaFiles) {
   } else if (mediaFiles.length == 3) {
     return GestureDetector(
       child: Row(
+        mainAxisSize: MainAxisSize.min,
         children: <Widget>[
           getFileImageTile(
             mediaFiles[0],
@@ -422,8 +431,10 @@ Widget getImageFileMessage(BuildContext context, List<Media> mediaFiles) {
   } else if (mediaFiles.length == 4) {
     return GestureDetector(
       child: Column(
+        mainAxisSize: MainAxisSize.min,
         children: [
           Row(
+            mainAxisSize: MainAxisSize.min,
             children: <Widget>[
               getFileImageTile(
                 mediaFiles[0],
@@ -440,6 +451,7 @@ Widget getImageFileMessage(BuildContext context, List<Media> mediaFiles) {
           ),
           kVerticalPaddingSmall,
           Row(
+            mainAxisSize: MainAxisSize.min,
             children: <Widget>[
               getFileImageTile(
                 mediaFiles[2],
@@ -460,8 +472,10 @@ Widget getImageFileMessage(BuildContext context, List<Media> mediaFiles) {
   } else {
     return GestureDetector(
       child: Column(
+        mainAxisSize: MainAxisSize.min,
         children: [
           Row(
+            mainAxisSize: MainAxisSize.min,
             children: <Widget>[
               getFileImageTile(
                 mediaFiles[0],
@@ -478,6 +492,7 @@ Widget getImageFileMessage(BuildContext context, List<Media> mediaFiles) {
           ),
           kVerticalPaddingSmall,
           Row(
+            mainAxisSize: MainAxisSize.min,
             children: <Widget>[
               getFileImageTile(
                 mediaFiles[2],
