@@ -901,7 +901,7 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
                                             fontWeight: FontWeight.bold,
                                             color: secondary.shade100,
                                           ),
-                                          visibleLines: 2,
+                                          visibleLines: 4,
                                           animation: true,
                                         ),
                                         borderRadius: const BorderRadius.only(
@@ -1683,6 +1683,7 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
       }
       return Column(
         crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
         children: [
           Stack(
             children: [

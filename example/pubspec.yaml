@@ -2,7 +2,7 @@ name: likeminds_chat_ss_sample
 description: Sample app running the SS package with demo creds.
 publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 
-version: 1.0.5
+version: 1.1.0
 
 environment:
   sdk: '>=3.0.0 <4.0.0'
