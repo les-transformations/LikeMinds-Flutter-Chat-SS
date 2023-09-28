@@ -956,7 +956,7 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
                                         mediaWidget:
                                             item.deletedByUserId == null
                                                 ? getContent(item)
-                                                : const SizedBox.shrink(),
+                                                : null,
                                       )
                                     : LMChatBubble(
                                         currentUser: user!,
@@ -1371,10 +1371,45 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
                                     ),
                                   ),
                                 ),
-                                LMProfilePicture(
-                                  fallbackText: chatroom!.header,
-                                  imageUrl: chatroom?.chatroomImageUrl,
-                                  size: 36,
+                                GestureDetector(
+                                  behavior: HitTestBehavior.opaque,
+                                  onTap: () {
+                                    chatroom != null
+                                        ? showBottomSheet(
+                                            context: context,
+                                            builder: (context) {
+                                              return LMGroupDetailBottomSheet(
+                                                chatRoom: chatroom!,
+                                                backgroundColor: Colors.white
+                                                    .withOpacity(0.9),
+                                                swipeChipColor: kGrey3Color
+                                                    .withOpacity(0.6),
+                                                descriptionHeading: LMTextView(
+                                                  text: chatroom!.title,
+                                                  textStyle: const TextStyle(
+                                                    color: Color.fromARGB(
+                                                        255, 30, 41, 59),
+                                                    fontSize: 18,
+                                                  ),
+                                                ),
+                                                description: LMTextView(
+                                                  text: chatroom!.title,
+                                                  textStyle: const TextStyle(
+                                                    color: Color.fromARGB(
+                                                        255, 30, 41, 59),
+                                                    fontSize: 16,
+                                                  ),
+                                                ),
+                                              );
+                                            },
+                                          )
+                                        : {};
+                                  },
+                                  child: LMProfilePicture(
+                                    fallbackText: chatroom!.header,
+                                    imageUrl: chatroom?.chatroomImageUrl,
+                                    size: 36,
+                                  ),
                                 ),
                                 SizedBox(width: 2.w),
                                 Expanded(
@@ -1389,6 +1424,25 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
                                                   chatRoom: chatroom!,
                                                   backgroundColor: Colors.white
                                                       .withOpacity(0.9),
+                                                  swipeChipColor: kGrey3Color
+                                                      .withOpacity(0.6),
+                                                  descriptionHeading:
+                                                      LMTextView(
+                                                    text: chatroom!.title,
+                                                    textStyle: const TextStyle(
+                                                      color: Color.fromARGB(
+                                                          255, 30, 41, 59),
+                                                      fontSize: 18,
+                                                    ),
+                                                  ),
+                                                  description: LMTextView(
+                                                    text: chatroom!.title,
+                                                    textStyle: const TextStyle(
+                                                      color: Color.fromARGB(
+                                                          255, 30, 41, 59),
+                                                      fontSize: 16,
+                                                    ),
+                                                  ),
                                                 );
                                               },
                                             )
