@@ -18,6 +18,29 @@ class ChatroomActionBloc
             .markReadChatroom((MarkReadChatroomRequestBuilder()
                   ..chatroomId(event.chatroomId))
                 .build());
+      } else if (event is SetChatroomTopicEvent) {
+        try {
+          emit(ChatroomActionLoading());
+          LMResponse<SetChatroomTopicResponse> response =
+              await locator<LikeMindsService>()
+                  .setChatroomTopic((SetChatroomTopicRequestBuilder()
+                        ..chatroomId(event.chatroomId)
+                        ..conversationId(event.conversationId))
+                      .build());
+          if (response.success) {
+            if (response.data!.success) {
+              emit(ChatroomTopicSet(event.topic));
+            } else {
+              emit(ChatroomTopicError(
+                  errorMessage: response.data!.errorMessage!));
+            }
+          } else {
+            emit(ChatroomTopicError(errorMessage: response.errorMessage!));
+          }
+        } catch (e) {
+          emit(ChatroomTopicError(
+              errorMessage: "An error occurred while setting topic"));
+        }
       }
     });
   }

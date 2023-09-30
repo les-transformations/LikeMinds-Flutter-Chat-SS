@@ -1,11 +1,12 @@
 import 'dart:io';
+import 'package:likeminds_chat_fl/likeminds_chat_fl.dart';
 import 'package:likeminds_chat_ss_fl/src/utils/constants/string_constants.dart';
 import 'package:likeminds_chat_ss_fl/src/utils/credentials/credentials.dart';
 import 'package:likeminds_chat_ss_fl/src/utils/imports.dart';
 
 import 'package:simple_s3/simple_s3.dart';
 
-enum MediaType { photo, video, document, audio, gif, voiceNote }
+enum MediaType { photo, video, document, audio, gif, voiceNote, link }
 
 String mapMediaTypeToString(MediaType mediaType) {
   switch (mediaType) {
@@ -21,6 +22,8 @@ String mapMediaTypeToString(MediaType mediaType) {
       return kAttachmentTypeGIF;
     case MediaType.voiceNote:
       return kAttachmentTypeVoiceNote;
+    case MediaType.link:
+      return kAttachmentTypeLink;
     default:
       return kAttachmentTypeImage;
   }
@@ -40,6 +43,8 @@ MediaType mapStringToMediaType(String mediaType) {
       return MediaType.gif;
     case kAttachmentTypeVoiceNote:
       return MediaType.voiceNote;
+    case kAttachmentTypeLink:
+      return MediaType.link;
     default:
       return MediaType.photo;
   }
@@ -55,6 +60,7 @@ class Media {
   File? thumbnailFile;
   int? pageCount;
   int? size; // In bytes
+  OgTags? ogTags;
 
   Media({
     this.mediaFile,
@@ -66,6 +72,7 @@ class Media {
     this.thumbnailFile,
     this.thumbnailUrl,
     this.width,
+    this.ogTags,
   });
 
   static Media fromJson(dynamic json) => Media(
@@ -76,6 +83,7 @@ class Media {
         width: json['width'] as int?,
         thumbnailUrl: json['thumbnail_url'] as String?,
         pageCount: json['meta']['number_of_page'] as int?,
+        ogTags: OgTags.fromEntity(OgTagsEntity.fromJson(json['og_tags']??{}))
       );
 }
 
