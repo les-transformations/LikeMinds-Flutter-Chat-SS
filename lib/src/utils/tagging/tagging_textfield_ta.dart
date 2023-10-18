@@ -79,7 +79,7 @@ class _LMTextFieldState extends State<LMTextField> {
       if (currentText.isEmpty) {
         return const Iterable.empty();
       } else if (!tagComplete && currentText.contains('@')) {
-        String tag = tagValue.substring(1).replaceAll(' ', '');
+        String tag = tagValue.substring(1).split(' ').first;
         final taggingData = (await locator<LikeMindsService>().getTaggingList(
           (TagRequestModelBuilder()
                 ..chatroomId(widget.chatroomId)
@@ -211,6 +211,8 @@ class _LMTextFieldState extends State<LMTextField> {
           setState(() {
             tagComplete = true;
             tagCount = '@'.allMatches(_controller.text).length;
+            int currentPosition = _controller.selection.base.offset;
+            String suffix = _controller.text.substring(currentPosition);
             // _controller.text.substring(_controller.text.lastIndexOf('@'));
             if (textValue.length > 2 &&
                 textValue.substring(textValue.length - 1) == '~') {
@@ -218,9 +220,9 @@ class _LMTextFieldState extends State<LMTextField> {
             } else {
               textValue += "@${suggestion.name!}~";
             }
-            _controller.text = '$textValue ';
+            _controller.text = '$textValue $suffix';
             _controller.selection = TextSelection.fromPosition(
-                TextPosition(offset: _controller.text.length));
+                TextPosition(offset: _controller.text.length - suffix.length));
             tagValue = '';
             textValue = _controller.value.text;
             page = 1;
