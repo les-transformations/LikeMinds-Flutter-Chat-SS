@@ -1,4 +1,3 @@
-
 import 'package:custom_pop_up_menu/custom_pop_up_menu.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
@@ -25,6 +24,7 @@ import 'package:likeminds_chat_ss_fl/src/utils/ui_utils.dart';
 import 'package:likeminds_chat_ss_fl/src/widgets/chat_bar.dart';
 import 'package:likeminds_chat_ss_fl/src/widgets/chatroom_menu.dart';
 import 'package:likeminds_chat_ss_fl/src/widgets/chatroom_skeleton.dart';
+import 'package:likeminds_chat_ss_fl/src/widgets/confirmation_dialogue.dart';
 import 'package:likeminds_chat_ss_fl/src/widgets/media/document/document_preview_factory.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:likeminds_chat_fl/likeminds_chat_fl.dart';
@@ -607,7 +607,7 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
                                         currentUser: user!,
                                         key: Key(item.id.toString()),
                                         isSent: item.userId == user!.id,
-                                        backgroundColor: secondary.shade500,
+                                        backgroundColor:item.deletedByUserId!=null?secondary.shade200: secondary.shade500,
                                         deletedText: item.deletedByUserId !=
                                                 null
                                             ? getDeletedTextWidget(item, user!)
@@ -616,7 +616,7 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
                                           if (user!.id ==
                                                   chatroom!.member!.id ||
                                               user!.state == 1)
-                                            LMMenuItem(
+                                            LMMenuItemUI(
                                               onTap: () {
                                                 if (localTopic != null
                                                     ? localTopic!.id != item.id
@@ -646,7 +646,7 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
                                                 ),
                                               ),
                                             ),
-                                          LMMenuItem(
+                                          LMMenuItemUI(
                                             onTap: () {
                                               int userId =
                                                   item.userId ?? item.memberId!;
@@ -677,7 +677,7 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
                                               ),
                                             ),
                                           ),
-                                          LMMenuItem(
+                                          LMMenuItemUI(
                                             onTap: () {
                                               Clipboard.setData(
                                                 ClipboardData(
@@ -703,7 +703,7 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
                                             ),
                                           ),
                                           if (checkDeletePermissions(item))
-                                            LMMenuItem(
+                                            LMMenuItemUI(
                                               onTap: () async {
                                                 if ((localTopic != null &&
                                                         localTopic!.id ==
@@ -714,44 +714,34 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
                                                                 .topic!.id)) {
                                                   showDialog(
                                                       context: context,
-                                                      builder:
-                                                          (context) => Dialog(
-                                                                child: Column(
-                                                                  children: [
-                                                                    const Text(
-                                                                        "Delete Message?"),
-                                                                    const Text(
-                                                                        "Are you sure you want to delete this message? The message has been set as current topic of this chatroom"),
-                                                                    Row(
-                                                                      children: [
-                                                                        TextButton(
-                                                                          onPressed:
-                                                                              () {
-                                                                            Navigator.pop(context);
-                                                                          },
-                                                                          child:
-                                                                              const LMTextView(text: "CANCEL"),
-                                                                        ),
-                                                                        TextButton(
-                                                                          onPressed:
-                                                                              () {
-                                                                            DeleteConversationRequest request = (DeleteConversationRequestBuilder()
-                                                                                  ..conversationIds([
-                                                                                    item.id
-                                                                                  ])
-                                                                                  ..reason("Delete"))
-                                                                                .build();
-                                                                            _convActionBloc.add(DeleteConversation(request));
-                                                                            Navigator.pop(context);
-                                                                          },
-                                                                          child:
-                                                                              const LMTextView(text: "DELETE"),
-                                                                        ),
-                                                                      ],
-                                                                    ),
-                                                                  ],
-                                                                ),
-                                                              ));
+                                                      builder: (context) =>
+                                                          LMConfirmationDialogue(
+                                                            width: 270,
+                                                            titleText:
+                                                                "Delete Chat",
+                                                            bodyText:
+                                                                "Are you sure you want to delete this chat? The message has been set as current topic of this chatroom",
+                                                            onCancel: () {
+                                                              Navigator.pop(
+                                                                  context);
+                                                            },
+                                                            onDelete: () {
+                                                              DeleteConversationRequest
+                                                                  request =
+                                                                  (DeleteConversationRequestBuilder()
+                                                                        ..conversationIds([
+                                                                          item.id
+                                                                        ])
+                                                                        ..reason(
+                                                                            "Delete"))
+                                                                      .build();
+                                                              _convActionBloc.add(
+                                                                  DeleteConversation(
+                                                                      request));
+                                                              Navigator.pop(
+                                                                  context);
+                                                            },
+                                                          ));
                                                 } else {
                                                   DeleteConversationRequest
                                                       request =
@@ -906,12 +896,11 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
                                         key: Key(item.id.toString()),
                                         isSent: item.userId == user!.id,
                                         backgroundColor: secondary.shade100,
-
                                         menuItems: [
                                           if (user!.id ==
                                                   chatroom!.member!.id ||
                                               user!.state == 1)
-                                            LMMenuItem(
+                                            LMMenuItemUI(
                                               onTap: () {
                                                 if (localTopic != null
                                                     ? localTopic!.id != item.id
@@ -941,7 +930,7 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
                                                 ),
                                               ),
                                             ),
-                                          LMMenuItem(
+                                          LMMenuItemUI(
                                             onTap: () {
                                               int userId =
                                                   item.userId ?? item.memberId!;
@@ -972,7 +961,7 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
                                               ),
                                             ),
                                           ),
-                                          LMMenuItem(
+                                          LMMenuItemUI(
                                             onTap: () {
                                               Clipboard.setData(
                                                 ClipboardData(
@@ -998,7 +987,7 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
                                             ),
                                           ),
                                           if (checkDeletePermissions(item))
-                                            LMMenuItem(
+                                            LMMenuItemUI(
                                               onTap: () async {
                                                 if ((localTopic != null &&
                                                         localTopic!.id ==
@@ -1009,55 +998,65 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
                                                                 .topic!.id)) {
                                                   showDialog(
                                                       context: context,
-                                                      builder:
-                                                          (context) => Dialog(
-                                                                child: Column(
-                                                                  children: [
-                                                                    const Text(
-                                                                        "Delete Message?"),
-                                                                    const Text(
-                                                                        "Are you sure you want to delete this message? The message has been set as current topic of this chatroom"),
-                                                                    Row(
-                                                                      children: [
-                                                                        TextButton(
-                                                                          onPressed:
-                                                                              () {
-                                                                            Navigator.pop(context);
-                                                                          },
-                                                                          child:
-                                                                              const LMTextView(text: "CANCEL"),
-                                                                        ),
-                                                                        TextButton(
-                                                                          onPressed:
-                                                                              () {
-                                                                            DeleteConversationRequest request = (DeleteConversationRequestBuilder()
-                                                                                  ..conversationIds([
-                                                                                    item.id
-                                                                                  ])
-                                                                                  ..reason("Delete"))
-                                                                                .build();
-                                                                            _convActionBloc.add(DeleteConversation(request));
-                                                                            Navigator.pop(context);
-                                                                          },
-                                                                          child:
-                                                                              const LMTextView(text: "DELETE"),
-                                                                        ),
-                                                                      ],
-                                                                    ),
-                                                                  ],
-                                                                ),
-                                                              ));
+                                                      builder: (context) =>
+                                                          LMConfirmationDialogue(
+                                                            width: 270,
+                                                            titleText:
+                                                                "Delete Chat",
+                                                            bodyText:
+                                                                "Are you sure you want to delete this chat? The message has been set as current topic of this chatroom",
+                                                            onCancel: () {
+                                                              Navigator.pop(
+                                                                  context);
+                                                            },
+                                                            onDelete: () {
+                                                              DeleteConversationRequest
+                                                                  request =
+                                                                  (DeleteConversationRequestBuilder()
+                                                                        ..conversationIds([
+                                                                          item.id
+                                                                        ])
+                                                                        ..reason(
+                                                                            "Delete"))
+                                                                      .build();
+                                                              _convActionBloc.add(
+                                                                  DeleteConversation(
+                                                                      request));
+                                                              Navigator.pop(
+                                                                  context);
+                                                            },
+                                                          ));
                                                 } else {
-                                                  DeleteConversationRequest
-                                                      request =
-                                                      (DeleteConversationRequestBuilder()
-                                                            ..conversationIds(
-                                                                [item.id])
-                                                            ..reason("Delete"))
-                                                          .build();
-                                                  _convActionBloc.add(
-                                                      DeleteConversation(
-                                                          request));
+                                                  showDialog(
+                                                      context: context,
+                                                      builder: (context) =>
+                                                          LMConfirmationDialogue(
+                                                            width: 270,
+                                                            titleText:
+                                                                "Delete Chat",
+                                                            bodyText:
+                                                                "Are you sure you want to delete this chat?",
+                                                            onCancel: () {
+                                                              Navigator.pop(
+                                                                  context);
+                                                            },
+                                                            onDelete: () {
+                                                              DeleteConversationRequest
+                                                                  request =
+                                                                  (DeleteConversationRequestBuilder()
+                                                                        ..conversationIds([
+                                                                          item.id
+                                                                        ])
+                                                                        ..reason(
+                                                                            "Delete"))
+                                                                      .build();
+                                                              _convActionBloc.add(
+                                                                  DeleteConversation(
+                                                                      request));
+                                                              Navigator.pop(
+                                                                  context);
+                                                            },
+                                                          ));
                                                 }
                                               },
                                               leading: const LMIcon(
@@ -1074,7 +1073,6 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
                                               ),
                                             ),
                                         ],
-
                                         onReply: (replyingTo) {
                                           int userId =
                                               item.userId ?? item.memberId!;
