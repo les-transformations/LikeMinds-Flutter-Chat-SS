@@ -5,8 +5,8 @@ import 'package:flutter/cupertino.dart';
 import 'package:likeminds_chat_ss_fl/src/utils/constants/constants.dart';
 import 'package:likeminds_chat_ui_fl/likeminds_chat_ui_fl.dart';
 
-class LMConfirmationDialogue extends StatelessWidget {
-  const LMConfirmationDialogue({
+class LMConfirmationDialog extends StatelessWidget {
+  const LMConfirmationDialog({
     super.key,
     this.height,
     this.width,

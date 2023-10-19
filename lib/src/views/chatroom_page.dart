@@ -715,7 +715,7 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
                                                   showDialog(
                                                       context: context,
                                                       builder: (context) =>
-                                                          LMConfirmationDialogue(
+                                                          LMConfirmationDialog(
                                                             width: 270,
                                                             titleText:
                                                                 "Delete Chat",
@@ -999,7 +999,7 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
                                                   showDialog(
                                                       context: context,
                                                       builder: (context) =>
-                                                          LMConfirmationDialogue(
+                                                          LMConfirmationDialog(
                                                             width: 270,
                                                             titleText:
                                                                 "Delete Chat",
@@ -1030,7 +1030,7 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
                                                   showDialog(
                                                       context: context,
                                                       builder: (context) =>
-                                                          LMConfirmationDialogue(
+                                                          LMConfirmationDialog(
                                                             width: 270,
                                                             titleText:
                                                                 "Delete Chat",
