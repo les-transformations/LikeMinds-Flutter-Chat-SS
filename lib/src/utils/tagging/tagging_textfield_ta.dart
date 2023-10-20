@@ -160,6 +160,11 @@ class _LMTextFieldState extends State<LMTextField> {
               tagCount = completeCount;
               tagValue = value.substring(value.lastIndexOf('@'));
               textValue = value.substring(0, value.lastIndexOf('@'));
+            } else {
+               int currentPosition = _controller.selection.base.offset;
+               if(_controller.text[currentPosition]=='~') {
+                _controller.text = _controller.text.replaceRange(currentPosition, currentPosition+1, "");
+               }
             }
           }),
         ),
