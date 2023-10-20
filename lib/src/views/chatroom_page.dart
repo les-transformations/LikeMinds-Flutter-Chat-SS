@@ -642,7 +642,8 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
                                                   if (user!.id ==
                                                           chatroom!
                                                               .member!.id ||
-                                                      user!.state == 1)
+                                                      locator<LMPreferenceService>()
+                                                          .fetchMemberRight(1))
                                                     InkWell(
                                                       splashColor: Colors.grey,
                                                       onTap: () {},
@@ -654,8 +655,8 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
                                                               ? localTopic!
                                                                       .id !=
                                                                   item.id
-                                                              : chatroom!.topic!
-                                                                      .id !=
+                                                              : chatroom!.topic
+                                                                      ?.id !=
                                                                   item.id) {
                                                             _chatroomActionBloc
                                                                 .add(
@@ -988,7 +989,8 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
                                                   if (user!.id ==
                                                           chatroom!
                                                               .member!.id ||
-                                                      user!.state == 1)
+                                                      locator<LMPreferenceService>()
+                                                          .fetchMemberRight(1))
                                                     ListTile(
                                                       onTap: () {
                                                         chatBubbleController

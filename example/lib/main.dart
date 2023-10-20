@@ -33,7 +33,8 @@ void main() async {
   ]);
   await setupNotifications();
   LMChat.setupLMChat(
-    apiKey: !isDebug ? EnvProd.apiKey : EnvDev.apiKey,
+    // apiKey: !isDebug ? EnvProd.apiKey : EnvDev.apiKey,
+    apiKey: "7c59da2f-7bb4-435e-a976-08a339cdc1fa",
     lmCallBack: ExampleCallback(),
   );
   // await AppLocalPreference.instance.initialize();

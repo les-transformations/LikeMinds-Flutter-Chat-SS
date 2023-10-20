@@ -407,7 +407,7 @@ class _CredScreenState extends State<CredScreen> {
                   } else {
                     lmChat = LMChat.instance(
                       builder: LMChatBuilder()
-                        ..userId(userId)
+                        ..userId("662c81e3-8cb3-413f-82f8-442646779802")
                         ..userName(username)
                         ..defaultChatroom(defaultChatroom)
                         ..backButtonCallback(() {
