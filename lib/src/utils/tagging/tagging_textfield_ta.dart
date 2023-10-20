@@ -12,6 +12,7 @@ class LMTextField extends StatefulWidget {
   final TextStyle? style;
   final Function(String)? onChange;
   final int chatroomId;
+  final bool isSecret;
 
   const LMTextField({
     super.key,
@@ -20,6 +21,7 @@ class LMTextField extends StatefulWidget {
     required this.onTagSelected,
     required this.controller,
     required this.focusNode,
+    this.isSecret = false,
     this.style,
     this.decoration,
     this.onChange,
@@ -89,9 +91,18 @@ class _LMTextFieldState extends State<LMTextField> {
               .build(),
         ))
             .data;
-        if (taggingData!.members != null && taggingData.members!.isNotEmpty) {
-          userTags = taggingData.members!.map((e) => e).toList();
-          return userTags;
+
+        if (!widget.isSecret) {
+          if (taggingData!.members != null && taggingData.members!.isNotEmpty) {
+            userTags.addAll(taggingData.members!.map((e) => e).toList());
+            return userTags;
+          }
+        } else {
+          if (taggingData!.participants != null &&
+              taggingData.participants!.isNotEmpty) {
+            userTags.addAll(taggingData.participants!.map((e) => e).toList());
+            return userTags;
+          }
         }
         return const Iterable.empty();
       } else {

@@ -310,6 +310,7 @@ class _ChatBarState extends State<ChatBar> {
                         Expanded(
                           child: LMTextField(
                             isDown: false,
+                            isSecret: widget.chatroom.isSecret ?? false,
                             chatroomId: widget.chatroom.id,
                             style: Theme.of(context)
                                 .textTheme
@@ -437,7 +438,7 @@ class _ChatBarState extends State<ChatBar> {
                                                         .bodyMedium,
                                                   ),
                                                 ),
-                                                Spacer(),
+                                                const Spacer(),
                                                 LMIconButton(
                                                   onTap: (bool isActive) async {
                                                     _popupMenuController
@@ -512,7 +513,7 @@ class _ChatBarState extends State<ChatBar> {
                                                         .bodyMedium,
                                                   ),
                                                 ),
-                                                Spacer(),
+                                                const Spacer(),
                                                 LMIconButton(
                                                   onTap: (bool isActive) async {
                                                     _popupMenuController
@@ -578,7 +579,7 @@ class _ChatBarState extends State<ChatBar> {
                                                   containerSize: 48,
                                                   borderRadius: 24,
                                                   backgroundColor:
-                                                      ui.Color.fromARGB(
+                                                      const ui.Color.fromARGB(
                                                           255, 151, 188, 98),
                                                   title: LMTextView(
                                                     text: 'Video',
