@@ -47,9 +47,10 @@ LMTextView getDeletedTextWidget(Conversation conversation, User user,
   return LMTextView(
     text: getDeletedText(conversation, user),
     maxLines: maxLines,
-    textStyle: const TextStyle(
-      color: Colors.black,
-      fontSize: 12,
+    textStyle:  TextStyle(
+      color: secondary.shade800,
+      fontStyle: FontStyle.italic,
+      fontSize: 13,
     ),
   );
 }
