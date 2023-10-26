@@ -521,8 +521,71 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
                   builder: (context, _, __) {
                     return BlocConsumer<ConversationBloc, ConversationState>(
                         bloc: _conversationBloc,
-                        listener: (context, state) =>
-                            updatePagingControllers(state),
+                        listener: (context, state) {
+                          updatePagingControllers(state);
+                          if (state is ConversationPosted) {
+                            Map<String, String> userTags =
+                                TaggingHelper.decodeString(state
+                                        .postConversationResponse
+                                        .conversation
+                                        ?.answer ??
+                                    "");
+                            LMAnalytics.get().track(
+                              AnalyticsKeys.chatroomResponded,
+                              {
+                                "chatroom_type": chatroom!.type,
+                                "community_id": chatroom!.communityId,
+                                "chatroom_name": chatroom!.header,
+                                "chatroom_last_conversation_type": state
+                                        .postConversationResponse
+                                        .conversation
+                                        ?.attachments
+                                        ?.first
+                                        .type ??
+                                    "text",
+                                "tagged_users": userTags.isNotEmpty,
+                                "count_tagged_users": userTags.length,
+                                "name_tagged_users": userTags.keys
+                                    .map((e) => e.replaceFirst("@", ""))
+                                    .toList(),
+                                "is_group_tag": false,
+                              },
+                            );
+                          }
+                          if (state is ConversationError) {
+                            LMAnalytics.get().track(
+                              AnalyticsKeys.messageSendingError,
+                              {
+                                "chatroom_id": chatroom!.id,
+                                "chatroom_type": chatroom!.type,
+                                "clicked_resend": false,
+                              },
+                            );
+                          }
+                          if (state is MultiMediaConversationError) {
+                            LMAnalytics.get().track(
+                              AnalyticsKeys.attachmentUploadedError,
+                              {
+                                "chatroom_id": chatroom!.id,
+                                "chatroom_type": chatroom!.type,
+                                "clicked_retry": false
+                              },
+                            );
+                          }
+                          if (state is MultiMediaConversationPosted) {
+                            LMAnalytics.get().track(
+                              AnalyticsKeys.attachmentUploaded,
+                              {
+                                "chatroom_id": chatroom!.id,
+                                "chatroom_type": chatroom!.type,
+                                "message_id": state
+                                    .postConversationResponse.conversation?.id,
+                                "type": state.postConversationResponse
+                                    .conversation?.attachments?.first.type
+                              },
+                            );
+                          }
+                        },
                         builder: (context, state) {
                           return PagedListView(
                             pagingController: pagedListController,

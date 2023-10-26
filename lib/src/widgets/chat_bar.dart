@@ -206,41 +206,6 @@ class _ChatBarState extends State<ChatBar> {
     userMeta = widget.userMeta;
     chatActionBloc = BlocProvider.of<ConversationActionBloc>(context);
     conversationBloc = BlocProvider.of<ConversationBloc>(context);
-    BlocListener<ConversationBloc, ConversationState>(
-      listener: (context, state) {
-        if (state is ConversationError) {
-          LMAnalytics.get().track(
-            AnalyticsKeys.messageSendingError,
-            {
-              "chatroom_id": widget.chatroom.id,
-              "chatroom_type": widget.chatroom.type,
-              "clicked_resend": false,
-            },
-          );
-        }
-         if (state is MultiMediaConversationError) {
-           LMAnalytics.get().track(
-            AnalyticsKeys.attachmentUploadedError,
-            {
-              "chatroom_id": widget.chatroom.id,
-              "chatroom_type": widget.chatroom.type,
-              "clicked_retry": false
-            },
-          );
-        }
-        if (state is MultiMediaConversationPosted) {
-          LMAnalytics.get().track(
-            AnalyticsKeys.attachmentUploaded,
-            {
-              "chatroom_id": widget.chatroom.id,
-              "chatroom_type": widget.chatroom.type,
-              "message_id": state.postConversationResponse.conversation?.id,
-              "type": state.postConversationResponse.conversation?.attachments?.first
-            },
-          );
-        }
-      },
-    );
     return Column(
       children: [
         replyToConversation != null && checkIfAnnouncementChannel()
