@@ -615,12 +615,13 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
                                         menuItems: [
                                           if (user!.id ==
                                                   chatroom!.member!.id ||
-                                              user!.state == 1)
+                                               locator<LMPreferenceService>()
+                                                          .fetchMemberRight(1))
                                             LMMenuItemUI(
                                               onTap: () {
                                                 if (localTopic != null
                                                     ? localTopic!.id != item.id
-                                                    : chatroom!.topic!.id !=
+                                                    : chatroom!.topic?.id !=
                                                         item.id) {
                                                   _chatroomActionBloc.add(
                                                     SetChatroomTopicEvent(
@@ -899,12 +900,13 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
                                         menuItems: [
                                           if (user!.id ==
                                                   chatroom!.member!.id ||
-                                              user!.state == 1)
+                                               locator<LMPreferenceService>()
+                                                          .fetchMemberRight(1))
                                             LMMenuItemUI(
                                               onTap: () {
                                                 if (localTopic != null
                                                     ? localTopic!.id != item.id
-                                                    : chatroom!.topic!.id !=
+                                                    : chatroom!.topic?.id !=
                                                         item.id) {
                                                   _chatroomActionBloc.add(
                                                     SetChatroomTopicEvent(
