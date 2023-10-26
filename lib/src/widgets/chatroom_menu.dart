@@ -5,6 +5,7 @@ import 'package:likeminds_chat_ss_fl/src/navigation/router.dart';
 import 'package:likeminds_chat_ss_fl/src/service/likeminds_service.dart';
 import 'package:likeminds_chat_ss_fl/src/service/preference_service.dart';
 import 'package:likeminds_chat_ss_fl/src/service/service_locator.dart';
+import 'package:likeminds_chat_ss_fl/src/utils/analytics/analytics.dart';
 import 'package:likeminds_chat_ss_fl/src/utils/constants/ui_constants.dart';
 import 'package:likeminds_chat_ss_fl/src/utils/imports.dart';
 import 'package:likeminds_chat_fl/likeminds_chat_fl.dart';
@@ -129,6 +130,21 @@ class _ChatroomMenuState extends State<ChatroomMenu> {
     if (response.success) {
       // _controller.hideMenu();
       // rebuildChatroomMenu.value = !rebuildChatroomMenu.value;
+      if ((action.title.toLowerCase() == "mute notifications")) {
+        LMAnalytics.get().track(
+          AnalyticsKeys.chatroomMuted,
+          {
+            'chatroom_name ': widget.chatroom.header,
+          },
+        );
+      } else {
+        LMAnalytics.get().track(
+          AnalyticsKeys.chatroomUnMuted,
+          {
+            'chatroom_name ': widget.chatroom.header,
+          },
+        );
+      }
       toast((action.title.toLowerCase() == "mute notifications")
           ? "Chatroom muted"
           : "Chatroom unmuted");
