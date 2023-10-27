@@ -45,6 +45,8 @@ const Color kDarkGreyColor = Color.fromARGB(255, 61, 61, 61);
 const Color kGrey2Color = Color(0xff504B4B);
 const Color kGrey3Color = Color(0xff9B9B9B);
 const Color kGreyWebBGColor = Color(0xffE6EBF5);
+const Color kGrey4Color = Color(0xFFE2E8F0);
+const Color kRedColor = Color(0xffCE3E3E);
 
 const double kFontSmall = 12;
 const double kButtonFontSize = 12;
