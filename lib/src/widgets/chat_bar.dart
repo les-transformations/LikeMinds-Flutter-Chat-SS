@@ -320,7 +320,7 @@ class _ChatBarState extends State<ChatBar> {
                               debugPrint(tag.toString());
                               userTags.add(tag);
                               LMAnalytics.get()
-                                  .logEvent(AnalyticsKeys.userTagsSomeone, {
+                                  .track(AnalyticsKeys.userTagsSomeone, {
                                 'community_id': widget.chatroom.id,
                                 'chatroom_name': widget.chatroom.title,
                                 'tagged_user_id': tag.id,
@@ -770,6 +770,22 @@ class _ChatBarState extends State<ChatBar> {
                                         showLinkPreview = true;
                                       }
                                       widget.scrollToBottom();
+                                      if (replyToConversation != null) {
+                                        LMAnalytics.get().track(
+                                          AnalyticsKeys.messageReply,
+                                          {
+                                            "type": "text",
+                                            "chatroom_id": widget.chatroom.id,
+                                            "replied_to_member_id":
+                                                replyToConversation?.member?.id,
+                                            "replied_to_member_state":
+                                                replyToConversation
+                                                    ?.member?.state,
+                                            "replied_to_message_id":
+                                                replyToConversation?.id,
+                                          },
+                                        );
+                                      }
                                     }
                                     if (widget.chatroom.isGuest ?? false) {
                                       toast("Chatroom joined");

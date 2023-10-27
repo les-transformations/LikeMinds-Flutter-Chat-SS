@@ -73,4 +73,24 @@ class AnalyticsKeys {
   static const String postCreationStarted = 'Post creation started';
   static const String clickedOnAttachment = 'Clicked on Attachment';
   static const String userTaggedInPost = 'User tagged in a post';
+  static const String pinnedChatroomsViewed = 'Pinned chatrooms viewed';
+  static const String memberGroupAdded = 'Member group added';
+  static const String chatroomLeft = 'Chatroom left';
+  static const String secretChatroomInvite = 'Secret Chatroom invite';
+  static const String communityTabClicked = 'Community Tab clicked';
+  static const String groupDetailsScreen = 'Group details screen';
+  static const String syncComplete = 'Sync Complete';
+  static const String chatroomUnMuted = 'Chatroom unmuted';
+  static const String voiceMessageRecorded = 'Voice message recorded';
+  static const String voiceMessagePreviewed = 'Voice message previewed';
+  static const String voiceMessageCancelled = 'Voice message cancelled';
+  static const String voiceMessageSent = 'Voice message sent';
+  static const String voiceMessagePlayed = 'Voice message played';
+  static const String attachmentUploaded = 'Attachment uploaded';
+  static const String messageSelected = 'Messages selected';
+  static const String messageDeleted = 'Message deleted';
+  static const String messageCopied = 'Message copied';
+  static const String messageReply = 'Message reply';
+  static const String messageReported = 'Message reported';
+  static const String messageEdited = 'Messages edited';
 }
