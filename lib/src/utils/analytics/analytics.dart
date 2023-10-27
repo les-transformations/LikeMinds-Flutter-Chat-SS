@@ -80,7 +80,7 @@ class AnalyticsKeys {
   static const String communityTabClicked = 'Community Tab clicked';
   static const String groupDetailsScreen = 'Group details screen';
   static const String syncComplete = 'Sync Complete';
-  static const String chatroomUnMuted = 'Chatroom muted';
+  static const String chatroomUnMuted = 'Chatroom unmuted';
   static const String voiceMessageRecorded = 'Voice message recorded';
   static const String voiceMessagePreviewed = 'Voice message previewed';
   static const String voiceMessageCancelled = 'Voice message cancelled';
@@ -93,5 +93,4 @@ class AnalyticsKeys {
   static const String messageReply = 'Message reply';
   static const String messageReported = 'Message reported';
   static const String messageEdited = 'Messages edited';
-  
 }

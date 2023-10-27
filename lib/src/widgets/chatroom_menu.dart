@@ -130,7 +130,7 @@ class _ChatroomMenuState extends State<ChatroomMenu> {
     if (response.success) {
       // _controller.hideMenu();
       // rebuildChatroomMenu.value = !rebuildChatroomMenu.value;
-      if ((action.title.toLowerCase() == "mute notifications")) {
+      if (action.title.toLowerCase() == "mute notifications") {
         LMAnalytics.get().track(
           AnalyticsKeys.chatroomMuted,
           {
@@ -176,7 +176,14 @@ class _ChatroomMenuState extends State<ChatroomMenu> {
               .build());
       if (response.success) {
         widget.chatroom.isGuest = true;
-        // _controller.hideMenu();
+        LMAnalytics.get().track(
+          AnalyticsKeys.chatroomLeft,
+          {
+            'chatroom_name ': widget.chatroom.header,
+            'chatroom_id': widget.chatroom.id,
+            'chatroom_type': 'normal',
+          },
+        );
         toast("Chatroom left");
         _controller!.hideMenu();
         homeBloc?.add(UpdateHomeEvent());
@@ -192,7 +199,14 @@ class _ChatroomMenuState extends State<ChatroomMenu> {
               .build());
       if (response.success) {
         widget.chatroom.isGuest = true;
-        // _controller.hideMenu();
+        LMAnalytics.get().track(
+          AnalyticsKeys.chatroomLeft,
+          {
+            'chatroom_name ': widget.chatroom.header,
+            'chatroom_id': widget.chatroom.id,
+            'chatroom_type': 'secret',
+          },
+        );
         toast("Chatroom left");
         _controller!.hideMenu();
         homeBloc?.add(UpdateHomeEvent());

@@ -319,7 +319,7 @@ class _ChatBarState extends State<ChatBar> {
                               debugPrint(tag.toString());
                               userTags.add(tag);
                               LMAnalytics.get()
-                                  .logEvent(AnalyticsKeys.userTagsSomeone, {
+                                  .track(AnalyticsKeys.userTagsSomeone, {
                                 'community_id': widget.chatroom.id,
                                 'chatroom_name': widget.chatroom.title,
                                 'tagged_user_id': tag.id,
@@ -437,7 +437,7 @@ class _ChatBarState extends State<ChatBar> {
                                                         .bodyMedium,
                                                   ),
                                                 ),
-                                                Spacer(),
+                                                const Spacer(),
                                                 LMIconButton(
                                                   onTap: (bool isActive) async {
                                                     _popupMenuController
@@ -512,7 +512,7 @@ class _ChatBarState extends State<ChatBar> {
                                                         .bodyMedium,
                                                   ),
                                                 ),
-                                                Spacer(),
+                                                const Spacer(),
                                                 LMIconButton(
                                                   onTap: (bool isActive) async {
                                                     _popupMenuController
@@ -578,7 +578,7 @@ class _ChatBarState extends State<ChatBar> {
                                                   containerSize: 48,
                                                   borderRadius: 24,
                                                   backgroundColor:
-                                                      ui.Color.fromARGB(
+                                                      const ui.Color.fromARGB(
                                                           255, 151, 188, 98),
                                                   title: LMTextView(
                                                     text: 'Video',

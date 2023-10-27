@@ -580,8 +580,8 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
                                 "chatroom_type": chatroom!.type,
                                 "message_id": state
                                     .postConversationResponse.conversation?.id,
-                                "type": state.postConversationResponse
-                                    .conversation?.attachments?.first.type
+                                "type": mapMediaTypeToString(
+                                    state.putMediaResponse.first.mediaType),
                               },
                             );
                           }
