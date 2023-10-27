@@ -676,7 +676,10 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
                                         currentUser: user!,
                                         key: Key(item.id.toString()),
                                         isSent: item.userId == user!.id,
-                                        backgroundColor:item.deletedByUserId!=null?secondary.shade200: secondary.shade500,
+                                        backgroundColor:
+                                            item.deletedByUserId != null
+                                                ? secondary.shade200
+                                                : secondary.shade500,
                                         deletedText: item.deletedByUserId !=
                                                 null
                                             ? getDeletedTextWidget(item, user!)
@@ -684,8 +687,8 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
                                         menuItems: [
                                           if (user!.id ==
                                                   chatroom!.member!.id ||
-                                               locator<LMPreferenceService>()
-                                                          .fetchMemberRight(1))
+                                              locator<LMPreferenceService>()
+                                                  .fetchMemberRight(1))
                                             LMMenuItemUI(
                                               onTap: () {
                                                 if (localTopic != null
@@ -758,20 +761,16 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
                                                 ),
                                               ).then((value) {
                                                 toast("Copied to clipboard");
-                                                String type = item
-                                                                .attachments
-                                                                ?.first
-                                                                .type ??
-                                                            "text";
-                                                        LMAnalytics.get().track(
-                                                          AnalyticsKeys
-                                                              .messageCopied,
-                                                          {
-                                                            "type": type,
-                                                            "chatroom_id":
-                                                                chatroom?.id
-                                                          },
-                                                        );
+                                                String type = item.attachments
+                                                        ?.first.type ??
+                                                    "text";
+                                                LMAnalytics.get().track(
+                                                  AnalyticsKeys.messageCopied,
+                                                  {
+                                                    "type": type,
+                                                    "chatroom_id": chatroom?.id
+                                                  },
+                                                );
                                               });
                                             },
                                             leading: const LMIcon(
@@ -983,8 +982,8 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
                                         menuItems: [
                                           if (user!.id ==
                                                   chatroom!.member!.id ||
-                                               locator<LMPreferenceService>()
-                                                          .fetchMemberRight(1))
+                                              locator<LMPreferenceService>()
+                                                  .fetchMemberRight(1))
                                             LMMenuItemUI(
                                               onTap: () {
                                                 if (localTopic != null
@@ -1057,20 +1056,16 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
                                                 ),
                                               ).then((value) {
                                                 toast("Copied to clipboard");
-                                                String type = item
-                                                                .attachments
-                                                                ?.first
-                                                                .type ??
-                                                            "text";
-                                                        LMAnalytics.get().track(
-                                                          AnalyticsKeys
-                                                              .messageCopied,
-                                                          {
-                                                            "type": type,
-                                                            "chatroom_id":
-                                                                chatroom?.id
-                                                          },
-                                                        );
+                                                String type = item.attachments
+                                                        ?.first.type ??
+                                                    "text";
+                                                LMAnalytics.get().track(
+                                                  AnalyticsKeys.messageCopied,
+                                                  {
+                                                    "type": type,
+                                                    "chatroom_id": chatroom?.id
+                                                  },
+                                                );
                                               });
                                             },
                                             leading: const LMIcon(
@@ -1349,14 +1344,6 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
                                                 Colors.white.withOpacity(0.9),
                                             swipeChipColor:
                                                 kGrey3Color.withOpacity(0.6),
-                                            descriptionHeading: LMTextView(
-                                              text: chatroom!.title,
-                                              textStyle: const TextStyle(
-                                                color: Color.fromARGB(
-                                                    255, 30, 41, 59),
-                                                fontSize: 18,
-                                              ),
-                                            ),
                                             description: LMTextView(
                                               text: chatroom!.title,
                                               textStyle: const TextStyle(
@@ -1397,14 +1384,6 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
                                                   Colors.white.withOpacity(0.9),
                                               swipeChipColor:
                                                   kGrey3Color.withOpacity(0.6),
-                                              descriptionHeading: LMTextView(
-                                                text: chatroom!.title,
-                                                textStyle: const TextStyle(
-                                                  color: Color.fromARGB(
-                                                      255, 30, 41, 59),
-                                                  fontSize: 18,
-                                                ),
-                                              ),
                                               description: LMTextView(
                                                 text: chatroom!.title,
                                                 textStyle: const TextStyle(
