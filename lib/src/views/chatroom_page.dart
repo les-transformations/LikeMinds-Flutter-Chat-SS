@@ -489,6 +489,12 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
                   chatroomId: chatroom!.id,
                   conversationId: lastConversationId,
                 ));
+                LMAnalytics.get().track(
+                  AnalyticsKeys.syncComplete,
+                  {
+                    'sync_complete': true,
+                  },
+                );
                 LMAnalytics.get().track(AnalyticsKeys.chatroomOpened, {
                   'chatroom_id': chatroom!.id,
                   'community_id': chatroom!.communityId,
@@ -509,8 +515,71 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
                   builder: (context, _, __) {
                     return BlocConsumer<ConversationBloc, ConversationState>(
                         bloc: _conversationBloc,
-                        listener: (context, state) =>
-                            updatePagingControllers(state),
+                        listener: (context, state) {
+                          updatePagingControllers(state);
+                          if (state is ConversationPosted) {
+                            Map<String, String> userTags =
+                                TaggingHelper.decodeString(state
+                                        .postConversationResponse
+                                        .conversation
+                                        ?.answer ??
+                                    "");
+                            LMAnalytics.get().track(
+                              AnalyticsKeys.chatroomResponded,
+                              {
+                                "chatroom_type": chatroom!.type,
+                                "community_id": chatroom!.communityId,
+                                "chatroom_name": chatroom!.header,
+                                "chatroom_last_conversation_type": state
+                                        .postConversationResponse
+                                        .conversation
+                                        ?.attachments
+                                        ?.first
+                                        .type ??
+                                    "text",
+                                "tagged_users": userTags.isNotEmpty,
+                                "count_tagged_users": userTags.length,
+                                "name_tagged_users": userTags.keys
+                                    .map((e) => e.replaceFirst("@", ""))
+                                    .toList(),
+                                "is_group_tag": false,
+                              },
+                            );
+                          }
+                          if (state is ConversationError) {
+                            LMAnalytics.get().track(
+                              AnalyticsKeys.messageSendingError,
+                              {
+                                "chatroom_id": chatroom!.id,
+                                "chatroom_type": chatroom!.type,
+                                "clicked_resend": false,
+                              },
+                            );
+                          }
+                          if (state is MultiMediaConversationError) {
+                            LMAnalytics.get().track(
+                              AnalyticsKeys.attachmentUploadedError,
+                              {
+                                "chatroom_id": chatroom!.id,
+                                "chatroom_type": chatroom!.type,
+                                "clicked_retry": false
+                              },
+                            );
+                          }
+                          if (state is MultiMediaConversationPosted) {
+                            LMAnalytics.get().track(
+                              AnalyticsKeys.attachmentUploaded,
+                              {
+                                "chatroom_id": chatroom!.id,
+                                "chatroom_type": chatroom!.type,
+                                "message_id": state
+                                    .postConversationResponse.conversation?.id,
+                                "type": mapMediaTypeToString(
+                                    state.putMediaResponse.first.mediaType),
+                              },
+                            );
+                          }
+                        },
                         builder: (context, state) {
                           return PagedListView(
                             pagingController: pagedListController,
@@ -615,12 +684,13 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
                                         menuItems: [
                                           if (user!.id ==
                                                   chatroom!.member!.id ||
-                                              user!.state == 1)
+                                               locator<LMPreferenceService>()
+                                                          .fetchMemberRight(1))
                                             LMMenuItemUI(
                                               onTap: () {
                                                 if (localTopic != null
                                                     ? localTopic!.id != item.id
-                                                    : chatroom!.topic!.id !=
+                                                    : chatroom!.topic?.id !=
                                                         item.id) {
                                                   _chatroomActionBloc.add(
                                                     SetChatroomTopicEvent(
@@ -688,6 +758,20 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
                                                 ),
                                               ).then((value) {
                                                 toast("Copied to clipboard");
+                                                String type = item
+                                                                .attachments
+                                                                ?.first
+                                                                .type ??
+                                                            "text";
+                                                        LMAnalytics.get().track(
+                                                          AnalyticsKeys
+                                                              .messageCopied,
+                                                          {
+                                                            "type": type,
+                                                            "chatroom_id":
+                                                                chatroom?.id
+                                                          },
+                                                        );
                                               });
                                             },
                                             leading: const LMIcon(
@@ -899,12 +983,13 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
                                         menuItems: [
                                           if (user!.id ==
                                                   chatroom!.member!.id ||
-                                              user!.state == 1)
+                                               locator<LMPreferenceService>()
+                                                          .fetchMemberRight(1))
                                             LMMenuItemUI(
                                               onTap: () {
                                                 if (localTopic != null
                                                     ? localTopic!.id != item.id
-                                                    : chatroom!.topic!.id !=
+                                                    : chatroom!.topic?.id !=
                                                         item.id) {
                                                   _chatroomActionBloc.add(
                                                     SetChatroomTopicEvent(
@@ -972,6 +1057,20 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
                                                 ),
                                               ).then((value) {
                                                 toast("Copied to clipboard");
+                                                String type = item
+                                                                .attachments
+                                                                ?.first
+                                                                .type ??
+                                                            "text";
+                                                        LMAnalytics.get().track(
+                                                          AnalyticsKeys
+                                                              .messageCopied,
+                                                          {
+                                                            "type": type,
+                                                            "chatroom_id":
+                                                                chatroom?.id
+                                                          },
+                                                        );
                                               });
                                             },
                                             leading: const LMIcon(
@@ -1234,28 +1333,42 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
                                 GestureDetector(
                                   behavior: HitTestBehavior.opaque,
                                   onTap: () {
-                                    chatroom != null
-                                        ? showBottomSheet(
-                                            context: context,
-                                            builder: (context) {
-                                              return LMGroupDetailBottomSheet(
-                                                chatRoom: chatroom!,
-                                                backgroundColor: Colors.white
-                                                    .withOpacity(0.9),
-                                                swipeChipColor: kGrey3Color
-                                                    .withOpacity(0.6),
-                                                description: LMTextView(
-                                                  text: chatroom!.title,
-                                                  textStyle: const TextStyle(
-                                                    color: Color.fromARGB(
-                                                        255, 30, 41, 59),
-                                                    fontSize: 16,
-                                                  ),
-                                                ),
-                                              );
-                                            },
-                                          )
-                                        : {};
+                                    if (chatroom != null) {
+                                      LMAnalytics.get().track(
+                                        AnalyticsKeys.groupDetailsScreen,
+                                        {
+                                          'chatroom_id': chatroom!.id,
+                                        },
+                                      );
+                                      showBottomSheet(
+                                        context: context,
+                                        builder: (context) {
+                                          return LMGroupDetailBottomSheet(
+                                            chatRoom: chatroom!,
+                                            backgroundColor:
+                                                Colors.white.withOpacity(0.9),
+                                            swipeChipColor:
+                                                kGrey3Color.withOpacity(0.6),
+                                            descriptionHeading: LMTextView(
+                                              text: chatroom!.title,
+                                              textStyle: const TextStyle(
+                                                color: Color.fromARGB(
+                                                    255, 30, 41, 59),
+                                                fontSize: 18,
+                                              ),
+                                            ),
+                                            description: LMTextView(
+                                              text: chatroom!.title,
+                                              textStyle: const TextStyle(
+                                                color: Color.fromARGB(
+                                                    255, 30, 41, 59),
+                                                fontSize: 16,
+                                              ),
+                                            ),
+                                          );
+                                        },
+                                      );
+                                    }
                                   },
                                   child: LMProfilePicture(
                                     fallbackText: chatroom!.header,
@@ -1268,28 +1381,42 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
                                   child: GestureDetector(
                                     behavior: HitTestBehavior.opaque,
                                     onTap: () {
-                                      chatroom != null
-                                          ? showBottomSheet(
-                                              context: context,
-                                              builder: (context) {
-                                                return LMGroupDetailBottomSheet(
-                                                  chatRoom: chatroom!,
-                                                  backgroundColor: Colors.white
-                                                      .withOpacity(0.9),
-                                                  swipeChipColor: kGrey3Color
-                                                      .withOpacity(0.6),
-                                                  description: LMTextView(
-                                                    text: chatroom!.title,
-                                                    textStyle: const TextStyle(
-                                                      color: Color.fromARGB(
-                                                          255, 30, 41, 59),
-                                                      fontSize: 16,
-                                                    ),
-                                                  ),
-                                                );
-                                              },
-                                            )
-                                          : {};
+                                      if (chatroom != null) {
+                                        LMAnalytics.get().track(
+                                          AnalyticsKeys.groupDetailsScreen,
+                                          {
+                                            'chatroom_id': chatroom!.id,
+                                          },
+                                        );
+                                        showBottomSheet(
+                                          context: context,
+                                          builder: (context) {
+                                            return LMGroupDetailBottomSheet(
+                                              chatRoom: chatroom!,
+                                              backgroundColor:
+                                                  Colors.white.withOpacity(0.9),
+                                              swipeChipColor:
+                                                  kGrey3Color.withOpacity(0.6),
+                                              descriptionHeading: LMTextView(
+                                                text: chatroom!.title,
+                                                textStyle: const TextStyle(
+                                                  color: Color.fromARGB(
+                                                      255, 30, 41, 59),
+                                                  fontSize: 18,
+                                                ),
+                                              ),
+                                              description: LMTextView(
+                                                text: chatroom!.title,
+                                                textStyle: const TextStyle(
+                                                  color: Color.fromARGB(
+                                                      255, 30, 41, 59),
+                                                  fontSize: 16,
+                                                ),
+                                              ),
+                                            );
+                                          },
+                                        );
+                                      }
                                     },
                                     child: Column(
                                       crossAxisAlignment:
@@ -1411,11 +1538,37 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
                           if (state is ConversationDelete) {
                             updateDeletedConversation(
                                 state.deleteConversationResponse);
+                            String type = state
+                                    .deleteConversationResponse
+                                    .conversations
+                                    ?.first
+                                    .attachments
+                                    ?.first
+                                    .type ??
+                                "text";
+                            LMAnalytics.get().track(
+                              AnalyticsKeys.messageDeleted,
+                              {
+                                "type": type,
+                                "chatroom_id": chatroom?.id,
+                              },
+                            );
                           }
 
                           if (state is ConversationEdited) {
                             updateEditedConversation(
                                 state.editConversationResponse.conversation!);
+                            String type = state.editConversationResponse
+                                    .conversation?.attachments?.first.type ??
+                                "text";
+                            LMAnalytics.get().track(
+                              AnalyticsKeys.messageEdited,
+                              {
+                                "type": type,
+                                "chatroom_id": chatroom?.id,
+                                "description_Updated": true,
+                              },
+                            );
                           }
                           if (state is ReplyConversationState) {
                             rebuildChatBar.value = !rebuildChatBar.value;

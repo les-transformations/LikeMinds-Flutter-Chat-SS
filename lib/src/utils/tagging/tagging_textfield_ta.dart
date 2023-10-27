@@ -12,6 +12,7 @@ class LMTextField extends StatefulWidget {
   final TextStyle? style;
   final Function(String)? onChange;
   final int chatroomId;
+  final bool isSecret;
 
   const LMTextField({
     super.key,
@@ -20,6 +21,7 @@ class LMTextField extends StatefulWidget {
     required this.onTagSelected,
     required this.controller,
     required this.focusNode,
+    this.isSecret = false,
     this.style,
     this.decoration,
     this.onChange,
@@ -79,7 +81,7 @@ class _LMTextFieldState extends State<LMTextField> {
       if (currentText.isEmpty) {
         return const Iterable.empty();
       } else if (!tagComplete && currentText.contains('@')) {
-        String tag = tagValue.substring(1).replaceAll(' ', '');
+        String tag = tagValue.substring(1).split(' ').first;
         final taggingData = (await locator<LikeMindsService>().getTaggingList(
           (TagRequestModelBuilder()
                 ..chatroomId(widget.chatroomId)
@@ -89,9 +91,20 @@ class _LMTextFieldState extends State<LMTextField> {
               .build(),
         ))
             .data;
-        if (taggingData!.members != null && taggingData.members!.isNotEmpty) {
-          userTags = taggingData.members!.map((e) => e).toList();
-          return userTags;
+
+        if (!widget.isSecret) {
+          if (taggingData!.members != null && taggingData.members!.isNotEmpty) {
+            userTags.clear();
+            userTags.addAll(taggingData.members!.map((e) => e).toList());
+            return userTags;
+          }
+        } else {
+          if (taggingData!.participants != null &&
+              taggingData.participants!.isNotEmpty) {
+            userTags.clear();
+            userTags.addAll(taggingData.participants!.map((e) => e).toList());
+            return userTags;
+          }
         }
         return const Iterable.empty();
       } else {
@@ -160,6 +173,11 @@ class _LMTextFieldState extends State<LMTextField> {
               tagCount = completeCount;
               tagValue = value.substring(value.lastIndexOf('@'));
               textValue = value.substring(0, value.lastIndexOf('@'));
+            } else {
+               int currentPosition = _controller.selection.base.offset;
+               if(_controller.text[currentPosition]=='~') {
+                _controller.text = _controller.text.replaceRange(currentPosition, currentPosition+1, "");
+               }
             }
           }),
         ),
@@ -211,6 +229,8 @@ class _LMTextFieldState extends State<LMTextField> {
           setState(() {
             tagComplete = true;
             tagCount = '@'.allMatches(_controller.text).length;
+            int currentPosition = _controller.selection.base.offset;
+            String suffix = _controller.text.substring(currentPosition);
             // _controller.text.substring(_controller.text.lastIndexOf('@'));
             if (textValue.length > 2 &&
                 textValue.substring(textValue.length - 1) == '~') {
@@ -218,9 +238,9 @@ class _LMTextFieldState extends State<LMTextField> {
             } else {
               textValue += "@${suggestion.name!}~";
             }
-            _controller.text = '$textValue ';
+            _controller.text = '$textValue $suffix';
             _controller.selection = TextSelection.fromPosition(
-                TextPosition(offset: _controller.text.length));
+                TextPosition(offset: _controller.text.length - suffix.length));
             tagValue = '';
             textValue = _controller.value.text;
             page = 1;
