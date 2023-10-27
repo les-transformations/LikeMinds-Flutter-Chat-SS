@@ -1244,14 +1244,6 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
                                                     .withOpacity(0.9),
                                                 swipeChipColor: kGrey3Color
                                                     .withOpacity(0.6),
-                                                descriptionHeading: LMTextView(
-                                                  text: chatroom!.title,
-                                                  textStyle: const TextStyle(
-                                                    color: Color.fromARGB(
-                                                        255, 30, 41, 59),
-                                                    fontSize: 18,
-                                                  ),
-                                                ),
                                                 description: LMTextView(
                                                   text: chatroom!.title,
                                                   textStyle: const TextStyle(
@@ -1286,15 +1278,6 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
                                                       .withOpacity(0.9),
                                                   swipeChipColor: kGrey3Color
                                                       .withOpacity(0.6),
-                                                  descriptionHeading:
-                                                      LMTextView(
-                                                    text: chatroom!.title,
-                                                    textStyle: const TextStyle(
-                                                      color: Color.fromARGB(
-                                                          255, 30, 41, 59),
-                                                      fontSize: 18,
-                                                    ),
-                                                  ),
                                                   description: LMTextView(
                                                     text: chatroom!.title,
                                                     textStyle: const TextStyle(
