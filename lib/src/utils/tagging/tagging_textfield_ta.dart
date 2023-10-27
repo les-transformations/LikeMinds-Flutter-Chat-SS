@@ -94,12 +94,14 @@ class _LMTextFieldState extends State<LMTextField> {
 
         if (!widget.isSecret) {
           if (taggingData!.members != null && taggingData.members!.isNotEmpty) {
+            userTags.clear();
             userTags.addAll(taggingData.members!.map((e) => e).toList());
             return userTags;
           }
         } else {
           if (taggingData!.participants != null &&
               taggingData.participants!.isNotEmpty) {
+            userTags.clear();
             userTags.addAll(taggingData.participants!.map((e) => e).toList());
             return userTags;
           }
