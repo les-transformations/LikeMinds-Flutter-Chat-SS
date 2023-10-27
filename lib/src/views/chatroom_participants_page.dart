@@ -229,7 +229,7 @@ class _ChatroomParticipantsPageState extends State<ChatroomParticipantsPage> {
                 );
               },
             ),
-            Divider(),
+            const Divider(),
             Expanded(
               child: BlocConsumer(
                   bloc: participantsBloc,
@@ -263,7 +263,7 @@ class _ChatroomParticipantsPageState extends State<ChatroomParticipantsPage> {
                       );
                     } else if (state is ParticipantsLoaded) {
                       LMAnalytics.get()
-                          .logEvent(AnalyticsKeys.viewChatroomParticipants, {
+                          .track(AnalyticsKeys.viewChatroomParticipants, {
                         'chatroom_id': widget.chatroom.id,
                         'community_id': widget.chatroom.communityId,
                         'source': 'chatroom_overflow_menu',
