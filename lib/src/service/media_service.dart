@@ -3,7 +3,7 @@ import 'package:likeminds_chat_fl/likeminds_chat_fl.dart';
 import 'package:likeminds_chat_ss_fl/src/utils/constants/string_constants.dart';
 import 'package:likeminds_chat_ss_fl/src/utils/credentials/credentials.dart';
 import 'package:likeminds_chat_ss_fl/src/utils/imports.dart';
-
+import 'package:path/path.dart' as path;
 import 'package:simple_s3/simple_s3.dart';
 
 enum MediaType { photo, video, document, audio, gif, voiceNote, link }
@@ -76,15 +76,14 @@ class Media {
   });
 
   static Media fromJson(dynamic json) => Media(
-        mediaType: mapStringToMediaType(json['type']),
-        height: json['height'] as int?,
-        mediaUrl: json['url'] ?? json['file_url'],
-        size: json['meta']['size'],
-        width: json['width'] as int?,
-        thumbnailUrl: json['thumbnail_url'] as String?,
-        pageCount: json['meta']['number_of_page'] as int?,
-        ogTags: OgTags.fromEntity(OgTagsEntity.fromJson(json['og_tags']??{}))
-      );
+      mediaType: mapStringToMediaType(json['type']),
+      height: json['height'] as int?,
+      mediaUrl: json['url'] ?? json['file_url'],
+      size: json['meta']['size'],
+      width: json['width'] as int?,
+      thumbnailUrl: json['thumbnail_url'] as String?,
+      pageCount: json['meta']['number_of_page'] as int?,
+      ogTags: OgTags.fromEntity(OgTagsEntity.fromJson(json['og_tags'] ?? {})));
 }
 
 class MediaService {
@@ -104,13 +103,24 @@ class MediaService {
     int conversationId,
   ) async {
     try {
+      String extension = path.extension(file.path);
+      String fileName = path.basenameWithoutExtension(file.path);
+      fileName = fileName.replaceAll(RegExp('[^A-Za-z0-9]'), '');
+      String currTimeInMilli = DateTime.now().millisecondsSinceEpoch.toString();
+      fileName = '$fileName-$currTimeInMilli$extension';
+
+      String dir = path.dirname(file.path);
+      String newPath = path.join(dir, fileName);
+
+      File renamedFile = file.copySync(newPath);
+
       String result = await _s3Client.uploadFile(
-        file,
+        renamedFile,
         _bucketName,
         _poolId,
         _region,
         s3FolderPath:
-            "files/collabcard/$chatroomId/conversation/$conversationId/",
+            "files/collabcard/$chatroomId/conversation/$conversationId",
       );
       return result;
     } on SimpleS3Errors catch (e) {

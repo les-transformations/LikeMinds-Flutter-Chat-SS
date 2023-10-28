@@ -310,6 +310,7 @@ class _ChatBarState extends State<ChatBar> {
                         Expanded(
                           child: LMTextField(
                             isDown: false,
+                            isSecret: widget.chatroom.isSecret ?? false,
                             chatroomId: widget.chatroom.id,
                             style: Theme.of(context)
                                 .textTheme
@@ -319,7 +320,7 @@ class _ChatBarState extends State<ChatBar> {
                               debugPrint(tag.toString());
                               userTags.add(tag);
                               LMAnalytics.get()
-                                  .logEvent(AnalyticsKeys.userTagsSomeone, {
+                                  .track(AnalyticsKeys.userTagsSomeone, {
                                 'community_id': widget.chatroom.id,
                                 'chatroom_name': widget.chatroom.title,
                                 'tagged_user_id': tag.id,
@@ -437,7 +438,7 @@ class _ChatBarState extends State<ChatBar> {
                                                         .bodyMedium,
                                                   ),
                                                 ),
-                                                Spacer(),
+                                                const Spacer(),
                                                 LMIconButton(
                                                   onTap: (bool isActive) async {
                                                     _popupMenuController
@@ -512,7 +513,7 @@ class _ChatBarState extends State<ChatBar> {
                                                         .bodyMedium,
                                                   ),
                                                 ),
-                                                Spacer(),
+                                                const Spacer(),
                                                 LMIconButton(
                                                   onTap: (bool isActive) async {
                                                     _popupMenuController
@@ -578,7 +579,7 @@ class _ChatBarState extends State<ChatBar> {
                                                   containerSize: 48,
                                                   borderRadius: 24,
                                                   backgroundColor:
-                                                      ui.Color.fromARGB(
+                                                      const ui.Color.fromARGB(
                                                           255, 151, 188, 98),
                                                   title: LMTextView(
                                                     text: 'Video',
@@ -769,6 +770,22 @@ class _ChatBarState extends State<ChatBar> {
                                         showLinkPreview = true;
                                       }
                                       widget.scrollToBottom();
+                                      if (replyToConversation != null) {
+                                        LMAnalytics.get().track(
+                                          AnalyticsKeys.messageReply,
+                                          {
+                                            "type": "text",
+                                            "chatroom_id": widget.chatroom.id,
+                                            "replied_to_member_id":
+                                                replyToConversation?.member?.id,
+                                            "replied_to_member_state":
+                                                replyToConversation
+                                                    ?.member?.state,
+                                            "replied_to_message_id":
+                                                replyToConversation?.id,
+                                          },
+                                        );
+                                      }
                                     }
                                     if (widget.chatroom.isGuest ?? false) {
                                       toast("Chatroom joined");
