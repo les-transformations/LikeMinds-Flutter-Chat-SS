@@ -684,6 +684,14 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
                                                 null
                                             ? getDeletedTextWidget(item, user!)
                                             : null,
+                                        menuDecoration: LMMenuDecoration(
+                                          surfaceTintColor: kWhiteColor,
+                                          color: kWhiteColor,
+                                          constraints: BoxConstraints(
+                                            minWidth: 35.w,
+                                            maxWidth: 50.w,
+                                          ),
+                                        ),
                                         menuItems: [
                                           if (user!.id ==
                                                   chatroom!.member!.id ||
@@ -755,8 +763,11 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
                                               Clipboard.setData(
                                                 ClipboardData(
                                                   text: TaggingHelper
-                                                          .convertRouteToTag(
-                                                              item.answer) ??
+                                                              .convertRouteToTag(
+                                                                  item.answer)
+                                                          ?.replaceAll(
+                                                              RegExp(r'[@~]'),
+                                                              '') ??
                                                       '',
                                                 ),
                                               ).then((value) {
@@ -979,6 +990,14 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
                                         key: Key(item.id.toString()),
                                         isSent: item.userId == user!.id,
                                         backgroundColor: secondary.shade100,
+                                        menuDecoration: LMMenuDecoration(
+                                          surfaceTintColor: kWhiteColor,
+                                          color: kWhiteColor,
+                                          constraints: BoxConstraints(
+                                            minWidth: 35.w,
+                                            maxWidth: 50.w,
+                                          ),
+                                        ),
                                         menuItems: [
                                           if (user!.id ==
                                                   chatroom!.member!.id ||
@@ -1050,8 +1069,11 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
                                               Clipboard.setData(
                                                 ClipboardData(
                                                   text: TaggingHelper
-                                                          .convertRouteToTag(
-                                                              item.answer) ??
+                                                              .convertRouteToTag(
+                                                                  item.answer)
+                                                          ?.replaceAll(
+                                                              RegExp(r'[@~]'),
+                                                              '') ??
                                                       '',
                                                 ),
                                               ).then((value) {
@@ -1482,6 +1504,7 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
                                               ? FontStyle.italic
                                               : FontStyle.normal,
                                         ),
+                                        maxLines: 1,
                                         overflow: TextOverflow.ellipsis,
                                       ),
                                       conversation:
