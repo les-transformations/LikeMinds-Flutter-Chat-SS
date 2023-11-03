@@ -31,6 +31,7 @@ import 'package:likeminds_chat_fl/likeminds_chat_fl.dart';
 import 'package:likeminds_chat_ui_fl/likeminds_chat_ui_fl.dart';
 import 'package:overlay_support/overlay_support.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:scroll_to_index/scroll_to_index.dart';
 
 class ChatRoomPage extends StatefulWidget {
   const ChatRoomPage({
@@ -70,7 +71,7 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
   bool showChatTopic = true;
   Conversation? localTopic;
 
-  ScrollController scrollController = ScrollController();
+  AutoScrollController scrollController = AutoScrollController();
   PagingController<int, Conversation> pagedListController =
       PagingController<int, Conversation>(firstPageKey: 1);
 
@@ -429,6 +430,22 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
       curve: Curves.easeOut,
     );
     rebuildConversationList.value = !rebuildConversationList.value;
+  }
+
+  void scrollToConversation(int id) {
+    debugPrint("tapped");
+    int? index =
+        pagedListController.itemList?.indexWhere((element) => element.id == id);
+    debugPrint("jump to $index");
+    // int? page = pagedListController.;
+    if (index != null && index != -1) {
+      scrollController.scrollToIndex(
+        index,
+        duration: const Duration(milliseconds: 200),
+      );
+    } else {
+      debugPrint("element not found");
+    }
   }
 
   @override
@@ -1509,7 +1526,13 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
                                       ),
                                       conversation:
                                           localTopic ?? chatroom!.topic!,
-                                      onTap: () {});
+                                      onTap: () {
+                                        if (localTopic != null ||
+                                            chatroom!.topic != null) {
+                                          scrollToConversation(localTopic?.id ??
+                                              chatroom!.topic!.id);
+                                        }
+                                      });
                                 } else {
                                   return const SizedBox.shrink();
                                 }
