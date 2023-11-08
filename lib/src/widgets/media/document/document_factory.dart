@@ -30,7 +30,7 @@ class _DocumentFactoryState extends State<DocumentFactory> {
   CarouselController controller = CarouselController();
   FilePicker filePicker = FilePicker.platform;
   ValueNotifier<bool> rebuildCurr = ValueNotifier<bool>(false);
-  List<UserTag> userTags = [];
+  List<LMTagViewData> tags = [];
   String? result;
   int currPosition = 0;
   ConversationBloc? conversationBloc;
@@ -146,7 +146,7 @@ class _DocumentFactoryState extends State<DocumentFactory> {
                                 .copyWith(color: kWhiteColor),
                             onTagSelected: (tag) {
                               // print(tag);
-                              userTags.add(tag);
+                              tags.add(tag);
                             },
                             onChange: (value) {
                               // print(value);
@@ -159,10 +159,10 @@ class _DocumentFactoryState extends State<DocumentFactory> {
                           onTap: () {
                             router.pop();
                             final string = _textEditingController.text;
-                            userTags =
-                                TaggingHelper.matchTags(string, userTags);
+                            tags =
+                                TaggingHelper.matchTags(string, tags);
                             result =
-                                TaggingHelper.encodeString(string, userTags);
+                                TaggingHelper.encodeString(string, tags);
                             result = result?.trim();
                             conversationBloc!.add(
                               PostMultiMediaConversation(

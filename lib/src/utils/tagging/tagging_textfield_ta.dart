@@ -6,7 +6,7 @@ import 'package:likeminds_chat_ss_fl/src/utils/imports.dart';
 class LMTextField extends StatefulWidget {
   final bool isDown;
   final FocusNode focusNode;
-  final Function(UserTag) onTagSelected;
+  final Function(LMTagViewData) onTagSelected;
   final TextEditingController? controller;
   final InputDecoration? decoration;
   final TextStyle? style;
@@ -39,6 +39,7 @@ class _LMTextFieldState extends State<LMTextField> {
       SuggestionsBoxController();
 
   List<UserTag> userTags = [];
+  List<LMTagViewData> tagViewData = [];
 
   int page = 1;
   int tagCount = 0;
@@ -75,12 +76,13 @@ class _LMTextFieldState extends State<LMTextField> {
 
   TextEditingController? get controller => _controller;
 
-  FutureOr<Iterable<UserTag>> _getSuggestions(String query) async {
+  FutureOr<Iterable<LMTagViewData>> _getSuggestions(String query) async {
     String currentText = query;
     try {
       if (currentText.isEmpty) {
         return const Iterable.empty();
       } else if (!tagComplete && currentText.contains('@')) {
+        //todo: check for successful response
         String tag = tagValue.substring(1).split(' ').first;
         final taggingData = (await locator<LikeMindsService>().getTaggingList(
           (TagRequestModelBuilder()
@@ -92,21 +94,39 @@ class _LMTextFieldState extends State<LMTextField> {
         ))
             .data;
 
-        if (!widget.isSecret) {
-          if (taggingData!.members != null && taggingData.members!.isNotEmpty) {
-            userTags.clear();
-            userTags.addAll(taggingData.members!.map((e) => e).toList());
-            return userTags;
-          }
-        } else {
-          if (taggingData!.participants != null &&
-              taggingData.participants!.isNotEmpty) {
-            userTags.clear();
-            userTags.addAll(taggingData.participants!.map((e) => e).toList());
-            return userTags;
-          }
+        if (taggingData == null) {
+          return const Iterable.empty();
         }
-        return const Iterable.empty();
+
+        tagViewData.clear();
+        if (!widget.isSecret) {
+          if (taggingData.groupTags != null &&
+              taggingData.groupTags!.isNotEmpty) {
+            tagViewData.addAll(taggingData.groupTags!
+                .map((e) => LMTagViewData.fromGroupTag(e))
+                .toList());
+          }
+          if (taggingData.members != null && taggingData.members!.isNotEmpty) {
+            tagViewData.addAll(taggingData.members!
+                .map((e) => LMTagViewData.fromUserTag(e))
+                .toList());
+          }
+          return tagViewData;
+        } else {
+          if (taggingData.groupTags != null &&
+              taggingData.groupTags!.isNotEmpty) {
+            tagViewData.addAll(taggingData.groupTags!
+                .map((e) => LMTagViewData.fromGroupTag(e))
+                .toList());
+          }
+          if (taggingData.participants != null &&
+              taggingData.participants!.isNotEmpty) {
+            tagViewData.addAll(taggingData.participants!
+                .map((e) => LMTagViewData.fromUserTag(e))
+                .toList());
+          }
+          return tagViewData;
+        }
       } else {
         return const Iterable.empty();
       }
@@ -123,7 +143,7 @@ class _LMTextFieldState extends State<LMTextField> {
         right: 6.0,
         bottom: 4.0,
       ),
-      child: TypeAheadField<UserTag>(
+      child: TypeAheadField<LMTagViewData>(
         tagColor: secondary,
         onTagTap: (p) {
           // print(p);
@@ -144,6 +164,7 @@ class _LMTextFieldState extends State<LMTextField> {
         // keepSuggestionsOnLocading: true,
         noItemsFoundBuilder: (context) => const SizedBox.shrink(),
         hideOnEmpty: true,
+        hideOnLoading: true,
         debounceDuration: const Duration(milliseconds: 500),
         scrollController: _scrollController,
         textFieldConfiguration: TextFieldConfiguration(
@@ -174,10 +195,11 @@ class _LMTextFieldState extends State<LMTextField> {
               tagValue = value.substring(value.lastIndexOf('@'));
               textValue = value.substring(0, value.lastIndexOf('@'));
             } else {
-               int currentPosition = _controller.selection.base.offset;
-               if(_controller.text[currentPosition]=='~') {
-                _controller.text = _controller.text.replaceRange(currentPosition, currentPosition+1, "");
-               }
+              int currentPosition = _controller.selection.base.offset;
+              if (_controller.text[currentPosition] == '~') {
+                _controller.text = _controller.text
+                    .replaceRange(currentPosition, currentPosition + 1, "");
+              }
             }
           }),
         ),
@@ -206,13 +228,13 @@ class _LMTextFieldState extends State<LMTextField> {
                 child: Row(
                   children: [
                     LMProfilePicture(
-                      fallbackText: opt.name!,
+                      fallbackText: opt.name,
                       imageUrl: opt.imageUrl,
                       size: 36,
                     ),
                     const SizedBox(width: 12),
                     Text(
-                      opt.name!,
+                      opt.name,
                       style: const TextStyle(
                         fontSize: 14,
                       ),
@@ -224,7 +246,6 @@ class _LMTextFieldState extends State<LMTextField> {
           );
         }),
         onSuggestionSelected: ((suggestion) {
-          debugPrint(suggestion.toString());
           widget.onTagSelected.call(suggestion);
           setState(() {
             tagComplete = true;
@@ -234,9 +255,17 @@ class _LMTextFieldState extends State<LMTextField> {
             // _controller.text.substring(_controller.text.lastIndexOf('@'));
             if (textValue.length > 2 &&
                 textValue.substring(textValue.length - 1) == '~') {
-              textValue += " @${suggestion.name!}~";
+              if (suggestion.tagType == LMTagType.groupTag) {
+                textValue += " ${suggestion.name}~";
+              } else {
+                textValue += " @${suggestion.name}~";
+              }
             } else {
-              textValue += "@${suggestion.name!}~";
+              if (suggestion.tagType == LMTagType.groupTag) {
+                textValue += "${suggestion.name}~";
+              } else {
+                textValue += "@${suggestion.name}~";
+              }
             }
             _controller.text = '$textValue $suffix';
             _controller.selection = TextSelection.fromPosition(
