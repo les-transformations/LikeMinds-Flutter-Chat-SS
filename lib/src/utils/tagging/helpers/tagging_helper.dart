@@ -8,7 +8,7 @@ class TaggingHelper {
   static RegExp routeRegExp =
       RegExp(r'<<([^<>]+)\|route://([^<>]+)/([a-zA-Z-0-9]+)>>');
   static const String linkRoute =
-      r'(?:(?:https?|ftp):\/\/)?[\w/\-?=%.]+\.[\w/\-?=%.]+';
+     r'(?:(?:https?|ftp):\/\/)?[\w/\-?=%.]+\.[\w/\-?=%.]+|(\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b)';
 
   /// Encodes the string with the user tags and returns the encoded string
   static String encodeString(String string, List<UserTag> userTags) {
@@ -115,15 +115,15 @@ class TaggingHelper {
     }
     return input;
   }
-}
 
-List<String> extractLinkFromString(String text) {
-  RegExp exp = RegExp(TaggingHelper.linkRoute);
+
+static List<String> extractLinkFromString(String text) {
+  RegExp exp = RegExp(linkRoute);
   Iterable<RegExpMatch> matches = exp.allMatches(text);
   List<String> links = [];
   for (var match in matches) {
     String link = text.substring(match.start, match.end);
-    if (link.isNotEmpty) {
+    if (link.isNotEmpty && match.group(1) == null) {
       links.add(link);
     }
   }
@@ -134,7 +134,7 @@ List<String> extractLinkFromString(String text) {
   }
 }
 
-String getFirstValidLinkFromString(String text) {
+static String getFirstValidLinkFromString(String text) {
   try {
     List<String> links = extractLinkFromString(text);
     List<String> validLinks = [];
@@ -158,4 +158,5 @@ String getFirstValidLinkFromString(String text) {
   } catch (e) {
     return '';
   }
+}
 }
