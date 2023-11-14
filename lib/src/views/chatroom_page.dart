@@ -1,4 +1,3 @@
-import 'package:custom_pop_up_menu/custom_pop_up_menu.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
@@ -684,174 +683,199 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
                                                 null
                                             ? getDeletedTextWidget(item, user!)
                                             : null,
-                                        menuItems: [
-                                          if (user!.id ==
-                                                  chatroom!.member!.id ||
-                                              locator<LMPreferenceService>()
-                                                  .fetchMemberRight(1))
-                                            LMMenuItemUI(
-                                              onTap: () {
-                                                if (localTopic != null
-                                                    ? localTopic!.id != item.id
-                                                    : chatroom!.topic?.id !=
-                                                        item.id) {
-                                                  _chatroomActionBloc.add(
-                                                    SetChatroomTopicEvent(
+                                        menuBuilder: (child) {
+                                          return LMMenu(
+                                            surfaceTintColor: kWhiteColor,
+                                            color: kWhiteColor,
+                                            constraints: BoxConstraints(
+                                              minWidth: 35.w,
+                                              maxWidth: 50.w,
+                                            ),
+                                            menuItems: [
+                                              if (user!.id ==
+                                                      chatroom!.member!.id ||
+                                                  locator<LMPreferenceService>()
+                                                      .fetchMemberRight(1))
+                                                LMMenuItemUI(
+                                                  onTap: () {
+                                                    if (localTopic != null
+                                                        ? localTopic!.id !=
+                                                            item.id
+                                                        : chatroom!.topic?.id !=
+                                                            item.id) {
+                                                      _chatroomActionBloc.add(
+                                                        SetChatroomTopicEvent(
+                                                          chatroomId:
+                                                              chatroom!.id,
+                                                          conversationId:
+                                                              item.id,
+                                                          topic: item,
+                                                        ),
+                                                      );
+                                                    } else {
+                                                      toast(
+                                                          "Message is already pinned");
+                                                    }
+                                                  },
+                                                  leading: const LMIcon(
+                                                    type: LMIconType.svg,
+                                                    assetPath: ssPinIcon,
+                                                    size: 24,
+                                                  ),
+                                                  title: const LMTextView(
+                                                    text: "Pin Message",
+                                                    textStyle: TextStyle(
+                                                      fontSize: 14,
+                                                    ),
+                                                  ),
+                                                ),
+                                              LMMenuItemUI(
+                                                onTap: () {
+                                                  int userId = item.userId ??
+                                                      item.memberId!;
+                                                  if (userId == user!.id) {
+                                                    item.member = user!;
+                                                  }
+                                                  if (item.deletedByUserId !=
+                                                      null) {
+                                                    return;
+                                                  }
+                                                  _convActionBloc.add(
+                                                    ReplyConversation(
                                                       chatroomId: chatroom!.id,
                                                       conversationId: item.id,
-                                                      topic: item,
+                                                      replyConversation: item,
                                                     ),
                                                   );
-                                                } else {
-                                                  toast(
-                                                      "Message is already pinned");
-                                                }
-                                              },
-                                              leading: const LMIcon(
-                                                type: LMIconType.svg,
-                                                assetPath: ssPinIcon,
-                                                size: 24,
-                                              ),
-                                              title: const LMTextView(
-                                                text: "Pin Message",
-                                                textStyle: TextStyle(
-                                                  fontSize: 14,
+                                                },
+                                                leading: const LMIcon(
+                                                  type: LMIconType.svg,
+                                                  assetPath: ssReplyIcon,
+                                                  size: 24,
+                                                ),
+                                                title: const LMTextView(
+                                                  text: "Reply",
+                                                  textStyle: TextStyle(
+                                                    fontSize: 14,
+                                                  ),
                                                 ),
                                               ),
-                                            ),
-                                          LMMenuItemUI(
-                                            onTap: () {
-                                              int userId =
-                                                  item.userId ?? item.memberId!;
-                                              if (userId == user!.id) {
-                                                item.member = user!;
-                                              }
-                                              if (item.deletedByUserId !=
-                                                  null) {
-                                                return;
-                                              }
-                                              _convActionBloc.add(
-                                                ReplyConversation(
-                                                  chatroomId: chatroom!.id,
-                                                  conversationId: item.id,
-                                                  replyConversation: item,
+                                              LMMenuItemUI(
+                                                onTap: () {
+                                                  Clipboard.setData(
+                                                    ClipboardData(
+                                                      text: TaggingHelper
+                                                                  .convertRouteToTag(
+                                                                      item
+                                                                          .answer)
+                                                              ?.replaceAll(
+                                                                  RegExp(
+                                                                      r'[@~]'),
+                                                                  '') ??
+                                                          '',
+                                                    ),
+                                                  ).then((value) {
+                                                    toast(
+                                                        "Copied to clipboard");
+                                                    String type = item
+                                                            .attachments
+                                                            ?.first
+                                                            .type ??
+                                                        "text";
+                                                    LMAnalytics.get().track(
+                                                      AnalyticsKeys
+                                                          .messageCopied,
+                                                      {
+                                                        "type": type,
+                                                        "chatroom_id":
+                                                            chatroom?.id
+                                                      },
+                                                    );
+                                                  });
+                                                },
+                                                leading: const LMIcon(
+                                                  type: LMIconType.svg,
+                                                  assetPath: ssCopyIcon,
+                                                  size: 24,
                                                 ),
-                                              );
-                                            },
-                                            leading: const LMIcon(
-                                              type: LMIconType.svg,
-                                              assetPath: ssReplyIcon,
-                                              size: 24,
-                                            ),
-                                            title: const LMTextView(
-                                              text: "Reply",
-                                              textStyle: TextStyle(
-                                                fontSize: 14,
+                                                title: const LMTextView(
+                                                  text: "Copy",
+                                                  textStyle: TextStyle(
+                                                    fontSize: 14,
+                                                  ),
+                                                ),
                                               ),
-                                            ),
-                                          ),
-                                          LMMenuItemUI(
-                                            onTap: () {
-                                              Clipboard.setData(
-                                                ClipboardData(
-                                                  text: TaggingHelper
-                                                          .convertRouteToTag(
-                                                              item.answer) ??
-                                                      '',
-                                                ),
-                                              ).then((value) {
-                                                toast("Copied to clipboard");
-                                                String type = item.attachments
-                                                        ?.first.type ??
-                                                    "text";
-                                                LMAnalytics.get().track(
-                                                  AnalyticsKeys.messageCopied,
-                                                  {
-                                                    "type": type,
-                                                    "chatroom_id": chatroom?.id
+                                              if (checkDeletePermissions(item))
+                                                LMMenuItemUI(
+                                                  onTap: () async {
+                                                    if ((localTopic != null &&
+                                                            localTopic!.id ==
+                                                                item.id) ||
+                                                        (chatroom!.topic !=
+                                                                null &&
+                                                            item.id ==
+                                                                chatroom!.topic!
+                                                                    .id)) {
+                                                      showDialog(
+                                                          context: context,
+                                                          builder: (context) =>
+                                                              LMConfirmationDialog(
+                                                                width: 270,
+                                                                titleText:
+                                                                    "Delete Chat",
+                                                                bodyText:
+                                                                    "Are you sure you want to delete this chat? The message has been set as current topic of this chatroom",
+                                                                onCancel: () {
+                                                                  Navigator.pop(
+                                                                      context);
+                                                                },
+                                                                onDelete: () {
+                                                                  DeleteConversationRequest
+                                                                      request =
+                                                                      (DeleteConversationRequestBuilder()
+                                                                            ..conversationIds([
+                                                                              item.id
+                                                                            ])
+                                                                            ..reason("Delete"))
+                                                                          .build();
+                                                                  _convActionBloc.add(
+                                                                      DeleteConversation(
+                                                                          request));
+                                                                  Navigator.pop(
+                                                                      context);
+                                                                },
+                                                              ));
+                                                    } else {
+                                                      DeleteConversationRequest
+                                                          request =
+                                                          (DeleteConversationRequestBuilder()
+                                                                ..conversationIds(
+                                                                    [item.id])
+                                                                ..reason(
+                                                                    "Delete"))
+                                                              .build();
+                                                      _convActionBloc.add(
+                                                          DeleteConversation(
+                                                              request));
+                                                    }
                                                   },
-                                                );
-                                              });
-                                            },
-                                            leading: const LMIcon(
-                                              type: LMIconType.svg,
-                                              assetPath: ssCopyIcon,
-                                              size: 24,
-                                            ),
-                                            title: const LMTextView(
-                                              text: "Copy",
-                                              textStyle: TextStyle(
-                                                fontSize: 14,
-                                              ),
-                                            ),
-                                          ),
-                                          if (checkDeletePermissions(item))
-                                            LMMenuItemUI(
-                                              onTap: () async {
-                                                if ((localTopic != null &&
-                                                        localTopic!.id ==
-                                                            item.id) ||
-                                                    (chatroom!.topic != null &&
-                                                        item.id ==
-                                                            chatroom!
-                                                                .topic!.id)) {
-                                                  showDialog(
-                                                      context: context,
-                                                      builder: (context) =>
-                                                          LMConfirmationDialog(
-                                                            width: 270,
-                                                            titleText:
-                                                                "Delete Chat",
-                                                            bodyText:
-                                                                "Are you sure you want to delete this chat? The message has been set as current topic of this chatroom",
-                                                            onCancel: () {
-                                                              Navigator.pop(
-                                                                  context);
-                                                            },
-                                                            onDelete: () {
-                                                              DeleteConversationRequest
-                                                                  request =
-                                                                  (DeleteConversationRequestBuilder()
-                                                                        ..conversationIds([
-                                                                          item.id
-                                                                        ])
-                                                                        ..reason(
-                                                                            "Delete"))
-                                                                      .build();
-                                                              _convActionBloc.add(
-                                                                  DeleteConversation(
-                                                                      request));
-                                                              Navigator.pop(
-                                                                  context);
-                                                            },
-                                                          ));
-                                                } else {
-                                                  DeleteConversationRequest
-                                                      request =
-                                                      (DeleteConversationRequestBuilder()
-                                                            ..conversationIds(
-                                                                [item.id])
-                                                            ..reason("Delete"))
-                                                          .build();
-                                                  _convActionBloc.add(
-                                                      DeleteConversation(
-                                                          request));
-                                                }
-                                              },
-                                              leading: const LMIcon(
-                                                type: LMIconType.svg,
-                                                assetPath: ssDeleteIcon,
-                                                color: Colors.red,
-                                                size: 24,
-                                              ),
-                                              title: const LMTextView(
-                                                text: "Delete",
-                                                textStyle: TextStyle(
-                                                  fontSize: 14,
+                                                  leading: const LMIcon(
+                                                    type: LMIconType.svg,
+                                                    assetPath: ssDeleteIcon,
+                                                    color: Colors.red,
+                                                    size: 24,
+                                                  ),
+                                                  title: const LMTextView(
+                                                    text: "Delete",
+                                                    textStyle: TextStyle(
+                                                      fontSize: 14,
+                                                    ),
+                                                  ),
                                                 ),
-                                              ),
-                                            ),
-                                        ],
+                                            ],
+                                            child: child,
+                                          );
+                                        },
                                         onReply: (replyingTo) {
                                           int userId =
                                               item.userId ?? item.memberId!;
@@ -979,194 +1003,219 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
                                         key: Key(item.id.toString()),
                                         isSent: item.userId == user!.id,
                                         backgroundColor: secondary.shade100,
-                                        menuItems: [
-                                          if (user!.id ==
-                                                  chatroom!.member!.id ||
-                                              locator<LMPreferenceService>()
-                                                  .fetchMemberRight(1))
-                                            LMMenuItemUI(
-                                              onTap: () {
-                                                if (localTopic != null
-                                                    ? localTopic!.id != item.id
-                                                    : chatroom!.topic?.id !=
-                                                        item.id) {
-                                                  _chatroomActionBloc.add(
-                                                    SetChatroomTopicEvent(
-                                                      chatroomId: chatroom!.id,
-                                                      conversationId: item.id,
-                                                      topic: item,
+                                        menuBuilder: (child) {
+                                          return LMMenu(
+                                              surfaceTintColor: kWhiteColor,
+                                              color: kWhiteColor,
+                                              constraints: BoxConstraints(
+                                                minWidth: 35.w,
+                                                maxWidth: 50.w,
+                                              ),
+                                              menuItems: [
+                                                if (user!.id ==
+                                                        chatroom!.member!.id ||
+                                                    locator<LMPreferenceService>()
+                                                        .fetchMemberRight(1))
+                                                  LMMenuItemUI(
+                                                    onTap: () {
+                                                      if (localTopic != null
+                                                          ? localTopic!.id !=
+                                                              item.id
+                                                          : chatroom!
+                                                                  .topic?.id !=
+                                                              item.id) {
+                                                        _chatroomActionBloc.add(
+                                                          SetChatroomTopicEvent(
+                                                            chatroomId:
+                                                                chatroom!.id,
+                                                            conversationId:
+                                                                item.id,
+                                                            topic: item,
+                                                          ),
+                                                        );
+                                                      } else {
+                                                        toast(
+                                                            "Message is already pinned");
+                                                      }
+                                                    },
+                                                    leading: const LMIcon(
+                                                      type: LMIconType.svg,
+                                                      assetPath: ssPinIcon,
+                                                      size: 24,
                                                     ),
-                                                  );
-                                                } else {
-                                                  toast(
-                                                      "Message is already pinned");
-                                                }
-                                              },
-                                              leading: const LMIcon(
-                                                type: LMIconType.svg,
-                                                assetPath: ssPinIcon,
-                                                size: 24,
-                                              ),
-                                              title: const LMTextView(
-                                                text: "Pin Message",
-                                                textStyle: TextStyle(
-                                                  fontSize: 14,
-                                                ),
-                                              ),
-                                            ),
-                                          LMMenuItemUI(
-                                            onTap: () {
-                                              int userId =
-                                                  item.userId ?? item.memberId!;
-                                              if (userId == user!.id) {
-                                                item.member = user!;
-                                              }
-                                              if (item.deletedByUserId !=
-                                                  null) {
-                                                return;
-                                              }
-                                              _convActionBloc.add(
-                                                ReplyConversation(
-                                                  chatroomId: chatroom!.id,
-                                                  conversationId: item.id,
-                                                  replyConversation: item,
-                                                ),
-                                              );
-                                            },
-                                            leading: const LMIcon(
-                                              type: LMIconType.svg,
-                                              assetPath: ssReplyIcon,
-                                              size: 24,
-                                            ),
-                                            title: const LMTextView(
-                                              text: "Reply",
-                                              textStyle: TextStyle(
-                                                fontSize: 14,
-                                              ),
-                                            ),
-                                          ),
-                                          LMMenuItemUI(
-                                            onTap: () {
-                                              Clipboard.setData(
-                                                ClipboardData(
-                                                  text: TaggingHelper
-                                                          .convertRouteToTag(
-                                                              item.answer) ??
-                                                      '',
-                                                ),
-                                              ).then((value) {
-                                                toast("Copied to clipboard");
-                                                String type = item.attachments
-                                                        ?.first.type ??
-                                                    "text";
-                                                LMAnalytics.get().track(
-                                                  AnalyticsKeys.messageCopied,
-                                                  {
-                                                    "type": type,
-                                                    "chatroom_id": chatroom?.id
+                                                    title: const LMTextView(
+                                                      text: "Pin Message",
+                                                      textStyle: TextStyle(
+                                                        fontSize: 14,
+                                                      ),
+                                                    ),
+                                                  ),
+                                                LMMenuItemUI(
+                                                  onTap: () {
+                                                    int userId = item.userId ??
+                                                        item.memberId!;
+                                                    if (userId == user!.id) {
+                                                      item.member = user!;
+                                                    }
+                                                    if (item.deletedByUserId !=
+                                                        null) {
+                                                      return;
+                                                    }
+                                                    _convActionBloc.add(
+                                                      ReplyConversation(
+                                                        chatroomId:
+                                                            chatroom!.id,
+                                                        conversationId: item.id,
+                                                        replyConversation: item,
+                                                      ),
+                                                    );
                                                   },
-                                                );
-                                              });
-                                            },
-                                            leading: const LMIcon(
-                                              type: LMIconType.svg,
-                                              assetPath: ssCopyIcon,
-                                              size: 24,
-                                            ),
-                                            title: const LMTextView(
-                                              text: "Copy",
-                                              textStyle: TextStyle(
-                                                fontSize: 14,
-                                              ),
-                                            ),
-                                          ),
-                                          if (checkDeletePermissions(item))
-                                            LMMenuItemUI(
-                                              onTap: () async {
-                                                if ((localTopic != null &&
-                                                        localTopic!.id ==
-                                                            item.id) ||
-                                                    (chatroom!.topic != null &&
-                                                        item.id ==
-                                                            chatroom!
-                                                                .topic!.id)) {
-                                                  showDialog(
-                                                      context: context,
-                                                      builder: (context) =>
-                                                          LMConfirmationDialog(
-                                                            width: 270,
-                                                            titleText:
-                                                                "Delete Chat",
-                                                            bodyText:
-                                                                "Are you sure you want to delete this chat? The message has been set as current topic of this chatroom",
-                                                            onCancel: () {
-                                                              Navigator.pop(
-                                                                  context);
-                                                            },
-                                                            onDelete: () {
-                                                              DeleteConversationRequest
-                                                                  request =
-                                                                  (DeleteConversationRequestBuilder()
-                                                                        ..conversationIds([
-                                                                          item.id
-                                                                        ])
-                                                                        ..reason(
-                                                                            "Delete"))
-                                                                      .build();
-                                                              _convActionBloc.add(
-                                                                  DeleteConversation(
-                                                                      request));
-                                                              Navigator.pop(
-                                                                  context);
-                                                            },
-                                                          ));
-                                                } else {
-                                                  showDialog(
-                                                      context: context,
-                                                      builder: (context) =>
-                                                          LMConfirmationDialog(
-                                                            width: 270,
-                                                            titleText:
-                                                                "Delete Chat",
-                                                            bodyText:
-                                                                "Are you sure you want to delete this chat?",
-                                                            onCancel: () {
-                                                              Navigator.pop(
-                                                                  context);
-                                                            },
-                                                            onDelete: () {
-                                                              DeleteConversationRequest
-                                                                  request =
-                                                                  (DeleteConversationRequestBuilder()
-                                                                        ..conversationIds([
-                                                                          item.id
-                                                                        ])
-                                                                        ..reason(
-                                                                            "Delete"))
-                                                                      .build();
-                                                              _convActionBloc.add(
-                                                                  DeleteConversation(
-                                                                      request));
-                                                              Navigator.pop(
-                                                                  context);
-                                                            },
-                                                          ));
-                                                }
-                                              },
-                                              leading: const LMIcon(
-                                                type: LMIconType.svg,
-                                                assetPath: ssDeleteIcon,
-                                                color: Colors.red,
-                                                size: 24,
-                                              ),
-                                              title: const LMTextView(
-                                                text: "Delete",
-                                                textStyle: TextStyle(
-                                                  fontSize: 14,
+                                                  leading: const LMIcon(
+                                                    type: LMIconType.svg,
+                                                    assetPath: ssReplyIcon,
+                                                    size: 24,
+                                                  ),
+                                                  title: const LMTextView(
+                                                    text: "Reply",
+                                                    textStyle: TextStyle(
+                                                      fontSize: 14,
+                                                    ),
+                                                  ),
                                                 ),
-                                              ),
-                                            ),
-                                        ],
+                                                LMMenuItemUI(
+                                                  onTap: () {
+                                                    Clipboard.setData(
+                                                      ClipboardData(
+                                                        text: TaggingHelper
+                                                                    .convertRouteToTag(item
+                                                                        .answer)
+                                                                ?.replaceAll(
+                                                                    RegExp(
+                                                                        r'[@~]'),
+                                                                    '') ??
+                                                            '',
+                                                      ),
+                                                    ).then((value) {
+                                                      toast(
+                                                          "Copied to clipboard");
+                                                      String type = item
+                                                              .attachments
+                                                              ?.first
+                                                              .type ??
+                                                          "text";
+                                                      LMAnalytics.get().track(
+                                                        AnalyticsKeys
+                                                            .messageCopied,
+                                                        {
+                                                          "type": type,
+                                                          "chatroom_id":
+                                                              chatroom?.id
+                                                        },
+                                                      );
+                                                    });
+                                                  },
+                                                  leading: const LMIcon(
+                                                    type: LMIconType.svg,
+                                                    assetPath: ssCopyIcon,
+                                                    size: 24,
+                                                  ),
+                                                  title: const LMTextView(
+                                                    text: "Copy",
+                                                    textStyle: TextStyle(
+                                                      fontSize: 14,
+                                                    ),
+                                                  ),
+                                                ),
+                                                if (checkDeletePermissions(
+                                                    item))
+                                                  LMMenuItemUI(
+                                                    onTap: () async {
+                                                      if ((localTopic != null &&
+                                                              localTopic!.id ==
+                                                                  item.id) ||
+                                                          (chatroom!.topic !=
+                                                                  null &&
+                                                              item.id ==
+                                                                  chatroom!
+                                                                      .topic!
+                                                                      .id)) {
+                                                        showDialog(
+                                                            context: context,
+                                                            builder: (context) =>
+                                                                LMConfirmationDialog(
+                                                                  width: 270,
+                                                                  titleText:
+                                                                      "Delete Chat",
+                                                                  bodyText:
+                                                                      "Are you sure you want to delete this chat? The message has been set as current topic of this chatroom",
+                                                                  onCancel: () {
+                                                                    Navigator.pop(
+                                                                        context);
+                                                                  },
+                                                                  onDelete: () {
+                                                                    DeleteConversationRequest
+                                                                        request =
+                                                                        (DeleteConversationRequestBuilder()
+                                                                              ..conversationIds([
+                                                                                item.id
+                                                                              ])
+                                                                              ..reason("Delete"))
+                                                                            .build();
+                                                                    _convActionBloc.add(
+                                                                        DeleteConversation(
+                                                                            request));
+                                                                    Navigator.pop(
+                                                                        context);
+                                                                  },
+                                                                ));
+                                                      } else {
+                                                        showDialog(
+                                                            context: context,
+                                                            builder: (context) =>
+                                                                LMConfirmationDialog(
+                                                                  width: 270,
+                                                                  titleText:
+                                                                      "Delete Chat",
+                                                                  bodyText:
+                                                                      "Are you sure you want to delete this chat?",
+                                                                  onCancel: () {
+                                                                    Navigator.pop(
+                                                                        context);
+                                                                  },
+                                                                  onDelete: () {
+                                                                    DeleteConversationRequest
+                                                                        request =
+                                                                        (DeleteConversationRequestBuilder()
+                                                                              ..conversationIds([
+                                                                                item.id
+                                                                              ])
+                                                                              ..reason("Delete"))
+                                                                            .build();
+                                                                    _convActionBloc.add(
+                                                                        DeleteConversation(
+                                                                            request));
+                                                                    Navigator.pop(
+                                                                        context);
+                                                                  },
+                                                                ));
+                                                      }
+                                                    },
+                                                    leading: const LMIcon(
+                                                      type: LMIconType.svg,
+                                                      assetPath: ssDeleteIcon,
+                                                      color: Colors.red,
+                                                      size: 24,
+                                                    ),
+                                                    title: const LMTextView(
+                                                      text: "Delete",
+                                                      textStyle: TextStyle(
+                                                        fontSize: 14,
+                                                      ),
+                                                    ),
+                                                  ),
+                                              ],
+                                              child: child);
+                                        },
                                         onReply: (replyingTo) {
                                           int userId =
                                               item.userId ?? item.memberId!;
@@ -1482,6 +1531,7 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
                                               ? FontStyle.italic
                                               : FontStyle.normal,
                                         ),
+                                        maxLines: 1,
                                         overflow: TextOverflow.ellipsis,
                                       ),
                                       conversation:
