@@ -61,7 +61,7 @@ class _ChatBarState extends State<ChatBar> {
   MemberStateResponse? getMemberState =
       locator<LMPreferenceService>().getMemberRights();
 
-  List<UserTag> userTags = [];
+  List<LMTagViewData> tags = [];
   String? result;
 
   ValueNotifier<bool> rebuildLinkPreview = ValueNotifier(false);
@@ -184,7 +184,7 @@ class _ChatBarState extends State<ChatBar> {
         TextEditingValue(text: convertedMsgText ?? '');
     _textEditingController.selection = TextSelection.fromPosition(
         TextPosition(offset: _textEditingController.text.length));
-    userTags =
+    tags =
         TaggingHelper.addUserTagsIfMatched(editConversation?.answer ?? '');
     if (editConversation != null) {
       _focusNode.requestFocus();
@@ -317,8 +317,7 @@ class _ChatBarState extends State<ChatBar> {
                                 .bodyMedium!
                                 .copyWith(fontSize: 14),
                             onTagSelected: (tag) {
-                              debugPrint(tag.toString());
-                              userTags.add(tag);
+                              tags.add(tag);
                               LMAnalytics.get()
                                   .track(AnalyticsKeys.userTagsSomeone, {
                                 'community_id': widget.chatroom.id,
@@ -685,11 +684,15 @@ class _ChatBarState extends State<ChatBar> {
                                     toast("Text can't be empty");
                                   } else {
                                     final string = _textEditingController.text;
-                                    userTags = TaggingHelper.matchTags(
-                                        string, userTags);
+                                    // debugPrint(userTags.length.toString());
+                                    tags = TaggingHelper.matchTags(
+                                        string, tags);
+                                        // debugPrint(userTags.length.toString());
                                     result = TaggingHelper.encodeString(
-                                        string, userTags);
+                                        string, tags);
                                     result = result?.trim();
+                                    // debugPrint(result! + userTags.length.toString());
+                                    // return;
                                     if (editConversation != null) {
                                       linkModel = null;
                                       chatActionBloc!.add(EditConversation(
@@ -792,7 +795,7 @@ class _ChatBarState extends State<ChatBar> {
                                       widget.chatroom.isGuest = false;
                                     }
                                     _textEditingController.clear();
-                                    userTags = [];
+                                    tags = [];
                                     result = "";
                                     if (editConversation == null) {
                                       widget.scrollToBottom();

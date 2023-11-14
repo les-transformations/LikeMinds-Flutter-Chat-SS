@@ -2,24 +2,31 @@
 import 'package:collection/collection.dart';
 import 'package:flutter/foundation.dart';
 import 'package:likeminds_chat_fl/likeminds_chat_fl.dart';
+import 'package:likeminds_chat_ss_fl/src/utils/imports.dart';
+// import 'package:likeminds_chat_fl/likeminds_chat_fl.dart';
 
 class TaggingHelper {
+  UserTag? userTag;
   static final RegExp tagRegExp = RegExp(r'@([^<>~]+)~');
-  static RegExp routeRegExp =
-      RegExp(r'<<([^<>]+)\|route://([^<>]+)/([a-zA-Z-0-9]+)>>');
+  static RegExp routeRegExp = RegExp(
+      r'<<([^<>]+)\|route://([^<>]+)/([a-zA-Z-0-9]+)>>|<<([^<>]+)\|route://([^<>]+)>>');
   static const String linkRoute =
       r'(?:(?:https?|ftp):\/\/)?[\w/\-?=%.]+\.[\w/\-?=%.]+';
 
   /// Encodes the string with the user tags and returns the encoded string
-  static String encodeString(String string, List<UserTag> userTags) {
+  static String encodeString(String string, List<LMTagViewData> userTags) {
     final Iterable<RegExpMatch> matches = tagRegExp.allMatches(string);
     for (final match in matches) {
       final String tag = match.group(1)!;
-      final UserTag? userTag =
-          userTags.firstWhereOrNull((element) => element.name! == tag);
-      if (userTag != null) {
-        string = string.replaceAll(
-            '@$tag~', '<<${userTag.name}|route://member/${userTag.id}>>');
+      final LMTagViewData? tagData = userTags.firstWhereOrNull(
+          (element) => (element.name == tag || element.name == '@$tag'));
+      if (tagData != null) {
+        if (tagData.tagType == LMTagType.groupTag) {
+          string = string.replaceAll('@$tag~', tagData.tag!);
+        } else {
+          string = string.replaceAll(
+              '@$tag~', '<<${tagData.name}|route://member/${tagData.id}>>');
+        }
       }
     }
     return string;
@@ -30,22 +37,28 @@ class TaggingHelper {
     Map<String, String> result = {};
     final Iterable<RegExpMatch> matches = routeRegExp.allMatches(string);
     for (final match in matches) {
-      final String tag = match.group(1)!;
-      final String id = match.group(3)!;
-      string = string.replaceAll('<<$tag|route://member/$id>>', '@$tag');
-      result.addAll({'@$tag': id});
+      final String tag = match.group(1) ?? match.group(4)!;
+      final String? id = match.group(3);
+      if(id !=null) {
+        string = string.replaceAll('<<$tag|route://member/$id>>', '@$tag');
+      } else {
+        string =
+          string.replaceAll('<<@participants|route://participants>', '@$tag');
+      }
+      result.addAll({'@$tag': id ?? ''});
     }
     return result;
   }
 
   /// Matches the tags in the string and returns the list of matched tags
-  static List<UserTag> matchTags(String text, List<UserTag> items) {
-    final List<UserTag> tags = [];
+  static List<LMTagViewData> matchTags(String text, List<LMTagViewData> items) {
+    final List<LMTagViewData> tags = [];
     final Iterable<RegExpMatch> matches = tagRegExp.allMatches(text);
     for (final match in matches) {
       final String tag = match.group(1)!;
-      final UserTag? userTag =
-          items.firstWhereOrNull((element) => element.name! == tag);
+      final LMTagViewData? userTag = items.firstWhereOrNull((element) {
+        return (element.name == tag || element.name == '@$tag');
+      });
       if (userTag != null) {
         tags.add(userTag);
       }
@@ -62,11 +75,17 @@ class TaggingHelper {
     final Iterable<RegExpMatch> matches = routeRegExp.allMatches(text);
 
     for (final match in matches) {
-      final String tag = match.group(1)!;
-      final String mid = match.group(2)!;
-      final String id = match.group(3)!;
-      text = text!.replaceAll(
-          '<<$tag|route://$mid/$id>>', withTilde ? '@$tag~' : '@$tag');
+      final String tag = match.group(1) ?? match.group(4)!;
+      final String? mid = match.group(2);
+      final String? id = match.group(3);
+      if (id != null) {
+        text = text!.replaceAll(
+            '<<$tag|route://$mid/$id>>', withTilde ? '@$tag~' : '@$tag');
+
+      } else {
+         text =
+            text!.replaceAll('<<@participants|route://participants>>', tag);
+      }
     }
     return text;
   }
@@ -74,31 +93,40 @@ class TaggingHelper {
   static Map<String, dynamic> convertRouteToTagAndUserMap(String text,
       {bool withTilde = true}) {
     final Iterable<RegExpMatch> matches = routeRegExp.allMatches(text);
-    List<UserTag> userTags = [];
+    List<LMTagViewData> tags = [];
     for (final match in matches) {
-      final String tag = match.group(1)!;
-      final String mid = match.group(2)!;
-      final String id = match.group(3)!;
-      text = text.replaceAll(
+      final String tag = match.group(1) ?? match.group(4)!;
+      final String? mid = match.group(2);
+      final String? id = match.group(3);
+      if(id != null) {
+        text = text.replaceAll(
           '<<$tag|route://$mid/$id>>', withTilde ? '@$tag~' : '@$tag');
-      userTags.add(UserTag(userUniqueId: id, name: tag));
+      } else {
+       text =
+            text.replaceAll('<<@participants|route://participants>>', tag);
+      }
+      tags.add(
+        (LMTagViewDataBuilder()
+              ..name(tag)
+              ..id(int.tryParse(id ?? '')))
+            .build(),
+      );
     }
-    return {'text': text, 'userTags': userTags};
+    return {'text': text, 'userTags': tags};
   }
 
-  static List<UserTag> addUserTagsIfMatched(String input) {
+  static List<LMTagViewData> addUserTagsIfMatched(String input) {
     final Iterable<RegExpMatch> matches = routeRegExp.allMatches(input);
-    List<UserTag> userTags = [];
+    List<LMTagViewData> userTags = [];
     for (final match in matches) {
-      final String tag = match.group(1)!;
+      final String tag = match.group(1) ?? match.group(4)!;
       // final String mid = match.group(2)!;
-      final String id = match.group(3)!;
+      final String? id = match.group(3);
       userTags.add(
-        UserTag(
-          userUniqueId: id,
-          name: tag,
-          id: int.tryParse(id),
-        ),
+        (LMTagViewDataBuilder()
+              ..name(tag)
+              ..id(int.tryParse(id ?? '')))
+            .build(),
       );
     }
     return userTags;
