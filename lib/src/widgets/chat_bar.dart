@@ -113,7 +113,7 @@ class _ChatBarState extends State<ChatBar> {
   }
 
   Future<void> handleTextLinks(String text) async {
-    String link = getFirstValidLinkFromString(text);
+    String link = TaggingHelper.getFirstValidLinkFromString(text);
     if (link.isNotEmpty) {
       previewLink = link;
       DecodeUrlRequest request =
