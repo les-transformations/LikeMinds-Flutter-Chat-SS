@@ -77,12 +77,12 @@ class _LMTextFieldState extends State<LMTextField> {
   TextEditingController? get controller => _controller;
 
   FutureOr<Iterable<LMTagViewData>> _getSuggestions(String query) async {
+    page=1;
     String currentText = query;
     try {
       if (currentText.isEmpty) {
         return const Iterable.empty();
       } else if (!tagComplete && currentText.contains('@')) {
-        //todo: check for successful response
         String tag = tagValue.substring(1).split(' ').first;
         final taggingData = (await locator<LikeMindsService>().getTaggingList(
           (TagRequestModelBuilder()

@@ -116,6 +116,7 @@ class _ChatBarState extends State<ChatBar> {
     String link = TaggingHelper.getFirstValidLinkFromString(text);
     if (link.isNotEmpty) {
       previewLink = link;
+      showLinkPreview = true;
       DecodeUrlRequest request =
           (DecodeUrlRequestBuilder()..url(previewLink)).build();
       LMResponse<DecodeUrlResponse> response =
@@ -184,8 +185,7 @@ class _ChatBarState extends State<ChatBar> {
         TextEditingValue(text: convertedMsgText ?? '');
     _textEditingController.selection = TextSelection.fromPosition(
         TextPosition(offset: _textEditingController.text.length));
-    tags =
-        TaggingHelper.addUserTagsIfMatched(editConversation?.answer ?? '');
+    tags = TaggingHelper.addUserTagsIfMatched(editConversation?.answer ?? '');
     if (editConversation != null) {
       _focusNode.requestFocus();
     }
@@ -685,9 +685,9 @@ class _ChatBarState extends State<ChatBar> {
                                   } else {
                                     final string = _textEditingController.text;
                                     // debugPrint(userTags.length.toString());
-                                    tags = TaggingHelper.matchTags(
-                                        string, tags);
-                                        // debugPrint(userTags.length.toString());
+                                    tags =
+                                        TaggingHelper.matchTags(string, tags);
+                                    // debugPrint(userTags.length.toString());
                                     result = TaggingHelper.encodeString(
                                         string, tags);
                                     result = result?.trim();
@@ -747,21 +747,21 @@ class _ChatBarState extends State<ChatBar> {
                                         }
                                         widget.scrollToBottom();
                                       } else {
+                                        var requestBuilder =
+                                            PostConversationRequestBuilder()
+                                              ..chatroomId(widget.chatroom.id)
+                                              ..text(result!)
+                                              ..replyId(replyToConversation?.id)
+                                              ..temporaryId(DateTime.now()
+                                                  .millisecondsSinceEpoch
+                                                  .toString());
+                                        if (showLinkPreview && previewLink.isNotEmpty) {
+                                          requestBuilder.shareLink(previewLink);
+                                        }
                                         conversationBloc!.add(
                                           PostConversation(
                                               postConversationRequest:
-                                                  (PostConversationRequestBuilder()
-                                                        ..chatroomId(
-                                                            widget.chatroom.id)
-                                                        ..text(result!)
-                                                        ..replyId(
-                                                            replyToConversation
-                                                                ?.id)
-                                                        ..temporaryId(DateTime
-                                                                .now()
-                                                            .millisecondsSinceEpoch
-                                                            .toString()))
-                                                      .build(),
+                                                  requestBuilder.build(),
                                               repliedTo: replyToConversation),
                                         );
                                       }
