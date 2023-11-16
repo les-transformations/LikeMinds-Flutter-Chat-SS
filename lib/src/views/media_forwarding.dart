@@ -41,7 +41,7 @@ class _MediaForwardState extends State<MediaForward> {
   ConversationBloc? chatActionBloc;
   FlickManager? flickManager;
 
-  List<UserTag> userTags = [];
+  List<LMTagViewData> tags = [];
   String? result;
 
   @override
@@ -305,7 +305,7 @@ class _MediaForwardState extends State<MediaForward> {
                               // print(value);
                             },
                             onTagSelected: (tag) {
-                              userTags.add(tag);
+                              tags.add(tag);
                               // LMAnalytics.get()
                               //     .logEvent(AnalyticsKeys.userTagsSomeone, {
                               //   'community_id': widget.chatroom.id,
@@ -331,8 +331,8 @@ class _MediaForwardState extends State<MediaForward> {
                       onTap: () {
                         router.pop();
                         final string = _textEditingController.text;
-                        userTags = TaggingHelper.matchTags(string, userTags);
-                        result = TaggingHelper.encodeString(string, userTags);
+                        tags = TaggingHelper.matchTags(string, tags);
+                        result = TaggingHelper.encodeString(string, tags);
                         result = result?.trim();
                         chatActionBloc!.add(
                           PostMultiMediaConversation(
