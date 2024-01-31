@@ -82,11 +82,13 @@ class _MediaPreviewState extends State<MediaPreview> {
         centerTitle: false,
         leading: LMIconButton(
           onTap: (active) {
-            router.pop();
+            // router.pop();
+            Navigator.pop(context);
           },
           icon: const LMIcon(
             type: LMIconType.icon,
             icon: CupertinoIcons.xmark,
+            color: Colors.black,
             size: 28,
             boxSize: 64,
             boxPadding: 18,

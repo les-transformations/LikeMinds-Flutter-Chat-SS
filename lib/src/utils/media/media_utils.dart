@@ -6,6 +6,7 @@ import 'package:likeminds_chat_ss_fl/src/service/media_service.dart';
 import 'package:likeminds_chat_ss_fl/src/utils/constants/ui_constants.dart';
 import 'package:likeminds_chat_ss_fl/src/utils/imports.dart';
 import 'package:likeminds_chat_fl/likeminds_chat_fl.dart';
+import 'package:likeminds_chat_ss_fl/src/views/media_preview.dart';
 import 'package:likeminds_chat_ui_fl/likeminds_chat_ui_fl.dart';
 
 Widget mediaErrorWidget({bool isPP = false}) {
@@ -113,14 +114,24 @@ Widget getImageMessage(
     return const SizedBox();
   }
   void onTap() {
-    router.pushNamed(
-      "media_preview",
-      extra: [
-        conversationAttachments,
-        chatroom,
-        conversation,
-        userMeta,
-      ],
+    // router.pushNamed(
+    //   "media_preview",
+    //   extra: [
+    //     conversationAttachments,
+    //     chatroom,
+    //     conversation,
+    //     userMeta,
+    //   ],
+    // );
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => MediaPreview(
+            conversationAttachments: conversationAttachments,
+            chatroom: chatroom,
+            conversation: conversation,
+            userMeta: userMeta),
+      ),
     );
   }
 

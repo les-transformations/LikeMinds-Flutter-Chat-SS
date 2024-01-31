@@ -23,7 +23,7 @@ class LMCustomWillPop extends StatelessWidget {
             onHorizontalDragEnd: (details) {
               if (details.velocity.pixelsPerSecond.dx > 50) {
                 if (onWillPop) {
-                  if (!router.canPop()) {
+                  if (Navigator.of(context).canPop()) {
                     backButtonCallback != null ? backButtonCallback!() : () {};
                   }
                 }
@@ -39,8 +39,8 @@ class LMCustomWillPop extends StatelessWidget {
         : ConditionalWillPopScope(
             shouldAddCallback: true,
             onWillPop: () {
-              if (router.canPop()) {
-                router.pop();
+              if (Navigator.canPop(context)) {
+                Navigator.pop(context);
                 return Future.value(false);
               } else {
                 return Future.value(true);

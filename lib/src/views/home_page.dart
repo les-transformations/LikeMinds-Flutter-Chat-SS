@@ -1,5 +1,7 @@
 import 'package:likeminds_chat_ss_fl/src/bloc/chatroom/chatroom_bloc.dart';
 import 'package:likeminds_chat_ss_fl/src/bloc/chatroom_action/chatroom_action_bloc.dart';
+import 'package:likeminds_chat_ss_fl/src/bloc/conversation/conversation_bloc.dart';
+import 'package:likeminds_chat_ss_fl/src/bloc/conversation_action/conversation_action_bloc.dart';
 import 'package:likeminds_chat_ss_fl/src/bloc/home/home_bloc.dart';
 import 'package:likeminds_chat_ss_fl/src/navigation/router.dart';
 import 'package:likeminds_chat_ss_fl/src/utils/imports.dart';
@@ -7,6 +9,7 @@ import 'package:likeminds_chat_ss_fl/src/utils/media/media_helper.dart';
 import 'package:likeminds_chat_ss_fl/src/utils/realtime/realtime.dart';
 import 'package:likeminds_chat_ss_fl/src/utils/simple_bloc_observer.dart';
 import 'package:likeminds_chat_ss_fl/src/utils/tagging/helpers/tagging_helper.dart';
+import 'package:likeminds_chat_ss_fl/src/views/chatroom_page.dart';
 import 'package:likeminds_chat_ss_fl/src/widgets/skeleton_list.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:likeminds_chat_fl/likeminds_chat_fl.dart';
@@ -37,7 +40,7 @@ class _HomePageState extends State<HomePage> {
     Bloc.observer = SimpleBlocObserver();
     user = locator<LMPreferenceService>().getUser();
     homeFeedPagingController.itemList?.clear();
-    homeBloc = BlocProvider.of<HomeBloc>(context);
+    homeBloc = HomeBloc.instance;
     homeBloc!.add(
       InitHomeEvent(page: _pageKey, pageSize: pageSize),
     );
@@ -96,13 +99,22 @@ class _HomePageState extends State<HomePage> {
                   crossAxisAlignment: CrossAxisAlignment.center,
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    LMTextView(
-                      text: "Chats",
-                      textStyle:
-                          Theme.of(context).textTheme.headlineSmall!.copyWith(
+                    Row(
+                      children: [
+                        const BackButton(
+                          color: kBlackColor,
+                        ),
+                        LMTextView(
+                          text: "Chats",
+                          textStyle: Theme.of(context)
+                              .textTheme
+                              .headlineSmall!
+                              .copyWith(
                                 color: kBlackColor,
                                 fontWeight: FontWeight.w600,
                               ),
+                        ),
+                      ],
                     ),
                     // const Spacer(),
                     LMProfilePicture(
@@ -209,9 +221,18 @@ class _HomePageState extends State<HomePage> {
           // chatroom: chatrooms[i],
           onTap: () {
             LMRealtime.instance.chatroomId = chatrooms[i].id;
-            router.push("/chatroom/${chatrooms[i].id}").whenComplete(() {
-              BlocProvider.of<HomeBloc>(context).add(UpdateHomeEvent());
-            });
+            debugPrint(
+                '-------------------${chatrooms[i].id}-------------------');
+            // router.push("/chatroom/${chatrooms[i].id}").whenComplete(() {
+            //   BlocProvider.of<HomeBloc>(context).add(UpdateHomeEvent());
+            // });
+            Navigator.push(context, MaterialPageRoute(
+              builder: (context) {
+                return ChatRoomPage(
+                  chatroomId: chatrooms[i].id,
+                );
+              },
+            )).whenComplete(() => homeBloc?.add(UpdateHomeEvent()));
           },
           avatar: LMProfilePicture(
             fallbackText: chatrooms[i].header,

@@ -9,7 +9,9 @@ part 'chatroom_event.dart';
 part 'chatroom_state.dart';
 
 class ChatroomBloc extends Bloc<ChatroomEvent, ChatroomState> {
-  ChatroomBloc() : super(ChatroomInitial()) {
+  static ChatroomBloc? _instance;
+  static ChatroomBloc get instance => _instance ??= ChatroomBloc._();
+  ChatroomBloc._() : super(ChatroomInitial()) {
     on<ChatroomEvent>((event, emit) async {
       if (event is InitChatroomEvent) {
         emit(ChatroomLoading());

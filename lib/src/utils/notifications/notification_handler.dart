@@ -1,7 +1,10 @@
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:likeminds_chat_fl/likeminds_chat_fl.dart';
 import 'package:likeminds_chat_ss_fl/src/navigation/router.dart';
+import 'package:likeminds_chat_ss_fl/src/service/navigation_service.dart';
 import 'package:likeminds_chat_ss_fl/src/utils/imports.dart';
+import 'package:likeminds_chat_ss_fl/src/views/chatroom_page.dart';
+import 'package:likeminds_chat_ss_fl/src/views/home_page.dart';
 import 'package:overlay_support/overlay_support.dart';
 
 /// This class handles all the notification related logic
@@ -71,19 +74,23 @@ class LMNotificationHandler {
           });
         }
       });
-
+      GlobalKey<NavigatorState> rootNavigatorKey =
+          locator<NavigationService>().navigatorKey;
       // First, check if the message contains a data payload.
       if (show && message.data.isNotEmpty) {
         //Add LM check for showing LM notifications
-        showNotification(message);
+        showNotification(message, rootNavigatorKey);
       } else if (message.data.isNotEmpty) {
         // Second, extract the notification data and routes to the appropriate screen
-        routeNotification(message);
+        routeNotification(message, rootNavigatorKey);
       }
     }
   }
 
-  void routeNotification(RemoteMessage message) async {
+  void routeNotification(
+    RemoteMessage message,
+    GlobalKey<NavigatorState> rootNavigatorKey,
+  ) async {
     Map<String, String> queryParams = {};
     String host = "";
 
@@ -109,21 +116,32 @@ class LMNotificationHandler {
     }
 
     if (host == "collabcard") {
-      final path = "/chatroom/${queryParams["collabcard_id"]}/";
-      router.push('/');
-      router.push(path);
+      rootNavigatorKey.currentState!
+          .push(MaterialPageRoute(builder: (context) => const HomePage()));
+
+      // router.push(path);
+
+      rootNavigatorKey.currentState!.push(MaterialPageRoute(
+          builder: (context) => ChatRoomPage(
+              chatroomId: int.parse(queryParams["collabcard_id"]!))));
     }
   }
 
   /// Show a simple notification using overlay package
   /// This is a dismissable notification shown on the top of the screen
   /// It is shown when the notification is received in foreground
-  void showNotification(RemoteMessage message) {
+  void showNotification(
+    RemoteMessage message,
+    GlobalKey<NavigatorState> rootNavigatorKey,
+  ) {
     if (message.data.isNotEmpty) {
       showSimpleNotification(
         GestureDetector(
           onTap: () {
-            routeNotification(message);
+            routeNotification(
+              message,
+              rootNavigatorKey,
+            );
           },
           behavior: HitTestBehavior.opaque,
           child: Column(

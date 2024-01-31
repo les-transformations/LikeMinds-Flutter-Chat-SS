@@ -36,7 +36,7 @@ class _ChatroomParticipantsPageState extends State<ChatroomParticipantsPage> {
   void initState() {
     super.initState();
     Bloc.observer = SimpleBlocObserver();
-    participantsBloc = ParticipantsBloc();
+    participantsBloc = ParticipantsBloc.instance;
     participantsBloc!.add(
       GetParticipants(
         getParticipantsRequest: (GetParticipantsRequestBuilder()
@@ -101,7 +101,8 @@ class _ChatroomParticipantsPageState extends State<ChatroomParticipantsPage> {
                       rebuildSearchBar.value
                           ? BackButton(
                               onPressed: () {
-                                router.pop(context);
+                                // router.pop(context);
+                                Navigator.pop(context);
                               },
                             )
                           : const SizedBox(),

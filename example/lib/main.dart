@@ -14,6 +14,7 @@ import 'package:likeminds_chat_ss_fl/likeminds_chat_ss_fl.dart';
 
 /// Flutter flavour/environment manager v0.0.1
 const isDebug = bool.fromEnvironment('DEBUG');
+final GlobalKey<NavigatorState> rootNavigatorKey = GlobalKey<NavigatorState>();
 
 /// First level notification handler
 /// Essential to declare it outside of any class or function as per Firebase docs
@@ -31,11 +32,12 @@ void main() async {
     DeviceOrientation.portraitUp,
     DeviceOrientation.portraitDown,
   ]);
-  await setupNotifications();
   LMChat.setupLMChat(
     apiKey: !isDebug ? EnvProd.apiKey : EnvDev.apiKey,
     lmCallBack: ExampleCallback(),
+    navigatorKey: rootNavigatorKey,
   );
+  await setupNotifications();
   // await AppLocalPreference.instance.initialize();
   runApp(const MyApp());
 }

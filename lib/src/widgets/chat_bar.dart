@@ -20,6 +20,7 @@ import 'package:likeminds_chat_ss_fl/src/utils/tagging/helpers/tagging_helper.da
 import 'package:likeminds_chat_ss_fl/src/utils/tagging/tagging_textfield_ta.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:likeminds_chat_fl/likeminds_chat_fl.dart';
+import 'package:likeminds_chat_ss_fl/src/views/media_forwarding.dart';
 import 'package:overlay_support/overlay_support.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -75,6 +76,8 @@ class _ChatBarState extends State<ChatBar> {
   @override
   void initState() {
     Bloc.observer = SimpleBlocObserver();
+    chatActionBloc = ConversationActionBloc.instance;
+    conversationBloc = ConversationBloc.instance;
     _popupMenuController = CustomPopupMenuController();
     _textEditingController = TextEditingController();
     _focusNode = FocusNode();
@@ -204,8 +207,6 @@ class _ChatBarState extends State<ChatBar> {
     setupReplyText();
     setupEditText();
     userMeta = widget.userMeta;
-    chatActionBloc = BlocProvider.of<ConversationActionBloc>(context);
-    conversationBloc = BlocProvider.of<ConversationBloc>(context);
     return Column(
       children: [
         replyToConversation != null && checkIfAnnouncementChannel()
@@ -401,14 +402,34 @@ class _ChatBarState extends State<ChatBar> {
                                                           mediaList.add(media);
                                                           if (mediaList
                                                               .isNotEmpty) {
-                                                            router.pushNamed(
-                                                              "media_forward",
-                                                              extra: mediaList,
-                                                              pathParameters: {
-                                                                'chatroomId': widget
-                                                                    .chatroom.id
-                                                                    .toString()
-                                                              },
+                                                            // router.pushNamed(
+                                                            //   "media_forward",
+                                                            //   extra: mediaList,
+                                                            //   pathParameters: {
+                                                            //     'chatroomId': widget
+                                                            //         .chatroom.id
+                                                            //         .toString()
+                                                            //   },
+                                                            // );
+                                                            debugPrint(
+                                                                "mediaList: ${_textEditingController.text}");
+                                                            Navigator.push(
+                                                              context,
+                                                              MaterialPageRoute(
+                                                                builder:
+                                                                    (context) =>
+                                                                        MediaForward(
+                                                                  media:
+                                                                      mediaList,
+                                                                  chatroomId:
+                                                                      widget
+                                                                          .chatroom
+                                                                          .id,
+                                                                  textEditingController:
+                                                                      _textEditingController,
+                                                                  tags: tags,
+                                                                ),
+                                                              ),
                                                             );
                                                           }
                                                         }
@@ -474,17 +495,34 @@ class _ChatBarState extends State<ChatBar> {
                                                         }
                                                         if (pickedMediaFiles
                                                             .isNotEmpty) {
-                                                          router.pushNamed(
-                                                            "media_forward",
-                                                            extra:
-                                                                pickedMediaFiles,
-                                                            pathParameters: {
-                                                              'chatroomId':
-                                                                  widget
-                                                                      .chatroom
-                                                                      .id
-                                                                      .toString()
-                                                            },
+                                                          // router.pushNamed(
+                                                          //   "media_forward",
+                                                          //   extra:
+                                                          //       pickedMediaFiles,
+                                                          //   pathParameters: {
+                                                          //     'chatroomId':
+                                                          //         widget
+                                                          //             .chatroom
+                                                          //             .id
+                                                          //             .toString()
+                                                          //   },
+                                                          // );
+                                                          Navigator.push(
+                                                            context,
+                                                            MaterialPageRoute(
+                                                                builder:
+                                                                    (context) =>
+                                                                        MediaForward(
+                                                                          media:
+                                                                              pickedMediaFiles,
+                                                                          chatroomId: widget
+                                                                              .chatroom
+                                                                              .id,
+                                                                          textEditingController:
+                                                                              _textEditingController,
+                                                                          tags:
+                                                                              tags,
+                                                                        )),
                                                           );
                                                         }
                                                       } catch (e) {
@@ -549,17 +587,32 @@ class _ChatBarState extends State<ChatBar> {
                                                         }
                                                         if (pickedMediaFiles
                                                             .isNotEmpty) {
-                                                          router.pushNamed(
-                                                            "media_forward",
-                                                            extra:
-                                                                pickedMediaFiles,
-                                                            pathParameters: {
-                                                              'chatroomId':
-                                                                  widget
-                                                                      .chatroom
-                                                                      .id
-                                                                      .toString()
-                                                            },
+                                                          // router.pushNamed(
+                                                          //   "media_forward",
+                                                          //   extra:
+                                                          //       pickedMediaFiles,
+                                                          //   pathParameters: {
+                                                          //     'chatroomId':
+                                                          //         widget
+                                                          //             .chatroom
+                                                          //             .id
+                                                          //             .toString()
+                                                          //   },
+                                                          // );
+                                                          Navigator.push(
+                                                            context,
+                                                            MaterialPageRoute(
+                                                                builder: (context) => MediaForward(
+                                                                    media:
+                                                                        pickedMediaFiles,
+                                                                    chatroomId:
+                                                                        widget
+                                                                            .chatroom
+                                                                            .id,
+                                                                    textEditingController:
+                                                                        _textEditingController,
+                                                                    tags:
+                                                                        tags)),
                                                           );
                                                         }
                                                       } catch (e) {
@@ -608,17 +661,34 @@ class _ChatBarState extends State<ChatBar> {
                                                             await pickDocumentFiles();
                                                         if (pickedMediaFiles
                                                             .isNotEmpty) {
-                                                          router.pushNamed(
-                                                            "media_forward",
-                                                            extra:
-                                                                pickedMediaFiles,
-                                                            pathParameters: {
-                                                              'chatroomId':
-                                                                  widget
-                                                                      .chatroom
-                                                                      .id
-                                                                      .toString()
-                                                            },
+                                                          // router.pushNamed(
+                                                          //   "media_forward",
+                                                          //   extra:
+                                                          //       pickedMediaFiles,
+                                                          //   pathParameters: {
+                                                          //     'chatroomId':
+                                                          //         widget
+                                                          //             .chatroom
+                                                          //             .id
+                                                          //             .toString()
+                                                          //   },
+                                                          // );
+                                                          Navigator.push(
+                                                            context,
+                                                            MaterialPageRoute(
+                                                                builder:
+                                                                    (context) =>
+                                                                        MediaForward(
+                                                                          media:
+                                                                              pickedMediaFiles,
+                                                                          chatroomId: widget
+                                                                              .chatroom
+                                                                              .id,
+                                                                          textEditingController:
+                                                                              _textEditingController,
+                                                                          tags:
+                                                                              tags,
+                                                                        )),
                                                           );
                                                         }
                                                       }
@@ -755,7 +825,8 @@ class _ChatBarState extends State<ChatBar> {
                                               ..temporaryId(DateTime.now()
                                                   .millisecondsSinceEpoch
                                                   .toString());
-                                        if (showLinkPreview && previewLink.isNotEmpty) {
+                                        if (showLinkPreview &&
+                                            previewLink.isNotEmpty) {
                                           requestBuilder.shareLink(previewLink);
                                         }
                                         conversationBloc!.add(

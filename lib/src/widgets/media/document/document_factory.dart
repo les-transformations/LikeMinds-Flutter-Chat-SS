@@ -48,7 +48,7 @@ class _DocumentFactoryState extends State<DocumentFactory> {
 
   @override
   Widget build(BuildContext context) {
-    conversationBloc = BlocProvider.of<ConversationBloc>(context);
+    conversationBloc = ConversationBloc.instance;
     mediaList = widget.mediaList;
     return Scaffold(
       backgroundColor: Colors.transparent,
@@ -157,12 +157,11 @@ class _DocumentFactoryState extends State<DocumentFactory> {
                         ),
                         GestureDetector(
                           onTap: () {
-                            router.pop();
+                            // router.pop();
+                            Navigator.pop(context);
                             final string = _textEditingController.text;
-                            tags =
-                                TaggingHelper.matchTags(string, tags);
-                            result =
-                                TaggingHelper.encodeString(string, tags);
+                            tags = TaggingHelper.matchTags(string, tags);
+                            result = TaggingHelper.encodeString(string, tags);
                             result = result?.trim();
                             conversationBloc!.add(
                               PostMultiMediaConversation(

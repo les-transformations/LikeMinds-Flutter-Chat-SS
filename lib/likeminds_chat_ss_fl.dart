@@ -11,6 +11,7 @@ import 'package:likeminds_chat_ss_fl/src/bloc/home/home_bloc.dart';
 import 'package:likeminds_chat_ss_fl/src/navigation/router.dart';
 import 'package:likeminds_chat_ss_fl/src/utils/imports.dart';
 import 'package:likeminds_chat_ss_fl/src/utils/lm_willpop.dart';
+import 'package:likeminds_chat_ss_fl/src/views/home_page.dart';
 import 'package:likeminds_chat_ui_fl/likeminds_chat_ui_fl.dart';
 
 import 'src/utils/credentials/firebase_credentials.dart';
@@ -26,7 +27,7 @@ class LMChat extends StatelessWidget {
   final int? _defaultChatroom;
   final VoidCallback? _backButtonCallback;
 
-  final AuthBloc _authBloc = AuthBloc();
+  final AuthBloc _authBloc = AuthBloc.instance;
 
   LMChat._internal(
     this._userId,
@@ -48,7 +49,8 @@ class LMChat extends StatelessWidget {
         'LMChat builder needs to be initialized with User ID, or User Name',
       );
     } else {
-      router.go('/');
+      //todo: navigate to chatroom if default chatroom is not null
+      debugPrint('LMChat instance created');
       return LMChat._internal(
         builder.getUserId!,
         builder.getUserName!,
@@ -62,10 +64,12 @@ class LMChat extends StatelessWidget {
   static void setupLMChat({
     required String apiKey,
     LMSDKCallback? lmCallBack,
+    required GlobalKey<NavigatorState> navigatorKey,
   }) {
     setupChat(
       apiKey: apiKey,
       lmCallBack: lmCallBack,
+      navigatorKey: navigatorKey,
     );
     initFirebase();
   }
@@ -88,74 +92,7 @@ class LMChat extends StatelessWidget {
             listener: (context, state) {},
             builder: (context, state) {
               if (state is AuthSuccess) {
-                return MultiBlocProvider(
-                  providers: [
-                    BlocProvider<HomeBloc>(
-                      create: (context) => HomeBloc(),
-                    ),
-                    BlocProvider<ConversationBloc>(
-                      create: (context) => ConversationBloc(),
-                    ),
-                    BlocProvider<ChatroomBloc>(
-                      create: (context) => ChatroomBloc(),
-                    )
-                  ],
-                  child: MaterialApp.router(
-                    routerConfig: router,
-                    // routeInformationParser: router.routeInformationParser,
-                    // routeInformationProvider: router.routeInformationProvider,
-                    // routerDelegate: router.routerDelegate,
-                    debugShowCheckedModeBanner: isDebug,
-                    theme: ThemeData(
-                      colorScheme: ColorScheme.fromSeed(
-                        seedColor: primary,
-                        primary: primary,
-                        secondary: secondary,
-                      ),
-                      pageTransitionsTheme: const PageTransitionsTheme(
-                        builders: {
-                          TargetPlatform.android: ZoomPageTransitionsBuilder(),
-                          TargetPlatform.iOS:
-                              CupertinoWillPopScopePageTransionsBuilder(),
-                        },
-                      ),
-                      useMaterial3: true,
-                      fontFamily: 'Montserrat',
-                      textTheme: const TextTheme(
-                        displayLarge: TextStyle(
-                          fontSize: 24,
-                          fontWeight: FontWeight.w600,
-                          color: kBlackColor,
-                        ),
-                        displayMedium: TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.w600,
-                          color: kBlackColor,
-                        ),
-                        displaySmall: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.w600,
-                          color: kBlackColor,
-                        ),
-                        bodyLarge: TextStyle(
-                          fontSize: 14,
-                          fontWeight: FontWeight.w400,
-                          color: kBlackColor,
-                        ),
-                        bodyMedium: TextStyle(
-                          fontSize: 12,
-                          fontWeight: FontWeight.w400,
-                          color: kBlackColor,
-                        ),
-                        bodySmall: TextStyle(
-                          fontSize: 10,
-                          fontWeight: FontWeight.w400,
-                          color: kBlackColor,
-                        ),
-                      ),
-                    ),
-                  ),
-                );
+                return const HomePage();
               }
 
               return const SizedBox(

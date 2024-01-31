@@ -56,7 +56,8 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
                     color: Colors.white,
                   ),
                   onPressed: () {
-                    router.pop();
+                    // router.pop();
+                    Navigator.pop(context);
                   },
                 ),
                 Text(
