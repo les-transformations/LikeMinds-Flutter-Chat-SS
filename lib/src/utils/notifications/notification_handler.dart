@@ -12,8 +12,8 @@ import 'package:overlay_support/overlay_support.dart';
 /// It routes the notification to the appropriate screen
 /// Since this is a singleton class, it is initialized on the client side
 class LMNotificationHandler {
-  late final String deviceId;
-  late final String fcmToken;
+  String? deviceId;
+  String? fcmToken;
   int? memberId;
 
   static LMNotificationHandler? _instance;
@@ -39,23 +39,20 @@ class LMNotificationHandler {
   /// It initializes the [memberId] which is used to route the notification
   /// If the registration is successful, it prints success message
   void registerDevice(int memberId) async {
-    if (fcmToken != null) {
-      RegisterDeviceRequest request = RegisterDeviceRequest(
-        token: fcmToken,
-        memberId: memberId,
-        deviceId: deviceId,
-      );
-      this.memberId = memberId;
-      final response =
-          await locator<LikeMindsService>().registerDevice(request);
-      if (response.success) {
-        debugPrint("Device registered for notifications successfully");
-      } else {
-        throw Exception("Device registration for notification failed");
-      }
+    if (fcmToken == null || deviceId == null) {
+      return;
+    }
+    RegisterDeviceRequest request = RegisterDeviceRequest(
+      token: fcmToken!,
+      memberId: memberId,
+      deviceId: deviceId!,
+    );
+    this.memberId = memberId;
+    final response = await locator<LikeMindsService>().registerDevice(request);
+    if (response.success) {
+      debugPrint("Device registered for notifications successfully");
     } else {
-      debugPrint(
-          "Notifications not registered, will not show new notifications.");
+      throw Exception("Device registration for notification failed");
     }
   }
 
