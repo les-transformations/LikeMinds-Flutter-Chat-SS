@@ -2,8 +2,6 @@ import 'package:cupertino_will_pop_scope/cupertino_will_pop_scope.dart';
 import 'package:flutter/cupertino.dart';
 import 'dart:io' show Platform;
 
-import 'package:likeminds_chat_ss_fl/src/navigation/router.dart';
-
 class LMCustomWillPop extends StatelessWidget {
   const LMCustomWillPop({
     required this.child,

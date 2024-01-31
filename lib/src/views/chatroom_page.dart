@@ -7,7 +7,6 @@ import 'package:likeminds_chat_ss_fl/src/bloc/chatroom_action/chatroom_action_bl
 import 'package:likeminds_chat_ss_fl/src/bloc/conversation/conversation_bloc.dart';
 import 'package:likeminds_chat_ss_fl/src/bloc/conversation_action/conversation_action_bloc.dart';
 import 'package:likeminds_chat_ss_fl/src/bloc/home/home_bloc.dart';
-import 'package:likeminds_chat_ss_fl/src/navigation/router.dart';
 import 'package:likeminds_chat_ss_fl/src/service/media_service.dart';
 import 'package:likeminds_chat_ss_fl/src/service/preference_service.dart';
 import 'package:likeminds_chat_ss_fl/src/service/service_locator.dart';

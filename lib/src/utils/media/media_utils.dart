@@ -1,7 +1,6 @@
 import 'dart:math';
 
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:likeminds_chat_ss_fl/src/navigation/router.dart';
 import 'package:likeminds_chat_ss_fl/src/service/media_service.dart';
 import 'package:likeminds_chat_ss_fl/src/utils/constants/ui_constants.dart';
 import 'package:likeminds_chat_ss_fl/src/utils/imports.dart';

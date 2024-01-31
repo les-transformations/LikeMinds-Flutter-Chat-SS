@@ -51,13 +51,6 @@ class _MediaForwardState extends State<MediaForward> {
     super.initState();
   }
 
-  // @override
-  // void dispose() {
-  //   widget.textEditingController.dispose();
-
-  //   super.dispose();
-  // }
-
   bool checkIfMultipleAttachments() {
     return mediaList.length > 1;
   }
@@ -73,7 +66,6 @@ class _MediaForwardState extends State<MediaForward> {
         backgroundColor: kWhiteColor,
         leading: IconButton(
           onPressed: () {
-            // router.pop();
             Navigator.pop(context);
           },
           icon: const Icon(
@@ -156,13 +148,6 @@ class _MediaForwardState extends State<MediaForward> {
                     },
                     onTagSelected: (tag) {
                       tags.add(tag);
-                      // LMAnalytics.get()
-                      //     .logEvent(AnalyticsKeys.userTagsSomeone, {
-                      //   'community_id': widget.chatroom.id,
-                      //   'chatroom_name': widget.chatroom.title,
-                      //   'tagged_user_id': tag.id,
-                      //   'tagged_user_name': tag.name,
-                      // });
                     },
                     decoration: InputDecoration(
                       border: InputBorder.none,

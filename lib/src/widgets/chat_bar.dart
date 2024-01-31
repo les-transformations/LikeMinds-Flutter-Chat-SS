@@ -7,7 +7,6 @@ import 'package:file_picker/file_picker.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:likeminds_chat_ss_fl/src/bloc/conversation/conversation_bloc.dart';
 import 'package:likeminds_chat_ss_fl/src/bloc/conversation_action/conversation_action_bloc.dart';
-import 'package:likeminds_chat_ss_fl/src/navigation/router.dart';
 import 'package:likeminds_chat_ss_fl/src/utils/analytics/analytics.dart';
 import 'package:likeminds_chat_ss_fl/src/utils/constants/asset_constants.dart';
 import 'package:likeminds_chat_ss_fl/src/utils/imports.dart';
@@ -402,15 +401,6 @@ class _ChatBarState extends State<ChatBar> {
                                                           mediaList.add(media);
                                                           if (mediaList
                                                               .isNotEmpty) {
-                                                            // router.pushNamed(
-                                                            //   "media_forward",
-                                                            //   extra: mediaList,
-                                                            //   pathParameters: {
-                                                            //     'chatroomId': widget
-                                                            //         .chatroom.id
-                                                            //         .toString()
-                                                            //   },
-                                                            // );
                                                             debugPrint(
                                                                 "mediaList: ${_textEditingController.text}");
                                                             Navigator.push(
@@ -495,18 +485,6 @@ class _ChatBarState extends State<ChatBar> {
                                                         }
                                                         if (pickedMediaFiles
                                                             .isNotEmpty) {
-                                                          // router.pushNamed(
-                                                          //   "media_forward",
-                                                          //   extra:
-                                                          //       pickedMediaFiles,
-                                                          //   pathParameters: {
-                                                          //     'chatroomId':
-                                                          //         widget
-                                                          //             .chatroom
-                                                          //             .id
-                                                          //             .toString()
-                                                          //   },
-                                                          // );
                                                           Navigator.push(
                                                             context,
                                                             MaterialPageRoute(
@@ -587,18 +565,6 @@ class _ChatBarState extends State<ChatBar> {
                                                         }
                                                         if (pickedMediaFiles
                                                             .isNotEmpty) {
-                                                          // router.pushNamed(
-                                                          //   "media_forward",
-                                                          //   extra:
-                                                          //       pickedMediaFiles,
-                                                          //   pathParameters: {
-                                                          //     'chatroomId':
-                                                          //         widget
-                                                          //             .chatroom
-                                                          //             .id
-                                                          //             .toString()
-                                                          //   },
-                                                          // );
                                                           Navigator.push(
                                                             context,
                                                             MaterialPageRoute(
@@ -661,18 +627,6 @@ class _ChatBarState extends State<ChatBar> {
                                                             await pickDocumentFiles();
                                                         if (pickedMediaFiles
                                                             .isNotEmpty) {
-                                                          // router.pushNamed(
-                                                          //   "media_forward",
-                                                          //   extra:
-                                                          //       pickedMediaFiles,
-                                                          //   pathParameters: {
-                                                          //     'chatroomId':
-                                                          //         widget
-                                                          //             .chatroom
-                                                          //             .id
-                                                          //             .toString()
-                                                          //   },
-                                                          // );
                                                           Navigator.push(
                                                             context,
                                                             MaterialPageRoute(

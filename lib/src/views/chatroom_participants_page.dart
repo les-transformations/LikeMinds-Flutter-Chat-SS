@@ -3,7 +3,6 @@ import 'dart:async';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:likeminds_chat_ss_fl/src/bloc/participants/participants_bloc.dart';
-import 'package:likeminds_chat_ss_fl/src/navigation/router.dart';
 import 'package:likeminds_chat_ss_fl/src/utils/analytics/analytics.dart';
 import 'package:likeminds_chat_ss_fl/src/utils/constants/ui_constants.dart';
 import 'package:likeminds_chat_ss_fl/src/utils/imports.dart';

@@ -3,7 +3,6 @@ import 'package:likeminds_chat_ss_fl/src/bloc/chatroom_action/chatroom_action_bl
 import 'package:likeminds_chat_ss_fl/src/bloc/conversation/conversation_bloc.dart';
 import 'package:likeminds_chat_ss_fl/src/bloc/conversation_action/conversation_action_bloc.dart';
 import 'package:likeminds_chat_ss_fl/src/bloc/home/home_bloc.dart';
-import 'package:likeminds_chat_ss_fl/src/navigation/router.dart';
 import 'package:likeminds_chat_ss_fl/src/utils/imports.dart';
 import 'package:likeminds_chat_ss_fl/src/utils/media/media_helper.dart';
 import 'package:likeminds_chat_ss_fl/src/utils/realtime/realtime.dart';
@@ -218,14 +217,8 @@ class _HomePageState extends State<HomePage> {
           : getDeletedText(conversation, user!);
       chats.add(
         LMListItem(
-          // chatroom: chatrooms[i],
           onTap: () {
             LMRealtime.instance.chatroomId = chatrooms[i].id;
-            debugPrint(
-                '-------------------${chatrooms[i].id}-------------------');
-            // router.push("/chatroom/${chatrooms[i].id}").whenComplete(() {
-            //   BlocProvider.of<HomeBloc>(context).add(UpdateHomeEvent());
-            // });
             Navigator.push(context, MaterialPageRoute(
               builder: (context) {
                 return ChatRoomPage(
