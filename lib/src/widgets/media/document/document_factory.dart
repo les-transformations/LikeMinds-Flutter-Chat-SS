@@ -1,9 +1,6 @@
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:file_picker/file_picker.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:likeminds_chat_ss_fl/src/bloc/conversation/conversation_bloc.dart';
-import 'package:likeminds_chat_ss_fl/src/bloc/conversation_action/conversation_action_bloc.dart';
-import 'package:likeminds_chat_ss_fl/src/navigation/router.dart';
 import 'package:likeminds_chat_ss_fl/src/service/media_service.dart';
 import 'package:likeminds_chat_ss_fl/src/utils/imports.dart';
 import 'package:likeminds_chat_ss_fl/src/utils/media/media_helper.dart';
@@ -48,7 +45,7 @@ class _DocumentFactoryState extends State<DocumentFactory> {
 
   @override
   Widget build(BuildContext context) {
-    conversationBloc = BlocProvider.of<ConversationBloc>(context);
+    conversationBloc = ConversationBloc.instance;
     mediaList = widget.mediaList;
     return Scaffold(
       backgroundColor: Colors.transparent,
@@ -157,12 +154,10 @@ class _DocumentFactoryState extends State<DocumentFactory> {
                         ),
                         GestureDetector(
                           onTap: () {
-                            router.pop();
+                            Navigator.pop(context);
                             final string = _textEditingController.text;
-                            tags =
-                                TaggingHelper.matchTags(string, tags);
-                            result =
-                                TaggingHelper.encodeString(string, tags);
+                            tags = TaggingHelper.matchTags(string, tags);
+                            result = TaggingHelper.encodeString(string, tags);
                             result = result?.trim();
                             conversationBloc!.add(
                               PostMultiMediaConversation(

@@ -30,6 +30,7 @@ class MyApp extends StatelessWidget {
           textColor: Colors.white,
         ),
         child: MaterialApp(
+          navigatorKey: main.rootNavigatorKey,
           title: 'Chat App for UI + SDK package',
           debugShowCheckedModeBanner: main.isDebug,
           scaffoldMessengerKey: rootScaffoldMessengerKey,

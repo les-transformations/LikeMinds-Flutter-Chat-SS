@@ -5,19 +5,23 @@ import 'package:likeminds_chat_ss_fl/src/service/likeminds_service.dart';
 import 'package:likeminds_chat_ss_fl/src/service/preference_service.dart';
 import 'package:likeminds_chat_ss_fl/src/service/service_locator.dart';
 import 'package:likeminds_chat_fl/likeminds_chat_fl.dart';
+import 'package:likeminds_chat_ss_fl/src/utils/imports.dart';
 import 'package:meta/meta.dart';
 
 part 'auth_event.dart';
 part 'auth_state.dart';
 
 class AuthBloc extends Bloc<AuthEvent, AuthState> {
-  AuthBloc() : super(AuthInitial()) {
+  static AuthBloc? _instance;
+  static AuthBloc get instance => _instance ??= AuthBloc._();
+  AuthBloc._() : super(AuthInitial()) {
     on<AuthEvent>((event, emit) async {
       if (event is InitAuthEvent) {
         emit(AuthLoading());
         LMChat.setupLMChat(
           apiKey: event.apiKey,
           lmCallBack: event.callback,
+          navigatorKey: event.navigatorKey,
         );
         emit(AuthInitiated());
       } else if (event is LoginEvent) {

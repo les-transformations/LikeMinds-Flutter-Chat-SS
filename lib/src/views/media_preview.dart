@@ -2,7 +2,6 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flick_video_player/flick_video_player.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:likeminds_chat_ss_fl/src/navigation/router.dart';
 import 'package:likeminds_chat_ss_fl/src/utils/analytics/analytics.dart';
 import 'package:likeminds_chat_ss_fl/src/utils/imports.dart';
 import 'package:likeminds_chat_ss_fl/src/utils/media/media_utils.dart';
@@ -82,11 +81,12 @@ class _MediaPreviewState extends State<MediaPreview> {
         centerTitle: false,
         leading: LMIconButton(
           onTap: (active) {
-            router.pop();
+            Navigator.pop(context);
           },
           icon: const LMIcon(
             type: LMIconType.icon,
             icon: CupertinoIcons.xmark,
+            color: Colors.black,
             size: 28,
             boxSize: 64,
             boxPadding: 18,

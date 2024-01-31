@@ -7,7 +7,6 @@ import 'package:likeminds_chat_ss_fl/src/bloc/chatroom_action/chatroom_action_bl
 import 'package:likeminds_chat_ss_fl/src/bloc/conversation/conversation_bloc.dart';
 import 'package:likeminds_chat_ss_fl/src/bloc/conversation_action/conversation_action_bloc.dart';
 import 'package:likeminds_chat_ss_fl/src/bloc/home/home_bloc.dart';
-import 'package:likeminds_chat_ss_fl/src/navigation/router.dart';
 import 'package:likeminds_chat_ss_fl/src/service/media_service.dart';
 import 'package:likeminds_chat_ss_fl/src/service/preference_service.dart';
 import 'package:likeminds_chat_ss_fl/src/service/service_locator.dart';
@@ -80,6 +79,12 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
   void initState() {
     super.initState();
     Bloc.observer = SimpleBlocObserver();
+    _conversationBloc = ConversationBloc.instance;
+    _chatroomBloc = ChatroomBloc.instance;
+    _convActionBloc = ConversationActionBloc.instance;
+    _chatroomActionBloc = ChatroomActionBloc.instance;
+    _chatroomBloc.add(InitChatroomEvent(
+        (GetChatroomRequestBuilder()..chatroomId(widget.chatroomId)).build()));
     _addPaginationListener();
     scrollController.addListener(() {
       _showScrollToBottomButton();
@@ -88,10 +93,8 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
     // chatActionBloc = BlocProvider.of<ChatActionBloc>(context);
     // conversationBloc = ConversationBloc();
     user = locator<LMPreferenceService>().getUser();
-    _conversationBloc = BlocProvider.of<ConversationBloc>(context);
-    _chatroomBloc = BlocProvider.of<ChatroomBloc>(context);
-    _convActionBloc = BlocProvider.of<ConversationActionBloc>(context);
-    _chatroomActionBloc = BlocProvider.of<ChatroomActionBloc>(context);
+
+    debugPrint("Chatroom id is ${widget.chatroomId}");
   }
 
   @override
@@ -477,9 +480,10 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
           left: false,
           right: false,
           child: BlocConsumer<ChatroomBloc, ChatroomState>(
+            bloc: _chatroomBloc,
             listener: (context, state) {
               if (state is ChatroomLoaded) {
-                chatroom = state.getChatroomResponse.chatroom!;
+                chatroom = state.getChatroomResponse.chatroom;
                 lastConversationId =
                     state.getChatroomResponse.lastConversationId ?? 0;
                 _chatroomActionBloc
@@ -509,6 +513,7 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
               }
 
               if (state is ChatroomLoaded) {
+                chatroom = state.getChatroomResponse.chatroom;
                 var pagedListView = ValueListenableBuilder(
                   valueListenable: rebuildConversationList,
                   builder: (context, _, __) {
@@ -937,7 +942,7 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
                                             fontWeight: FontWeight.bold,
                                             color: secondary.shade100,
                                           ),
-                                          visibleLines: 4,
+                                          visibleLines: 7,
                                           animation: true,
                                         ),
                                         borderRadius: const BorderRadius.only(
@@ -1262,7 +1267,7 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
                                                 : null,
                                         content: LMChatContent(
                                           conversation: item,
-                                          visibleLines: 2,
+                                          visibleLines: 7,
                                           animation: true,
                                           textStyle: const TextStyle(
                                             fontSize: 14,
@@ -1360,10 +1365,10 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
                                       MarkReadChatroomEvent(
                                           chatroomId: widget.chatroomId),
                                     );
-                                    BlocProvider.of<HomeBloc>(context)
-                                        .add(UpdateHomeEvent());
+                                    HomeBloc.instance.add(UpdateHomeEvent());
 
-                                    router.pop();
+                                    // router.pop();
+                                    Navigator.pop(context);
                                   },
                                   style: ButtonStyle(
                                     padding: MaterialStateProperty.all(
@@ -1484,6 +1489,7 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
                           ),
                           const Divider(height: 1),
                           BlocListener<ChatroomActionBloc, ChatroomActionState>(
+                            bloc: _chatroomActionBloc,
                             listener: (context, state) {
                               if (state is ChatroomTopicSet) {
                                 localTopic = state.topic;

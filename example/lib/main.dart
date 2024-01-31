@@ -14,6 +14,7 @@ import 'package:likeminds_chat_ss_fl/likeminds_chat_ss_fl.dart';
 
 /// Flutter flavour/environment manager v0.0.1
 const isDebug = bool.fromEnvironment('DEBUG');
+final GlobalKey<NavigatorState> rootNavigatorKey = GlobalKey<NavigatorState>();
 
 /// First level notification handler
 /// Essential to declare it outside of any class or function as per Firebase docs
@@ -22,7 +23,7 @@ const isDebug = bool.fromEnvironment('DEBUG');
 /// Make sure to call [setupNotifications] before this function
 Future<void> _handleNotification(RemoteMessage message) async {
   debugPrint("--- Notification received in LEVEL 1 ---");
-  await LMNotificationHandler.instance.handleNotification(message, true);
+  await LMNotificationHandler.instance.handleNotification(message, true, rootNavigatorKey);
 }
 
 void main() async {
@@ -31,11 +32,12 @@ void main() async {
     DeviceOrientation.portraitUp,
     DeviceOrientation.portraitDown,
   ]);
-  await setupNotifications();
   LMChat.setupLMChat(
     apiKey: !isDebug ? EnvProd.apiKey : EnvDev.apiKey,
     lmCallBack: ExampleCallback(),
+    navigatorKey: rootNavigatorKey,
   );
+  await setupNotifications();
   // await AppLocalPreference.instance.initialize();
   runApp(const MyApp());
 }
@@ -63,13 +65,13 @@ Future setupNotifications() async {
   });
   FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) async {
     debugPrint("---The app is opened from a notification---");
-    await LMNotificationHandler.instance.handleNotification(message, false);
+    await LMNotificationHandler.instance.handleNotification(message, false, rootNavigatorKey);
   });
   FirebaseMessaging.instance.getInitialMessage().then(
     (RemoteMessage? message) async {
       if (message != null) {
         debugPrint("---The terminated app is opened from a notification---");
-        await LMNotificationHandler.instance.handleNotification(message, false);
+        await LMNotificationHandler.instance.handleNotification(message, false, rootNavigatorKey);
       }
     },
   );

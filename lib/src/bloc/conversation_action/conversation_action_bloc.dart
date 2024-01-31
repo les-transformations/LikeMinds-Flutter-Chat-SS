@@ -10,7 +10,10 @@ part 'conversation_action_state.dart';
 
 class ConversationActionBloc
     extends Bloc<ConversationActionEvent, ConversationActionState> {
-  ConversationActionBloc() : super(ConversationActionInitial()) {
+  static ConversationActionBloc? _instance;
+  static ConversationActionBloc get instance =>
+      _instance ??= ConversationActionBloc._();
+  ConversationActionBloc._() : super(ConversationActionInitial()) {
     on<EditConversation>(
       (event, emit) async {
         await mapEditConversation(

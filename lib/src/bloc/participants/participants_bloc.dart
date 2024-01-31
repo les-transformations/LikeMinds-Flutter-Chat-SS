@@ -9,7 +9,9 @@ part 'participants_event.dart';
 part 'participants_state.dart';
 
 class ParticipantsBloc extends Bloc<ParticipantsEvent, ParticipantsState> {
-  ParticipantsBloc() : super(const ParticipantsInitial()) {
+  static ParticipantsBloc? _instance;
+  static ParticipantsBloc get instance => _instance ??= ParticipantsBloc._();
+  ParticipantsBloc._() : super(const ParticipantsInitial()) {
     on<GetParticipants>((event, emit) async {
       if (event.getParticipantsRequest.page == 1) {
         emit(
