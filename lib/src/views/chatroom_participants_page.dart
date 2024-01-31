@@ -3,7 +3,6 @@ import 'dart:async';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:likeminds_chat_ss_fl/src/bloc/participants/participants_bloc.dart';
-import 'package:likeminds_chat_ss_fl/src/navigation/router.dart';
 import 'package:likeminds_chat_ss_fl/src/utils/analytics/analytics.dart';
 import 'package:likeminds_chat_ss_fl/src/utils/constants/ui_constants.dart';
 import 'package:likeminds_chat_ss_fl/src/utils/imports.dart';
@@ -36,7 +35,7 @@ class _ChatroomParticipantsPageState extends State<ChatroomParticipantsPage> {
   void initState() {
     super.initState();
     Bloc.observer = SimpleBlocObserver();
-    participantsBloc = ParticipantsBloc();
+    participantsBloc = ParticipantsBloc.instance;
     participantsBloc!.add(
       GetParticipants(
         getParticipantsRequest: (GetParticipantsRequestBuilder()
@@ -101,7 +100,8 @@ class _ChatroomParticipantsPageState extends State<ChatroomParticipantsPage> {
                       rebuildSearchBar.value
                           ? BackButton(
                               onPressed: () {
-                                router.pop(context);
+                                // router.pop(context);
+                                Navigator.pop(context);
                               },
                             )
                           : const SizedBox(),

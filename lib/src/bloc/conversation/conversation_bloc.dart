@@ -14,8 +14,9 @@ class ConversationBloc extends Bloc<ConversationEvent, ConversationState> {
   MediaService mediaService = MediaService(!isDebug);
   final DatabaseReference realTime = LMRealtime.instance.chatroom();
   int? lastConversationId;
-
-  ConversationBloc() : super(ConversationInitial()) {
+  static ConversationBloc? _instance;
+  static ConversationBloc get instance => _instance ??= ConversationBloc._();
+  ConversationBloc._() : super(ConversationInitial()) {
     on<InitConversations>(
       (event, emit) {
         debugPrint("Conversations initiated");
@@ -153,20 +154,20 @@ class ConversationBloc extends Bloc<ConversationEvent, ConversationState> {
       DateTime dateTime = DateTime.now();
       User user = locator<LMPreferenceService>().getUser()!;
       Conversation conversation = Conversation(
-          answer: event.postConversationRequest.text,
-          chatroomId: event.postConversationRequest.chatroomId,
-          createdAt: "",
-          header: "",
-          date: "${dateTime.day} ${dateTime.month} ${dateTime.year}",
-          replyId: event.postConversationRequest.replyId,
-          attachmentCount: event.postConversationRequest.attachmentCount,
-          hasFiles: event.postConversationRequest.hasFiles,
-          member: user,
-          temporaryId: event.postConversationRequest.temporaryId,
-          id: 1,
-          userId: user.id,
-          ogTags: event.postConversationRequest.ogTags,
-          );
+        answer: event.postConversationRequest.text,
+        chatroomId: event.postConversationRequest.chatroomId,
+        createdAt: "",
+        header: "",
+        date: "${dateTime.day} ${dateTime.month} ${dateTime.year}",
+        replyId: event.postConversationRequest.replyId,
+        attachmentCount: event.postConversationRequest.attachmentCount,
+        hasFiles: event.postConversationRequest.hasFiles,
+        member: user,
+        temporaryId: event.postConversationRequest.temporaryId,
+        id: 1,
+        userId: user.id,
+        ogTags: event.postConversationRequest.ogTags,
+      );
 
       emit(
         MultiMediaConversationLoading(
@@ -182,13 +183,14 @@ class ConversationBloc extends Bloc<ConversationEvent, ConversationState> {
       if (response.success) {
         PostConversationResponse postConversationResponse = response.data!;
         if (postConversationResponse.success) {
-          if (event.mediaFiles.length==1 && event.mediaFiles.first.mediaType == MediaType.link) {
-             emit(
-            MultiMediaConversationPosted(
-              postConversationResponse,
-              event.mediaFiles,
-            ),
-          );
+          if (event.mediaFiles.length == 1 &&
+              event.mediaFiles.first.mediaType == MediaType.link) {
+            emit(
+              MultiMediaConversationPosted(
+                postConversationResponse,
+                event.mediaFiles,
+              ),
+            );
           } else {
             List<Media> fileLink = [];
             int length = event.mediaFiles.length;

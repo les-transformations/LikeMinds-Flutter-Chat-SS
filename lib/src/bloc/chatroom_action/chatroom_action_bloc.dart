@@ -10,7 +10,10 @@ part 'chatroom_action_state.dart';
 
 class ChatroomActionBloc
     extends Bloc<ChatroomActionEvent, ChatroomActionState> {
-  ChatroomActionBloc() : super(ChatroomActionInitial()) {
+  static ChatroomActionBloc? _instance;
+  static ChatroomActionBloc get instance =>
+      _instance ??= ChatroomActionBloc._();
+  ChatroomActionBloc._() : super(ChatroomActionInitial()) {
     on<ChatroomActionEvent>((event, emit) async {
       if (event is MarkReadChatroomEvent) {
         // ignore: unused_local_variable

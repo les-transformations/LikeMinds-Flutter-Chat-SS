@@ -77,7 +77,7 @@ class _LMTextFieldState extends State<LMTextField> {
   TextEditingController? get controller => _controller;
 
   FutureOr<Iterable<LMTagViewData>> _getSuggestions(String query) async {
-    page=1;
+    page = 1;
     String currentText = query;
     try {
       if (currentText.isEmpty) {

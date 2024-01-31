@@ -1,7 +1,7 @@
 import 'package:custom_pop_up_menu/custom_pop_up_menu.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:likeminds_chat_ss_fl/src/bloc/home/home_bloc.dart';
-import 'package:likeminds_chat_ss_fl/src/navigation/router.dart';
+import 'package:likeminds_chat_ss_fl/src/bloc/participants/participants_bloc.dart';
 import 'package:likeminds_chat_ss_fl/src/service/likeminds_service.dart';
 import 'package:likeminds_chat_ss_fl/src/service/preference_service.dart';
 import 'package:likeminds_chat_ss_fl/src/service/service_locator.dart';
@@ -9,6 +9,7 @@ import 'package:likeminds_chat_ss_fl/src/utils/analytics/analytics.dart';
 import 'package:likeminds_chat_ss_fl/src/utils/constants/ui_constants.dart';
 import 'package:likeminds_chat_ss_fl/src/utils/imports.dart';
 import 'package:likeminds_chat_fl/likeminds_chat_fl.dart';
+import 'package:likeminds_chat_ss_fl/src/views/chatroom_participants_page.dart';
 import 'package:likeminds_chat_ui_fl/likeminds_chat_ui_fl.dart';
 import 'package:overlay_support/overlay_support.dart';
 
@@ -42,7 +43,7 @@ class _ChatroomMenuState extends State<ChatroomMenu> {
 
   @override
   Widget build(BuildContext context) {
-    homeBloc = BlocProvider.of<HomeBloc>(context);
+    homeBloc = HomeBloc.instance;
     return CustomPopupMenu(
       pressType: PressType.singleClick,
       showArrow: false,
@@ -98,7 +99,11 @@ class _ChatroomMenuState extends State<ChatroomMenu> {
       case 2:
         // _controller.hideMenu();
         _controller!.hideMenu();
-        router.push("/participants", extra: widget.chatroom);
+        Navigator.push(context, MaterialPageRoute(builder: (context) {
+          return ChatroomParticipantsPage(
+            chatroom: widget.chatroom,
+          );
+        }));
         break;
       case 6:
         muteChatroom(action);
@@ -187,7 +192,7 @@ class _ChatroomMenuState extends State<ChatroomMenu> {
         toast("Chatroom left");
         _controller!.hideMenu();
         homeBloc?.add(UpdateHomeEvent());
-        router.pop();
+        Navigator.pop(context);
       } else {
         toast(response.errorMessage!);
       }
@@ -210,7 +215,7 @@ class _ChatroomMenuState extends State<ChatroomMenu> {
         toast("Chatroom left");
         _controller!.hideMenu();
         homeBloc?.add(UpdateHomeEvent());
-        router.pop();
+        Navigator.pop(context);
       } else {
         toast(response.errorMessage!);
       }
