@@ -59,7 +59,8 @@ class LMNotificationHandler {
   /// Handle the notification when it is received
   /// This is called from the client side when notification [message] is received
   /// and is needed to be handled, i.e. shown and routed to the appropriate screen
-  Future<void> handleNotification(RemoteMessage message, bool show) async {
+  Future<void> handleNotification(RemoteMessage message, bool show,
+      GlobalKey<NavigatorState> rootNavigatorKey) async {
     debugPrint("--- Notification received in LEVEL 2 ---");
     if (message.data["category"].contains("Chat")) {
       message.toMap().forEach((key, value) {
@@ -70,8 +71,6 @@ class LMNotificationHandler {
           });
         }
       });
-      GlobalKey<NavigatorState> rootNavigatorKey =
-          locator<NavigationService>().navigatorKey;
       // First, check if the message contains a data payload.
       if (show && message.data.isNotEmpty) {
         //Add LM check for showing LM notifications
@@ -115,11 +114,15 @@ class LMNotificationHandler {
       rootNavigatorKey.currentState!
           .push(MaterialPageRoute(builder: (context) => const HomePage()));
 
-      // router.push(path);
-
       rootNavigatorKey.currentState!.push(MaterialPageRoute(
           builder: (context) => ChatRoomPage(
               chatroomId: int.parse(queryParams["collabcard_id"]!))));
+    } else if (host == 'chatroom_detail') {
+      rootNavigatorKey.currentState!
+          .push(MaterialPageRoute(builder: (context) => const HomePage()));
+      rootNavigatorKey.currentState!.push(MaterialPageRoute(
+          builder: (context) => ChatRoomPage(
+              chatroomId: int.parse(queryParams["chatroom_id"]!))));
     }
   }
 
