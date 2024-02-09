@@ -70,3 +70,7 @@ const SizedBox kVerticalPaddingSmall = SizedBox(height: kPaddingSmall);
 const SizedBox kVerticalPaddingXSmall = SizedBox(height: kPaddingXSmall);
 const SizedBox kVerticalPaddingLarge = SizedBox(height: kPaddingLarge);
 const SizedBox kVerticalPaddingMedium = SizedBox(height: kPaddingMedium);
+
+ThemeData kSuraasaThemeData = ThemeData(
+  primaryColor: kPrimaryColor,
+);

@@ -60,148 +60,152 @@ class _MediaForwardState extends State<MediaForward> {
     mediaList = widget.media;
 
     chatActionBloc = ConversationBloc.instance;
-    return Scaffold(
-      backgroundColor: kWhiteColor,
-      appBar: AppBar(
+    return Theme(
+      data: kSuraasaThemeData,
+      child: Scaffold(
         backgroundColor: kWhiteColor,
-        leading: IconButton(
-          onPressed: () {
-            Navigator.pop(context);
-          },
-          icon: const Icon(
-            Icons.arrow_back,
-            color: kBlackColor,
+        appBar: AppBar(
+          backgroundColor: kWhiteColor,
+          leading: IconButton(
+            onPressed: () {
+              Navigator.pop(context);
+            },
+            icon: const Icon(
+              Icons.arrow_back,
+              color: kBlackColor,
+            ),
           ),
+          elevation: 0,
         ),
-        elevation: 0,
-      ),
-      body: ValueListenableBuilder(
-          valueListenable: rebuildCurr,
-          builder: (context, _, __) {
-            return getMediaPreview();
-          }),
-      bottomNavigationBar: Padding(
-        padding: EdgeInsets.only(
-          bottom: MediaQuery.of(context).viewInsets.bottom + 1.h,
-          top: 1.h,
-          left: 3.w,
-          right: 3.w,
-        ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: <Widget>[
-            GestureDetector(
-              onTap: () async {
-                if (await handlePermissions(1)) {
-                  List<Media> pickedVideoFiles = await pickImageFiles();
-                  if (pickedVideoFiles.isNotEmpty) {
-                    if (mediaList.length + pickedVideoFiles.length > 10) {
-                      toast('Only 10 attachments can be sent');
-                      return;
-                    }
-                    for (Media media in pickedVideoFiles) {
-                      if (getFileSizeInDouble(media.size!) > 100) {
-                        toast(
-                          'File size should be smaller than 100MB',
-                        );
-                        pickedVideoFiles.remove(media);
+        body: ValueListenableBuilder(
+            valueListenable: rebuildCurr,
+            builder: (context, _, __) {
+              return getMediaPreview();
+            }),
+        bottomNavigationBar: Padding(
+          padding: EdgeInsets.only(
+            bottom: MediaQuery.of(context).viewInsets.bottom + 1.h,
+            top: 1.h,
+            left: 3.w,
+            right: 3.w,
+          ),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: <Widget>[
+              GestureDetector(
+                onTap: () async {
+                  if (await handlePermissions(1)) {
+                    List<Media> pickedVideoFiles = await pickImageFiles();
+                    if (pickedVideoFiles.isNotEmpty) {
+                      if (mediaList.length + pickedVideoFiles.length > 10) {
+                        toast('Only 10 attachments can be sent');
+                        return;
                       }
+                      for (Media media in pickedVideoFiles) {
+                        if (getFileSizeInDouble(media.size!) > 100) {
+                          toast(
+                            'File size should be smaller than 100MB',
+                          );
+                          pickedVideoFiles.remove(media);
+                        }
+                      }
+                      mediaList.addAll(pickedVideoFiles);
                     }
-                    mediaList.addAll(pickedVideoFiles);
+                    rebuildCurr.value = !rebuildCurr.value;
                   }
-                  rebuildCurr.value = !rebuildCurr.value;
-                }
-              },
-              child: SizedBox(
-                width: 10.w,
-                height: 10.w,
-                child: const LMIcon(
-                  type: LMIconType.svg,
-                  assetPath: ssGalleryIcon,
-                  color: kGrey3Color,
-                  size: 28,
+                },
+                child: SizedBox(
+                  width: 10.w,
+                  height: 10.w,
+                  child: const LMIcon(
+                    type: LMIconType.svg,
+                    assetPath: ssGalleryIcon,
+                    color: kGrey3Color,
+                    size: 28,
+                  ),
                 ),
               ),
-            ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: Container(
-                constraints: BoxConstraints(
-                  // minHeight: 4.h,
-                  minHeight: 8.w,
-                  maxHeight: 24.h,
-                ),
-                decoration: BoxDecoration(
-                  color: Colors.grey.shade200,
-                  borderRadius: BorderRadius.circular(24),
-                ),
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: kPaddingSmall,
+              const SizedBox(width: 12),
+              Expanded(
+                child: Container(
+                  constraints: BoxConstraints(
+                    // minHeight: 4.h,
+                    minHeight: 8.w,
+                    maxHeight: 24.h,
                   ),
-                  child: LMTextField(
-                    isDown: false,
-                    chatroomId: widget.chatroomId,
-                    style: Theme.of(context).textTheme.bodyMedium!,
-                    onChange: (value) {
-                      // print(value);
-                    },
-                    onTagSelected: (tag) {
-                      tags.add(tag);
-                    },
-                    decoration: InputDecoration(
-                      border: InputBorder.none,
-                      hintMaxLines: 1,
-                      hintStyle: Theme.of(context).textTheme.bodyMedium,
-                      hintText: "Type something..",
+                  decoration: BoxDecoration(
+                    color: Colors.grey.shade200,
+                    borderRadius: BorderRadius.circular(24),
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: kPaddingSmall,
                     ),
-                    controller: widget.textEditingController,
-                    focusNode: FocusNode(),
+                    child: LMTextField(
+                      isDown: false,
+                      chatroomId: widget.chatroomId,
+                      style: Theme.of(context).textTheme.bodyMedium!,
+                      onChange: (value) {
+                        // print(value);
+                      },
+                      onTagSelected: (tag) {
+                        tags.add(tag);
+                      },
+                      decoration: InputDecoration(
+                        border: InputBorder.none,
+                        hintMaxLines: 1,
+                        hintStyle: Theme.of(context).textTheme.bodyMedium,
+                        hintText: "Type something..",
+                      ),
+                      controller: widget.textEditingController,
+                      focusNode: FocusNode(),
+                    ),
                   ),
                 ),
               ),
-            ),
-            const SizedBox(width: 12),
-            GestureDetector(
-              onTap: () {
-                Navigator.pop(context);
-                final string = widget.textEditingController.text;
-                tags = TaggingHelper.matchTags(string, tags);
-                result = TaggingHelper.encodeString(string, tags);
-                result = result?.trim();
-                widget.textEditingController.clear();
-                chatActionBloc!.add(
-                  PostMultiMediaConversation(
-                    (PostConversationRequestBuilder()
-                          ..attachmentCount(mediaList.length)
-                          ..chatroomId(widget.chatroomId)
-                          ..temporaryId(
-                              DateTime.now().millisecondsSinceEpoch.toString())
-                          ..text(result!)
-                          ..hasFiles(true))
-                        .build(),
-                    mediaList,
+              const SizedBox(width: 12),
+              GestureDetector(
+                onTap: () {
+                  Navigator.pop(context);
+                  final string = widget.textEditingController.text;
+                  tags = TaggingHelper.matchTags(string, tags);
+                  result = TaggingHelper.encodeString(string, tags);
+                  result = result?.trim();
+                  widget.textEditingController.clear();
+                  chatActionBloc!.add(
+                    PostMultiMediaConversation(
+                      (PostConversationRequestBuilder()
+                            ..attachmentCount(mediaList.length)
+                            ..chatroomId(widget.chatroomId)
+                            ..temporaryId(DateTime.now()
+                                .millisecondsSinceEpoch
+                                .toString())
+                            ..text(result!)
+                            ..hasFiles(true))
+                          .build(),
+                      mediaList,
+                    ),
+                  );
+                },
+                child: Container(
+                  height: 10.w,
+                  width: 10.w,
+                  decoration: BoxDecoration(
+                    color: Colors.grey.shade200,
+                    borderRadius: BorderRadius.circular(6.w),
                   ),
-                );
-              },
-              child: Container(
-                height: 10.w,
-                width: 10.w,
-                decoration: BoxDecoration(
-                  color: Colors.grey.shade200,
-                  borderRadius: BorderRadius.circular(6.w),
-                ),
-                child: const Center(
-                  child: LMIcon(
-                    type: LMIconType.icon,
-                    icon: Icons.send_outlined,
-                    color: kBlackColor,
-                    size: 18,
+                  child: const Center(
+                    child: LMIcon(
+                      type: LMIconType.icon,
+                      icon: Icons.send_outlined,
+                      color: kBlackColor,
+                      size: 18,
+                    ),
                   ),
                 ),
-              ),
-            )
-          ],
+              )
+            ],
+          ),
         ),
       ),
     );

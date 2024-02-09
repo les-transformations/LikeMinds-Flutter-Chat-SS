@@ -81,108 +81,111 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: kWhiteColor,
-      body: Column(
-        children: [
-          SizedBox(
-            width: 100.w,
-            child: Padding(
-              padding: EdgeInsets.symmetric(
-                horizontal: 4.w,
-                vertical: 1.h,
-              ),
-              child: SafeArea(
-                bottom: false,
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Row(
-                      children: [
-                        const BackButton(
-                          color: kBlackColor,
-                        ),
-                        LMTextView(
-                          text: "Chats",
-                          textStyle: Theme.of(context)
-                              .textTheme
-                              .headlineSmall!
-                              .copyWith(
-                                color: kBlackColor,
-                                fontWeight: FontWeight.w600,
-                              ),
-                        ),
-                      ],
-                    ),
-                    // const Spacer(),
-                    LMProfilePicture(
-                      fallbackText: user!.name,
-                      size: 36,
-                      imageUrl: user?.imageUrl,
-                    ),
-                  ],
+    return Theme(
+       data: kSuraasaThemeData,
+      child: Scaffold(
+        backgroundColor: kWhiteColor,
+        body: Column(
+          children: [
+            SizedBox(
+              width: 100.w,
+              child: Padding(
+                padding: EdgeInsets.symmetric(
+                  horizontal: 4.w,
+                  vertical: 1.h,
+                ),
+                child: SafeArea(
+                  bottom: false,
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Row(
+                        children: [
+                          const BackButton(
+                            color: kBlackColor,
+                          ),
+                          LMTextView(
+                            text: "Chats",
+                            textStyle: Theme.of(context)
+                                .textTheme
+                                .headlineSmall!
+                                .copyWith(
+                                  color: kBlackColor,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                          ),
+                        ],
+                      ),
+                      // const Spacer(),
+                      LMProfilePicture(
+                        fallbackText: user!.name,
+                        size: 36,
+                        imageUrl: user?.imageUrl,
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ),
-          ),
-          const Divider(),
-          Expanded(
-            child: Padding(
-              padding: EdgeInsets.only(top: 1.h),
-              child: BlocConsumer<HomeBloc, HomeState>(
-                bloc: homeBloc,
-                listener: (context, state) {
-                  updatePagingControllers(state);
-                },
-                buildWhen: (previous, current) {
-                  if (previous is HomeLoaded && current is HomeLoading) {
-                    return false;
-                  } else if (previous is UpdateHomeFeed &&
-                      current is HomeLoading) {
-                    return false;
-                  }
-                  return true;
-                },
-                builder: (context, state) {
-                  if (state is HomeLoading) {
-                    return const SkeletonChatRoomList();
-                  } else if (state is HomeError) {
-                    return Center(
-                      child: Text(state.message),
-                    );
-                  } else if (state is HomeLoaded ||
-                      state is UpdateHomeFeed ||
-                      state is UpdatedHomeFeed) {
-                    return SafeArea(
-                      top: false,
-                      child: ValueListenableBuilder(
-                          valueListenable: rebuildPagedList,
-                          builder: (context, _, __) {
-                            return PagedListView<int, LMListItem>(
-                              pagingController: homeFeedPagingController,
-                              padding: EdgeInsets.zero,
-                              physics: const ClampingScrollPhysics(),
-                              builderDelegate:
-                                  PagedChildBuilderDelegate<LMListItem>(
-                                newPageProgressIndicatorBuilder: (_) =>
-                                    const SizedBox(),
-                                noItemsFoundIndicatorBuilder: (context) =>
-                                    const SizedBox(),
-                                itemBuilder: (context, item, index) {
-                                  return item;
-                                },
-                              ),
-                            );
-                          }),
-                    );
-                  }
-                  return const SizedBox();
-                },
+            const Divider(),
+            Expanded(
+              child: Padding(
+                padding: EdgeInsets.only(top: 1.h),
+                child: BlocConsumer<HomeBloc, HomeState>(
+                  bloc: homeBloc,
+                  listener: (context, state) {
+                    updatePagingControllers(state);
+                  },
+                  buildWhen: (previous, current) {
+                    if (previous is HomeLoaded && current is HomeLoading) {
+                      return false;
+                    } else if (previous is UpdateHomeFeed &&
+                        current is HomeLoading) {
+                      return false;
+                    }
+                    return true;
+                  },
+                  builder: (context, state) {
+                    if (state is HomeLoading) {
+                      return const SkeletonChatRoomList();
+                    } else if (state is HomeError) {
+                      return Center(
+                        child: Text(state.message),
+                      );
+                    } else if (state is HomeLoaded ||
+                        state is UpdateHomeFeed ||
+                        state is UpdatedHomeFeed) {
+                      return SafeArea(
+                        top: false,
+                        child: ValueListenableBuilder(
+                            valueListenable: rebuildPagedList,
+                            builder: (context, _, __) {
+                              return PagedListView<int, LMListItem>(
+                                pagingController: homeFeedPagingController,
+                                padding: EdgeInsets.zero,
+                                physics: const ClampingScrollPhysics(),
+                                builderDelegate:
+                                    PagedChildBuilderDelegate<LMListItem>(
+                                  newPageProgressIndicatorBuilder: (_) =>
+                                      const SizedBox(),
+                                  noItemsFoundIndicatorBuilder: (context) =>
+                                      const SizedBox(),
+                                  itemBuilder: (context, item, index) {
+                                    return item;
+                                  },
+                                ),
+                              );
+                            }),
+                      );
+                    }
+                    return const SizedBox();
+                  },
+                ),
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
