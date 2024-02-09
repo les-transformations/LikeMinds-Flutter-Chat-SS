@@ -24,7 +24,8 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  final int pageSize = 50;
+  int currentTime = DateTime.now().millisecondsSinceEpoch;
+  final int pageSize = 20;
   User? user;
   HomeBloc? homeBloc;
   ValueNotifier<bool> rebuildPagedList = ValueNotifier(false);
@@ -47,7 +48,15 @@ class _HomePageState extends State<HomePage> {
     homeFeedPagingController.addPageRequestListener(
       (pageKey) {
         homeBloc!.add(
-          InitHomeEvent(page: pageKey, pageSize: pageSize),
+          InitHomeEvent(
+            request: (GetHomeFeedRequestBuilder()
+                  ..page(pageKey)
+                  ..pageSize(pageSize)
+                  ..minTimeStamp(0)
+                  ..maxTimeStamp(currentTime)
+                  ..isLocalDB(false))
+                .build(),
+          ),
         );
       },
     );

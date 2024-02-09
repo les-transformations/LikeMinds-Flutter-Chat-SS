@@ -110,14 +110,6 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
     super.dispose();
   }
 
-  // Future<bool> _willPopCallback() {
-  //   _chatroomActionBloc.add(
-  //     MarkReadChatroomEvent(chatroomId: widget.chatroomId),
-  //   );
-  //   BlocProvider.of<HomeBloc>(context).add(UpdateHomeEvent());
-  //   return Future.value(false);
-  // }
-
   _addPaginationListener() {
     pagedListController.addPageRequestListener(
       (pageKey) {
@@ -127,6 +119,7 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
                   ..chatroomId(widget.chatroomId)
                   ..page(pageKey)
                   ..pageSize(500)
+                  ..isLocalDB(false)
                   ..minTimestamp(0)
                   ..maxTimestamp(currentTime))
                 .build(),
@@ -1357,11 +1350,6 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
                               children: [
                                 BackButton(
                                   onPressed: () {
-                                    _chatroomActionBloc.add(
-                                      MarkReadChatroomEvent(
-                                          chatroomId: widget.chatroomId),
-                                    );
-                                    // router.pop();
                                     Navigator.pop(context);
                                   },
                                   style: ButtonStyle(

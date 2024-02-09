@@ -24,11 +24,9 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
         if (event is InitHomeEvent) {
           emit(HomeLoading());
 
-          final response = await locator<LikeMindsService>()
-              .getHomeFeed((GetHomeFeedRequestBuilder()
-                    ..page(event.page)
-                    ..pageSize(event.pageSize))
-                  .build());
+          final response =
+              await locator<LikeMindsService>().getHomeFeed(event.request);
+
           if (response.success) {
             response.data?.conversationMeta?.forEach((key, value) {
               String? userId = value.userId == null
@@ -38,7 +36,8 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
               value.member = user;
             });
 
-            emit(HomeLoaded(response: response.data!, page: event.page));
+            emit(HomeLoaded(
+                response: response.data!, page: event.request.page!));
           } else {
             HomeError(response.errorMessage!);
           }
