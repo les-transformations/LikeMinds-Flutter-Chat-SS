@@ -591,7 +591,6 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
                             physics: const ClampingScrollPhysics(),
                             padding: const EdgeInsets.symmetric(vertical: 10),
                             reverse: true,
-                            scrollDirection: Axis.vertical,
                             builderDelegate:
                                 PagedChildBuilderDelegate<Conversation>(
                               noItemsFoundIndicatorBuilder: (context) =>
@@ -948,7 +947,6 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
                                         borderRadius: const BorderRadius.only(
                                           topLeft: Radius.circular(16),
                                           topRight: Radius.circular(16),
-                                          bottomRight: Radius.zero,
                                           bottomLeft: Radius.circular(16),
                                         ),
                                         conversation: item,
@@ -1287,7 +1285,6 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
                                         borderRadius: const BorderRadius.only(
                                           topLeft: Radius.circular(16),
                                           topRight: Radius.circular(16),
-                                          bottomLeft: Radius.zero,
                                           bottomRight: Radius.circular(16),
                                         ),
                                         conversation: item,
@@ -1357,7 +1354,6 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
                               vertical: 8,
                             ),
                             child: Row(
-                              mainAxisAlignment: MainAxisAlignment.start,
                               children: [
                                 BackButton(
                                   onPressed: () {
@@ -1365,8 +1361,6 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
                                       MarkReadChatroomEvent(
                                           chatroomId: widget.chatroomId),
                                     );
-                                    HomeBloc.instance.add(UpdateHomeEvent());
-
                                     // router.pop();
                                     Navigator.pop(context);
                                   },
