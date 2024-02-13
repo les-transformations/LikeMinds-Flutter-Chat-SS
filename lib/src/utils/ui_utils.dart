@@ -15,28 +15,30 @@ double getWidth(BuildContext context) {
 }
 
 bool checkDeletePermissions(Conversation conversation) {
-    final MemberStateResponse isCm =
-        locator<LMPreferenceService>().getMemberRights()!;
+  final MemberStateResponse isCm =
+      locator<LMPreferenceService>().getMemberRights()!;
 
-    if (isCm.member?.state == 1 && conversation.deletedByUserId == null) {
-      return true;
-    } else if ( locator<LMPreferenceService>().getUser()!.id == conversation.userId &&
-        conversation.deletedByUserId == null) {
-      return true;
-    } else {
-      return false;
-    }
-  }
-
-  bool checkEditPermissions(Conversation conversation) {
-    if (conversation.answer.isEmpty) {
-      return false;
-    } else if (locator<LMPreferenceService>().getUser()!.id == conversation.userId &&
-        conversation.deletedByUserId == null) {
-      return true;
-    }
+  if (isCm.member?.state == 1 && conversation.deletedByUserId == null) {
+    return true;
+  } else if (locator<LMPreferenceService>().getUser()!.id ==
+          conversation.userId &&
+      conversation.deletedByUserId == null) {
+    return true;
+  } else {
     return false;
   }
+}
+
+bool checkEditPermissions(Conversation conversation) {
+  if (conversation.answer.isEmpty) {
+    return false;
+  } else if (locator<LMPreferenceService>().getUser()!.id ==
+          conversation.userId &&
+      conversation.deletedByUserId == null) {
+    return true;
+  }
+  return false;
+}
 
 //Utils method for getting initials of a name (or first letter of every word)
 String getInitials(String? name) {
@@ -112,7 +114,8 @@ void filterOutStateMessage(List<Conversation> conversationList) {
             element.state == ConversationMessageState.memberLeftOpenChatroom ||
             element.state ==
                 ConversationMessageState.memberLeftSecretChatroom ||
-            element.state == ConversationMessageState.poll);
+            element.state == ConversationMessageState.poll ||
+            element.state == ConversationMessageState.memberAddedToChatroom);
   });
 }
 
@@ -120,7 +123,8 @@ bool stateMessage(Conversation conversation) {
   if (conversation.state == ConversationMessageState.memberJoinedOpenChatroom ||
       conversation.state == ConversationMessageState.memberLeftOpenChatroom ||
       conversation.state == ConversationMessageState.memberLeftSecretChatroom ||
-      conversation.state == ConversationMessageState.poll) {
+      conversation.state == ConversationMessageState.poll ||
+      conversation.state == ConversationMessageState.memberAddedToChatroom) {
     return false;
   } else {
     return true;
