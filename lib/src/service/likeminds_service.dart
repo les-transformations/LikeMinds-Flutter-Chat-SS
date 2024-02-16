@@ -51,7 +51,14 @@ class LikeMindsService implements ILikeMindsService {
   }) {
     client = (LMChatClientBuilder()
           ..apiKey(apiKey)
-          ..sdkCallback(lmCallBack))
+          ..sdkCallback(lmCallBack)
+          ..excludedConversationStates([
+            ConversationState.memberJoinedOpenChatroom,
+            ConversationState.memberLeftOpenChatroom,
+            ConversationState.memberLeftSecretChatroom,
+            ConversationState.poll,
+            ConversationState.memberAddedToChatroom,
+          ]))
         .build();
     LMAnalytics.get().initialize();
   }

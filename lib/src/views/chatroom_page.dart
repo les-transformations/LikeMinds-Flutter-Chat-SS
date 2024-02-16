@@ -25,7 +25,8 @@ import 'package:likeminds_chat_ss_fl/src/widgets/chatroom_skeleton.dart';
 import 'package:likeminds_chat_ss_fl/src/widgets/confirmation_dialogue.dart';
 import 'package:likeminds_chat_ss_fl/src/widgets/media/document/document_preview_factory.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
-import 'package:likeminds_chat_fl/likeminds_chat_fl.dart';
+import 'package:likeminds_chat_fl/likeminds_chat_fl.dart'
+    hide ConversationState;
 import 'package:likeminds_chat_ui_fl/likeminds_chat_ui_fl.dart';
 import 'package:overlay_support/overlay_support.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -219,7 +220,7 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
       }
       List<Conversation>? conversationData =
           state.getConversationResponse.conversationData;
-      filterOutStateMessage(conversationData!);
+      // filterOutStateMessage(conversationData!);
       conversationData = addTimeStampInConversationList(
           conversationData, chatroom!.communityId!);
       if (state.getConversationResponse.conversationData == null ||
