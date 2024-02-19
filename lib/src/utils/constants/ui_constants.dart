@@ -33,7 +33,7 @@ const MaterialColor secondary = MaterialColor(
   },
 );
 
-const Color kPrimaryColor = Color.fromARGB(255, 6, 92, 193);
+const Color kPrimaryColor = Color.fromRGBO(59, 130, 246, 1);
 const Color kSecondaryColor = Color.fromARGB(255, 223, 103, 34);
 const Color kAccentColor = Color.fromARGB(255, 100, 204, 40);
 
