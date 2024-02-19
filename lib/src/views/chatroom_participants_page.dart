@@ -52,7 +52,6 @@ class _ChatroomParticipantsPageState extends State<ChatroomParticipantsPage> {
 
   @override
   void dispose() {
-    participantsBloc?.close();
     focusNode.dispose();
     _searchController.dispose();
     rebuildSearchBar.dispose();

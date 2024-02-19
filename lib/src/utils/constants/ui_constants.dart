@@ -72,5 +72,20 @@ const SizedBox kVerticalPaddingLarge = SizedBox(height: kPaddingLarge);
 const SizedBox kVerticalPaddingMedium = SizedBox(height: kPaddingMedium);
 
 ThemeData kSuraasaThemeData = ThemeData(
-  primaryColor: kPrimaryColor,
-);
+    primaryColor: kPrimaryColor,
+    useMaterial3: false,
+    bottomSheetTheme:const BottomSheetThemeData(
+      backgroundColor: kWhiteColor,
+      elevation: 0,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.zero,
+      ),
+    ),
+    inputDecorationTheme: const InputDecorationTheme(
+      border: InputBorder.none,
+      focusedBorder: InputBorder.none,
+      enabledBorder: InputBorder.none,
+      errorBorder: InputBorder.none,
+      disabledBorder: InputBorder.none,
+      focusedErrorBorder: InputBorder.none,
+    ));
