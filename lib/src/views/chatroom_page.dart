@@ -25,7 +25,8 @@ import 'package:likeminds_chat_ss_fl/src/widgets/chatroom_skeleton.dart';
 import 'package:likeminds_chat_ss_fl/src/widgets/confirmation_dialogue.dart';
 import 'package:likeminds_chat_ss_fl/src/widgets/media/document/document_preview_factory.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
-import 'package:likeminds_chat_fl/likeminds_chat_fl.dart';
+import 'package:likeminds_chat_fl/likeminds_chat_fl.dart'
+    hide ConversationState;
 import 'package:likeminds_chat_ui_fl/likeminds_chat_ui_fl.dart';
 import 'package:overlay_support/overlay_support.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -212,7 +213,7 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
       }
       List<Conversation>? conversationData =
           state.getConversationResponse.conversationData;
-      filterOutStateMessage(conversationData!);
+      // filterOutStateMessage(conversationData!);
       conversationData = addTimeStampInConversationList(
           conversationData, chatroom!.communityId!);
       if (state.getConversationResponse.conversationData == null ||
@@ -428,82 +429,84 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
 
   @override
   Widget build(BuildContext context) {
-    return AnnotatedRegion<SystemUiOverlayStyle>(
-      value: SystemUiOverlayStyle.dark,
-      child: Scaffold(
-        backgroundColor: Colors.white,
-        floatingActionButton: showScrollButton
-            ? Padding(
-                padding: EdgeInsets.only(bottom: 18.h),
-                child: Container(
-                  height: 42,
-                  width: 42,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(24),
-                    color: secondary.shade200,
-                    boxShadow: [
-                      BoxShadow(
-                        offset: const Offset(0, 2),
-                        blurRadius: 8,
-                        color: kBlackColor.withOpacity(0.2),
-                      )
-                    ],
-                  ),
-                  child: Center(
-                    child: LMIconButton(
-                      containerSize: 42,
-                      onTap: (active) {
-                        _scrollToBottom();
-                      },
-                      icon: const LMIcon(
-                        type: LMIconType.icon,
-                        icon: Icons.keyboard_arrow_down,
-                        color: Colors.white,
-                        size: 24,
-                        boxPadding: 6,
-                        boxSize: 36,
+    return Theme(
+      data: kSuraasaThemeData,
+      child: AnnotatedRegion<SystemUiOverlayStyle>(
+        value: SystemUiOverlayStyle.dark,
+        child: Scaffold(
+          backgroundColor: Colors.white,
+          floatingActionButton: showScrollButton
+              ? Padding(
+                  padding: EdgeInsets.only(bottom: 18.h),
+                  child: Container(
+                    height: 42,
+                    width: 42,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(24),
+                      color: secondary.shade200,
+                      boxShadow: [
+                        BoxShadow(
+                          offset: const Offset(0, 2),
+                          blurRadius: 8,
+                          color: kBlackColor.withOpacity(0.2),
+                        )
+                      ],
+                    ),
+                    child: Center(
+                      child: LMIconButton(
+                        containerSize: 42,
+                        onTap: (active) {
+                          _scrollToBottom();
+                        },
+                        icon: const LMIcon(
+                          type: LMIconType.icon,
+                          icon: Icons.keyboard_arrow_down,
+                          color: Colors.white,
+                          size: 24,
+                          boxPadding: 6,
+                          boxSize: 36,
+                        ),
                       ),
                     ),
                   ),
-                ),
-              )
-            : null,
-        body: SafeArea(
-          bottom: false,
-          left: false,
-          right: false,
-          child: BlocConsumer<ChatroomBloc, ChatroomState>(
-            bloc: _chatroomBloc,
-            listener: (context, state) {
-              if (state is ChatroomLoaded) {
-                chatroom = state.getChatroomResponse.chatroom;
-                lastConversationId =
-                    state.getChatroomResponse.lastConversationId ?? 0;
-                _chatroomActionBloc
-                    .add(MarkReadChatroomEvent(chatroomId: chatroom!.id));
-                _conversationBloc.add(InitConversations(
-                  chatroomId: chatroom!.id,
-                  conversationId: lastConversationId,
-                ));
-                LMAnalytics.get().track(
-                  AnalyticsKeys.syncComplete,
-                  {
-                    'sync_complete': true,
-                  },
-                );
-                LMAnalytics.get().track(AnalyticsKeys.chatroomOpened, {
-                  'chatroom_id': chatroom!.id,
-                  'community_id': chatroom!.communityId,
-                  'chatroom_type': chatroom!.type,
-                  'source': 'home_feed',
-                });
-              }
-            },
-            builder: (context, state) {
-              // return const SkeletonChatList();
-              if (state is ChatroomLoading) {
-                return const SkeletonChatPage();
-              }
+                )
+              : null,
+          body: SafeArea(
+            bottom: false,
+            left: false,
+            right: false,
+            child: BlocConsumer<ChatroomBloc, ChatroomState>(
+              bloc: _chatroomBloc,
+              listener: (context, state) {
+                if (state is ChatroomLoaded) {
+                  chatroom = state.getChatroomResponse.chatroom;
+                  lastConversationId =
+                      state.getChatroomResponse.lastConversationId ?? 0;
+                  _chatroomActionBloc
+                      .add(MarkReadChatroomEvent(chatroomId: chatroom!.id));
+                  _conversationBloc.add(InitConversations(
+                    chatroomId: chatroom!.id,
+                    conversationId: lastConversationId,
+                  ));
+                  LMAnalytics.get().track(
+                    AnalyticsKeys.syncComplete,
+                    {
+                      'sync_complete': true,
+                    },
+                  );
+                  LMAnalytics.get().track(AnalyticsKeys.chatroomOpened, {
+                    'chatroom_id': chatroom!.id,
+                    'community_id': chatroom!.communityId,
+                    'chatroom_type': chatroom!.type,
+                    'source': 'home_feed',
+                  });
+                }
+              },
+              builder: (context, state) {
+                // return const SkeletonChatList();
+                if (state is ChatroomLoading) {
+                  return const SkeletonChatPage();
+                }
 
               if (state is ChatroomLoaded) {
                 chatroom = state.getChatroomResponse.chatroom;
@@ -656,16 +659,16 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
                                   );
                                 }
 
-                                final replyAttachments = item.replyId != null
-                                    ? conversationAttachmentsMeta.containsKey(
-                                            item.replyId.toString())
-                                        ? conversationAttachmentsMeta[
-                                            item.replyId.toString()]
-                                        : null
-                                    : null;
+                                  final replyAttachments = item.replyId != null
+                                      ? conversationAttachmentsMeta.containsKey(
+                                              item.replyId.toString())
+                                          ? conversationAttachmentsMeta[
+                                              item.replyId.toString()]
+                                          : null
+                                      : null;
 
-                                Conversation? replyConversation =
-                                    conversationMeta[item.replyId.toString()];
+                                  Conversation? replyConversation =
+                                      conversationMeta[item.replyId.toString()];
 
                                 return item.userId == user!.id
                                     ? LMChatBubble(
@@ -1572,69 +1575,71 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
                             );
                           }
 
-                          if (state is ConversationEdited) {
-                            updateEditedConversation(
-                                state.editConversationResponse.conversation!);
-                            String type = state.editConversationResponse
-                                    .conversation?.attachments?.first.type ??
-                                "text";
-                            LMAnalytics.get().track(
-                              AnalyticsKeys.messageEdited,
-                              {
-                                "type": type,
-                                "chatroom_id": chatroom?.id,
-                                "description_Updated": true,
-                              },
-                            );
-                          }
-                          if (state is ReplyConversationState) {
-                            rebuildChatBar.value = !rebuildChatBar.value;
-                          }
-                          if (state is EditConversationState) {
-                            rebuildChatBar.value = !rebuildChatBar.value;
-                          }
-                        },
-                        builder: (context, state) {
-                          return ValueListenableBuilder(
-                              valueListenable: rebuildChatBar,
-                              builder: (context, _, __) {
-                                if (state is EditConversationState) {
+                            if (state is ConversationEdited) {
+                              updateEditedConversation(
+                                  state.editConversationResponse.conversation!);
+                              String type = state.editConversationResponse
+                                      .conversation?.attachments?.first.type ??
+                                  "text";
+                              LMAnalytics.get().track(
+                                AnalyticsKeys.messageEdited,
+                                {
+                                  "type": type,
+                                  "chatroom_id": chatroom?.id,
+                                  "description_Updated": true,
+                                },
+                              );
+                            }
+                            if (state is ReplyConversationState) {
+                              rebuildChatBar.value = !rebuildChatBar.value;
+                            }
+                            if (state is EditConversationState) {
+                              rebuildChatBar.value = !rebuildChatBar.value;
+                            }
+                          },
+                          builder: (context, state) {
+                            return ValueListenableBuilder(
+                                valueListenable: rebuildChatBar,
+                                builder: (context, _, __) {
+                                  if (state is EditConversationState) {
+                                    return ChatBar(
+                                      chatroom: chatroom!,
+                                      editConversation: state.editConversation,
+                                      scrollToBottom: _scrollToBottom,
+                                      userMeta: userMeta,
+                                    );
+                                  }
+                                  if (state is ReplyConversationState) {
+                                    return ChatBar(
+                                      chatroom: chatroom!,
+                                      replyToConversation: state.conversation,
+                                      replyConversationAttachments:
+                                          conversationAttachmentsMeta
+                                                  .containsKey(state
+                                                      .conversation.id
+                                                      .toString())
+                                              ? conversationAttachmentsMeta[
+                                                  '${state.conversation.id}']
+                                              : null,
+                                      scrollToBottom: _scrollToBottom,
+                                      userMeta: userMeta,
+                                    );
+                                  }
                                   return ChatBar(
                                     chatroom: chatroom!,
-                                    editConversation: state.editConversation,
                                     scrollToBottom: _scrollToBottom,
                                     userMeta: userMeta,
                                   );
-                                }
-                                if (state is ReplyConversationState) {
-                                  return ChatBar(
-                                    chatroom: chatroom!,
-                                    replyToConversation: state.conversation,
-                                    replyConversationAttachments:
-                                        conversationAttachmentsMeta.containsKey(
-                                                state.conversation.id
-                                                    .toString())
-                                            ? conversationAttachmentsMeta[
-                                                '${state.conversation.id}']
-                                            : null,
-                                    scrollToBottom: _scrollToBottom,
-                                    userMeta: userMeta,
-                                  );
-                                }
-                                return ChatBar(
-                                  chatroom: chatroom!,
-                                  scrollToBottom: _scrollToBottom,
-                                  userMeta: userMeta,
-                                );
-                              });
-                        }),
-                  ],
+                                });
+                          }),
+                    ],
+                  );
+                }
+                return Container(
+                  color: kGreyColor.withOpacity(0.2),
                 );
-              }
-              return Container(
-                color: kGreyColor.withOpacity(0.2),
-              );
-            },
+              },
+            ),
           ),
         ),
       ),

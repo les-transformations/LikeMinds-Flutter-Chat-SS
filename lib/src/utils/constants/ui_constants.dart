@@ -33,7 +33,7 @@ const MaterialColor secondary = MaterialColor(
   },
 );
 
-const Color kPrimaryColor = Color.fromARGB(255, 6, 92, 193);
+const Color kPrimaryColor = Color.fromRGBO(59, 130, 246, 1);
 const Color kSecondaryColor = Color.fromARGB(255, 223, 103, 34);
 const Color kAccentColor = Color.fromARGB(255, 100, 204, 40);
 
@@ -70,3 +70,22 @@ const SizedBox kVerticalPaddingSmall = SizedBox(height: kPaddingSmall);
 const SizedBox kVerticalPaddingXSmall = SizedBox(height: kPaddingXSmall);
 const SizedBox kVerticalPaddingLarge = SizedBox(height: kPaddingLarge);
 const SizedBox kVerticalPaddingMedium = SizedBox(height: kPaddingMedium);
+
+ThemeData kSuraasaThemeData = ThemeData(
+    primaryColor: kPrimaryColor,
+    useMaterial3: false,
+    bottomSheetTheme:const BottomSheetThemeData(
+      backgroundColor: kWhiteColor,
+      elevation: 0,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.zero,
+      ),
+    ),
+    inputDecorationTheme: const InputDecorationTheme(
+      border: InputBorder.none,
+      focusedBorder: InputBorder.none,
+      enabledBorder: InputBorder.none,
+      errorBorder: InputBorder.none,
+      disabledBorder: InputBorder.none,
+      focusedErrorBorder: InputBorder.none,
+    ));
