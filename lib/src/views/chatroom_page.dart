@@ -111,14 +111,6 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
     super.dispose();
   }
 
-  // Future<bool> _willPopCallback() {
-  //   _chatroomActionBloc.add(
-  //     MarkReadChatroomEvent(chatroomId: widget.chatroomId),
-  //   );
-  //   BlocProvider.of<HomeBloc>(context).add(UpdateHomeEvent());
-  //   return Future.value(false);
-  // }
-
   _addPaginationListener() {
     pagedListController.addPageRequestListener(
       (pageKey) {
@@ -128,6 +120,7 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
                   ..chatroomId(widget.chatroomId)
                   ..page(pageKey)
                   ..pageSize(500)
+                  ..isLocalDB(false)
                   ..minTimestamp(0)
                   ..maxTimestamp(currentTime))
                 .build(),
@@ -515,159 +508,156 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
                   return const SkeletonChatPage();
                 }
 
-                if (state is ChatroomLoaded) {
-                  chatroom = state.getChatroomResponse.chatroom;
-                  var pagedListView = ValueListenableBuilder(
-                    valueListenable: rebuildConversationList,
-                    builder: (context, _, __) {
-                      return BlocConsumer<ConversationBloc, ConversationState>(
-                          bloc: _conversationBloc,
-                          listener: (context, state) {
-                            updatePagingControllers(state);
-                            if (state is ConversationPosted) {
-                              Map<String, String> userTags =
-                                  TaggingHelper.decodeString(state
-                                          .postConversationResponse
-                                          .conversation
-                                          ?.answer ??
-                                      "");
-                              LMAnalytics.get().track(
-                                AnalyticsKeys.chatroomResponded,
-                                {
-                                  "chatroom_type": chatroom!.type,
-                                  "community_id": chatroom!.communityId,
-                                  "chatroom_name": chatroom!.header,
-                                  "chatroom_last_conversation_type": state
-                                          .postConversationResponse
-                                          .conversation
-                                          ?.attachments
-                                          ?.first
-                                          .type ??
-                                      "text",
-                                  "tagged_users": userTags.isNotEmpty,
-                                  "count_tagged_users": userTags.length,
-                                  "name_tagged_users": userTags.keys
-                                      .map((e) => e.replaceFirst("@", ""))
-                                      .toList(),
-                                  "is_group_tag": false,
-                                },
-                              );
-                            }
-                            if (state is ConversationError) {
-                              LMAnalytics.get().track(
-                                AnalyticsKeys.messageSendingError,
-                                {
-                                  "chatroom_id": chatroom!.id,
-                                  "chatroom_type": chatroom!.type,
-                                  "clicked_resend": false,
-                                },
-                              );
-                            }
-                            if (state is MultiMediaConversationError) {
-                              LMAnalytics.get().track(
-                                AnalyticsKeys.attachmentUploadedError,
-                                {
-                                  "chatroom_id": chatroom!.id,
-                                  "chatroom_type": chatroom!.type,
-                                  "clicked_retry": false
-                                },
-                              );
-                            }
-                            if (state is MultiMediaConversationPosted) {
-                              LMAnalytics.get().track(
-                                AnalyticsKeys.attachmentUploaded,
-                                {
-                                  "chatroom_id": chatroom!.id,
-                                  "chatroom_type": chatroom!.type,
-                                  "message_id": state.postConversationResponse
-                                      .conversation?.id,
-                                  "type": mapMediaTypeToString(
-                                      state.putMediaResponse.first.mediaType),
-                                },
-                              );
-                            }
-                          },
-                          builder: (context, state) {
-                            return PagedListView(
-                              pagingController: pagedListController,
-                              scrollController: scrollController,
-                              physics: const ClampingScrollPhysics(),
-                              padding: const EdgeInsets.symmetric(vertical: 10),
-                              reverse: true,
-                              scrollDirection: Axis.vertical,
-                              builderDelegate:
-                                  PagedChildBuilderDelegate<Conversation>(
-                                noItemsFoundIndicatorBuilder: (context) =>
-                                    const SizedBox(height: 10),
-                                firstPageProgressIndicatorBuilder: (context) =>
-                                    const SkeletonChatList(),
-                                newPageProgressIndicatorBuilder: (context) =>
-                                    Padding(
-                                  padding: EdgeInsets.symmetric(vertical: 1.h),
-                                  child: const Column(
-                                    children: [
-                                      SkeletonChatBubble(isSent: true),
-                                      SkeletonChatBubble(isSent: false),
-                                      SkeletonChatBubble(isSent: true),
-                                    ],
-                                  ),
+              if (state is ChatroomLoaded) {
+                chatroom = state.getChatroomResponse.chatroom;
+                var pagedListView = ValueListenableBuilder(
+                  valueListenable: rebuildConversationList,
+                  builder: (context, _, __) {
+                    return BlocConsumer<ConversationBloc, ConversationState>(
+                        bloc: _conversationBloc,
+                        listener: (context, state) {
+                          updatePagingControllers(state);
+                          if (state is ConversationPosted) {
+                            Map<String, String> userTags =
+                                TaggingHelper.decodeString(state
+                                        .postConversationResponse
+                                        .conversation
+                                        ?.answer ??
+                                    "");
+                            LMAnalytics.get().track(
+                              AnalyticsKeys.chatroomResponded,
+                              {
+                                "chatroom_type": chatroom!.type,
+                                "community_id": chatroom!.communityId,
+                                "chatroom_name": chatroom!.header,
+                                "chatroom_last_conversation_type": state
+                                        .postConversationResponse
+                                        .conversation
+                                        ?.attachments
+                                        ?.first
+                                        .type ??
+                                    "text",
+                                "tagged_users": userTags.isNotEmpty,
+                                "count_tagged_users": userTags.length,
+                                "name_tagged_users": userTags.keys
+                                    .map((e) => e.replaceFirst("@", ""))
+                                    .toList(),
+                                "is_group_tag": false,
+                              },
+                            );
+                          }
+                          if (state is ConversationError) {
+                            LMAnalytics.get().track(
+                              AnalyticsKeys.messageSendingError,
+                              {
+                                "chatroom_id": chatroom!.id,
+                                "chatroom_type": chatroom!.type,
+                                "clicked_resend": false,
+                              },
+                            );
+                          }
+                          if (state is MultiMediaConversationError) {
+                            LMAnalytics.get().track(
+                              AnalyticsKeys.attachmentUploadedError,
+                              {
+                                "chatroom_id": chatroom!.id,
+                                "chatroom_type": chatroom!.type,
+                                "clicked_retry": false
+                              },
+                            );
+                          }
+                          if (state is MultiMediaConversationPosted) {
+                            LMAnalytics.get().track(
+                              AnalyticsKeys.attachmentUploaded,
+                              {
+                                "chatroom_id": chatroom!.id,
+                                "chatroom_type": chatroom!.type,
+                                "message_id": state
+                                    .postConversationResponse.conversation?.id,
+                                "type": mapMediaTypeToString(
+                                    state.putMediaResponse.first.mediaType),
+                              },
+                            );
+                          }
+                        },
+                        builder: (context, state) {
+                          return PagedListView(
+                            pagingController: pagedListController,
+                            scrollController: scrollController,
+                            physics: const ClampingScrollPhysics(),
+                            padding: const EdgeInsets.symmetric(vertical: 10),
+                            reverse: true,
+                            builderDelegate:
+                                PagedChildBuilderDelegate<Conversation>(
+                              noItemsFoundIndicatorBuilder: (context) =>
+                                  const SizedBox(height: 10),
+                              firstPageProgressIndicatorBuilder: (context) =>
+                                  const SkeletonChatList(),
+                              newPageProgressIndicatorBuilder: (context) =>
+                                  Padding(
+                                padding: EdgeInsets.symmetric(vertical: 1.h),
+                                child: const Column(
+                                  children: [
+                                    SkeletonChatBubble(isSent: true),
+                                    SkeletonChatBubble(isSent: false),
+                                    SkeletonChatBubble(isSent: true),
+                                  ],
                                 ),
-                                animateTransitions: true,
-                                transitionDuration:
-                                    const Duration(milliseconds: 500),
-                                itemBuilder: (context, item, index) {
-                                  if (item.isTimeStamp != null &&
-                                          item.isTimeStamp! ||
-                                      item.state != 0 && item.state != null) {
-                                    return IntrinsicWidth(
-                                      child: Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.center,
-                                        mainAxisSize: MainAxisSize.min,
-                                        children: [
-                                          IntrinsicWidth(
-                                            child: Container(
-                                              constraints: BoxConstraints(
-                                                  maxWidth: 80.w),
-                                              margin:
-                                                  const EdgeInsets.symmetric(
-                                                vertical: 5,
-                                              ),
-                                              padding:
-                                                  const EdgeInsets.symmetric(
-                                                horizontal: 8,
-                                                vertical: 4,
-                                              ),
-                                              decoration: BoxDecoration(
-                                                color: kWhiteColor
-                                                    .withOpacity(0.5),
-                                                borderRadius:
-                                                    BorderRadius.circular(18),
-                                                border: Border.all(
-                                                  color: const Color.fromRGBO(
-                                                      226, 232, 240, 1),
-                                                ),
-                                              ),
-                                              alignment: Alignment.center,
-                                              child: LMTextView(
-                                                text: TaggingHelper
-                                                    .extractStateMessage(
-                                                        item.answer),
-                                                textAlign: TextAlign.center,
-                                                textStyle: const TextStyle(
-                                                  fontSize: 10,
-                                                  color: Color.fromRGBO(
-                                                      100, 116, 139, 1),
-                                                ),
-                                                maxLines: 2,
-                                                overflow: TextOverflow.ellipsis,
+                              ),
+                              animateTransitions: true,
+                              transitionDuration:
+                                  const Duration(milliseconds: 500),
+                              itemBuilder: (context, item, index) {
+                                if (item.isTimeStamp != null &&
+                                        item.isTimeStamp! ||
+                                    item.state != 0 && item.state != null) {
+                                  return IntrinsicWidth(
+                                    child: Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        IntrinsicWidth(
+                                          child: Container(
+                                            constraints:
+                                                BoxConstraints(maxWidth: 80.w),
+                                            margin: const EdgeInsets.symmetric(
+                                              vertical: 5,
+                                            ),
+                                            padding: const EdgeInsets.symmetric(
+                                              horizontal: 8,
+                                              vertical: 4,
+                                            ),
+                                            decoration: BoxDecoration(
+                                              color:
+                                                  kWhiteColor.withOpacity(0.5),
+                                              borderRadius:
+                                                  BorderRadius.circular(18),
+                                              border: Border.all(
+                                                color: const Color.fromRGBO(
+                                                    226, 232, 240, 1),
                                               ),
                                             ),
-                                          )
-                                        ],
-                                      ),
-                                    );
-                                  }
+                                            alignment: Alignment.center,
+                                            child: LMTextView(
+                                              text: TaggingHelper
+                                                  .extractStateMessage(
+                                                      item.answer),
+                                              textAlign: TextAlign.center,
+                                              textStyle: const TextStyle(
+                                                fontSize: 10,
+                                                color: Color.fromRGBO(
+                                                    100, 116, 139, 1),
+                                              ),
+                                              maxLines: 2,
+                                              overflow: TextOverflow.ellipsis,
+                                            ),
+                                          ),
+                                        )
+                                      ],
+                                    ),
+                                  );
+                                }
 
                                   final replyAttachments = item.replyId != null
                                       ? conversationAttachmentsMeta.containsKey(
@@ -680,22 +670,340 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
                                   Conversation? replyConversation =
                                       conversationMeta[item.replyId.toString()];
 
-                                  return item.userId == user!.id
-                                      ? LMChatBubble(
-                                          currentUser: user!,
-                                          key: Key(item.id.toString()),
-                                          isSent: item.userId == user!.id,
-                                          backgroundColor:
-                                              item.deletedByUserId != null
-                                                  ? secondary.shade200
-                                                  : secondary.shade500,
-                                          deletedText:
-                                              item.deletedByUserId != null
+                                return item.userId == user!.id
+                                    ? LMChatBubble(
+                                        currentUser: user!,
+                                        key: Key(item.id.toString()),
+                                        isSent: item.userId == user!.id,
+                                        backgroundColor:
+                                            item.deletedByUserId != null
+                                                ? secondary.shade200
+                                                : secondary.shade500,
+                                        deletedText: item.deletedByUserId !=
+                                                null
+                                            ? getDeletedTextWidget(item, user!)
+                                            : null,
+                                        menuBuilder: (child) {
+                                          return LMMenu(
+                                            surfaceTintColor: kWhiteColor,
+                                            color: kWhiteColor,
+                                            constraints: BoxConstraints(
+                                              minWidth: 35.w,
+                                              maxWidth: 50.w,
+                                            ),
+                                            menuItems: [
+                                              if (user!.id ==
+                                                      chatroom!.member!.id ||
+                                                  locator<LMPreferenceService>()
+                                                      .fetchMemberRight(1))
+                                                LMMenuItemUI(
+                                                  onTap: () {
+                                                    if (localTopic != null
+                                                        ? localTopic!.id !=
+                                                            item.id
+                                                        : chatroom!.topic?.id !=
+                                                            item.id) {
+                                                      _chatroomActionBloc.add(
+                                                        SetChatroomTopicEvent(
+                                                          chatroomId:
+                                                              chatroom!.id,
+                                                          conversationId:
+                                                              item.id,
+                                                          topic: item,
+                                                        ),
+                                                      );
+                                                    } else {
+                                                      toast(
+                                                          "Message is already pinned");
+                                                    }
+                                                  },
+                                                  leading: const LMIcon(
+                                                    type: LMIconType.svg,
+                                                    assetPath: ssPinIcon,
+                                                    size: 24,
+                                                  ),
+                                                  title: const LMTextView(
+                                                    text: "Pin Message",
+                                                    textStyle: TextStyle(
+                                                      fontSize: 14,
+                                                    ),
+                                                  ),
+                                                ),
+                                              LMMenuItemUI(
+                                                onTap: () {
+                                                  int userId = item.userId ??
+                                                      item.memberId!;
+                                                  if (userId == user!.id) {
+                                                    item.member = user!;
+                                                  }
+                                                  if (item.deletedByUserId !=
+                                                      null) {
+                                                    return;
+                                                  }
+                                                  _convActionBloc.add(
+                                                    ReplyConversation(
+                                                      chatroomId: chatroom!.id,
+                                                      conversationId: item.id,
+                                                      replyConversation: item,
+                                                    ),
+                                                  );
+                                                },
+                                                leading: const LMIcon(
+                                                  type: LMIconType.svg,
+                                                  assetPath: ssReplyIcon,
+                                                  size: 24,
+                                                ),
+                                                title: const LMTextView(
+                                                  text: "Reply",
+                                                  textStyle: TextStyle(
+                                                    fontSize: 14,
+                                                  ),
+                                                ),
+                                              ),
+                                              LMMenuItemUI(
+                                                onTap: () {
+                                                  Clipboard.setData(
+                                                    ClipboardData(
+                                                      text: TaggingHelper
+                                                                  .convertRouteToTag(
+                                                                      item
+                                                                          .answer)
+                                                              ?.replaceAll(
+                                                                  RegExp(
+                                                                      r'[@~]'),
+                                                                  '') ??
+                                                          '',
+                                                    ),
+                                                  ).then((value) {
+                                                    toast(
+                                                        "Copied to clipboard");
+                                                    String type = item
+                                                            .attachments
+                                                            ?.first
+                                                            .type ??
+                                                        "text";
+                                                    LMAnalytics.get().track(
+                                                      AnalyticsKeys
+                                                          .messageCopied,
+                                                      {
+                                                        "type": type,
+                                                        "chatroom_id":
+                                                            chatroom?.id
+                                                      },
+                                                    );
+                                                  });
+                                                },
+                                                leading: const LMIcon(
+                                                  type: LMIconType.svg,
+                                                  assetPath: ssCopyIcon,
+                                                  size: 24,
+                                                ),
+                                                title: const LMTextView(
+                                                  text: "Copy",
+                                                  textStyle: TextStyle(
+                                                    fontSize: 14,
+                                                  ),
+                                                ),
+                                              ),
+                                              if (checkDeletePermissions(item))
+                                                LMMenuItemUI(
+                                                  onTap: () async {
+                                                    if ((localTopic != null &&
+                                                            localTopic!.id ==
+                                                                item.id) ||
+                                                        (chatroom!.topic !=
+                                                                null &&
+                                                            item.id ==
+                                                                chatroom!.topic!
+                                                                    .id)) {
+                                                      showDialog(
+                                                          context: context,
+                                                          builder: (context) =>
+                                                              LMConfirmationDialog(
+                                                                width: 270,
+                                                                titleText:
+                                                                    "Delete Chat",
+                                                                bodyText:
+                                                                    "Are you sure you want to delete this chat? The message has been set as current topic of this chatroom",
+                                                                onCancel: () {
+                                                                  Navigator.pop(
+                                                                      context);
+                                                                },
+                                                                onDelete: () {
+                                                                  DeleteConversationRequest
+                                                                      request =
+                                                                      (DeleteConversationRequestBuilder()
+                                                                            ..conversationIds([
+                                                                              item.id
+                                                                            ])
+                                                                            ..reason("Delete"))
+                                                                          .build();
+                                                                  _convActionBloc.add(
+                                                                      DeleteConversation(
+                                                                          request));
+                                                                  Navigator.pop(
+                                                                      context);
+                                                                },
+                                                              ));
+                                                    } else {
+                                                      DeleteConversationRequest
+                                                          request =
+                                                          (DeleteConversationRequestBuilder()
+                                                                ..conversationIds(
+                                                                    [item.id])
+                                                                ..reason(
+                                                                    "Delete"))
+                                                              .build();
+                                                      _convActionBloc.add(
+                                                          DeleteConversation(
+                                                              request));
+                                                    }
+                                                  },
+                                                  leading: const LMIcon(
+                                                    type: LMIconType.svg,
+                                                    assetPath: ssDeleteIcon,
+                                                    color: Colors.red,
+                                                    size: 24,
+                                                  ),
+                                                  title: const LMTextView(
+                                                    text: "Delete",
+                                                    textStyle: TextStyle(
+                                                      fontSize: 14,
+                                                    ),
+                                                  ),
+                                                ),
+                                            ],
+                                            child: child,
+                                          );
+                                        },
+                                        onReply: (replyingTo) {
+                                          int userId =
+                                              item.userId ?? item.memberId!;
+                                          if (userId == user!.id) {
+                                            item.member = user!;
+                                          }
+                                          if (item.deletedByUserId != null) {
+                                            return;
+                                          }
+                                          _convActionBloc.add(
+                                            ReplyConversation(
+                                              chatroomId: chatroom!.id,
+                                              conversationId: item.id,
+                                              replyConversation: replyingTo,
+                                            ),
+                                          );
+                                        },
+                                        outsideFooter: Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.end,
+                                          children: [
+                                            Visibility(
+                                              visible: item.isEdited != null &&
+                                                  item.isEdited!,
+                                              child: const LMTextView(
+                                                text: "Edited • ",
+                                                textStyle: TextStyle(
+                                                  fontSize: 10,
+                                                  color: Color.fromRGBO(
+                                                      71, 85, 105, 1),
+                                                ),
+                                              ),
+                                            ),
+                                            LMTextView(
+                                              text: item.createdAt,
+                                              textStyle: const TextStyle(
+                                                fontSize: 10,
+                                                color: Color.fromRGBO(
+                                                    71, 85, 105, 1),
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                        content: LMChatContent(
+                                          conversation: item,
+                                          textStyle: TextStyle(
+                                            fontSize: 14,
+                                            color: Theme.of(context)
+                                                .colorScheme
+                                                .onPrimary,
+                                          ),
+                                          tagStyle: TextStyle(
+                                            fontSize: 14,
+                                            fontWeight: FontWeight.bold,
+                                            color: primary.shade800,
+                                          ),
+                                          linkStyle: TextStyle(
+                                            fontSize: 14,
+                                            fontWeight: FontWeight.bold,
+                                            color: secondary.shade100,
+                                          ),
+                                          visibleLines: 7,
+                                          animation: true,
+                                        ),
+                                        borderRadius: const BorderRadius.only(
+                                          topLeft: Radius.circular(16),
+                                          topRight: Radius.circular(16),
+                                          bottomLeft: Radius.circular(16),
+                                        ),
+                                        conversation: item,
+                                        replyingTo: replyConversation,
+                                        replyItem: LMReplyItem(
+                                          replyToConversation:
+                                              replyConversation,
+                                          borderRadius: 10,
+                                          title: replyConversation != null
+                                              ? LMTextView(
+                                                  text: userMeta[
+                                                          replyConversation
+                                                                  .userId ??
+                                                              replyConversation
+                                                                  .memberId!]!
+                                                      .name,
+                                                  overflow:
+                                                      TextOverflow.ellipsis,
+                                                  maxLines: 1,
+                                                  textStyle: const TextStyle(
+                                                    color: kPrimaryColor,
+                                                    fontSize: 12,
+                                                    fontWeight: FontWeight.bold,
+                                                  ),
+                                                )
+                                              : null,
+                                          backgroundColor: Theme.of(context)
+                                              .colorScheme
+                                              .onPrimary
+                                              .withOpacity(0.7),
+                                          subtitle: replyConversation != null
+                                              ? replyConversation
+                                                          .deletedByUserId !=
+                                                      null
                                                   ? getDeletedTextWidget(
-                                                      item, user!)
-                                                  : null,
-                                          menuBuilder: (child) {
-                                            return LMMenu(
+                                                      replyConversation, user!)
+                                                  : getChatItemAttachmentTile(
+                                                      replyAttachments ?? [],
+                                                      replyConversation,
+                                                    )
+                                              : null,
+                                        ),
+                                        sender: userMeta[
+                                                item.userId ?? item.memberId] ??
+                                            item.member!,
+                                        mediaWidget:
+                                            item.deletedByUserId == null
+                                                ? getContent(item)
+                                                : null,
+                                      )
+                                    : LMChatBubble(
+                                        currentUser: user!,
+                                        deletedText: item.deletedByUserId !=
+                                                null
+                                            ? getDeletedTextWidget(item, user!)
+                                            : null,
+                                        key: Key(item.id.toString()),
+                                        isSent: item.userId == user!.id,
+                                        backgroundColor: secondary.shade100,
+                                        menuBuilder: (child) {
+                                          return LMMenu(
                                               surfaceTintColor: kWhiteColor,
                                               color: kWhiteColor,
                                               constraints: BoxConstraints(
@@ -860,17 +1168,35 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
                                                                   },
                                                                 ));
                                                       } else {
-                                                        DeleteConversationRequest
-                                                            request =
-                                                            (DeleteConversationRequestBuilder()
-                                                                  ..conversationIds(
-                                                                      [item.id])
-                                                                  ..reason(
-                                                                      "Delete"))
-                                                                .build();
-                                                        _convActionBloc.add(
-                                                            DeleteConversation(
-                                                                request));
+                                                        showDialog(
+                                                            context: context,
+                                                            builder: (context) =>
+                                                                LMConfirmationDialog(
+                                                                  width: 270,
+                                                                  titleText:
+                                                                      "Delete Chat",
+                                                                  bodyText:
+                                                                      "Are you sure you want to delete this chat?",
+                                                                  onCancel: () {
+                                                                    Navigator.pop(
+                                                                        context);
+                                                                  },
+                                                                  onDelete: () {
+                                                                    DeleteConversationRequest
+                                                                        request =
+                                                                        (DeleteConversationRequestBuilder()
+                                                                              ..conversationIds([
+                                                                                item.id
+                                                                              ])
+                                                                              ..reason("Delete"))
+                                                                            .build();
+                                                                    _convActionBloc.add(
+                                                                        DeleteConversation(
+                                                                            request));
+                                                                    Navigator.pop(
+                                                                        context);
+                                                                  },
+                                                                ));
                                                       }
                                                     },
                                                     leading: const LMIcon(
@@ -887,525 +1213,198 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
                                                     ),
                                                   ),
                                               ],
-                                              child: child,
-                                            );
-                                          },
-                                          onReply: (replyingTo) {
-                                            int userId =
-                                                item.userId ?? item.memberId!;
-                                            if (userId == user!.id) {
-                                              item.member = user!;
-                                            }
-                                            if (item.deletedByUserId != null) {
-                                              return;
-                                            }
-                                            _convActionBloc.add(
-                                              ReplyConversation(
-                                                chatroomId: chatroom!.id,
-                                                conversationId: item.id,
-                                                replyConversation: replyingTo,
-                                              ),
-                                            );
-                                          },
-                                          outsideFooter: Row(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.end,
-                                            children: [
-                                              Visibility(
-                                                visible:
-                                                    item.isEdited != null &&
-                                                        item.isEdited!,
-                                                child: const LMTextView(
-                                                  text: "Edited • ",
-                                                  textStyle: TextStyle(
-                                                    fontSize: 10,
-                                                    color: Color.fromRGBO(
-                                                        71, 85, 105, 1),
-                                                  ),
-                                                ),
-                                              ),
-                                              LMTextView(
-                                                text: item.createdAt,
-                                                textStyle: const TextStyle(
-                                                  fontSize: 10,
-                                                  color: Color.fromRGBO(
-                                                      71, 85, 105, 1),
-                                                ),
-                                              ),
-                                            ],
-                                          ),
-                                          content: LMChatContent(
-                                            conversation: item,
-                                            textStyle: TextStyle(
-                                              fontSize: 14,
-                                              color: Theme.of(context)
-                                                  .colorScheme
-                                                  .onPrimary,
+                                              child: child);
+                                        },
+                                        onReply: (replyingTo) {
+                                          int userId =
+                                              item.userId ?? item.memberId!;
+                                          if (userId == user!.id) {
+                                            item.member = user!;
+                                          }
+                                          if (item.deletedByUserId != null) {
+                                            return;
+                                          }
+                                          _convActionBloc.add(
+                                            ReplyConversation(
+                                              chatroomId: chatroom!.id,
+                                              conversationId: item.id,
+                                              replyConversation: replyingTo,
                                             ),
-                                            tagStyle: TextStyle(
-                                              fontSize: 14,
-                                              fontWeight: FontWeight.bold,
-                                              color: primary.shade800,
-                                            ),
-                                            linkStyle: TextStyle(
-                                              fontSize: 14,
-                                              fontWeight: FontWeight.bold,
-                                              color: secondary.shade100,
-                                            ),
-                                            visibleLines: 7,
-                                            animation: true,
+                                          );
+                                        },
+                                        avatar: LMProfilePicture(
+                                          fallbackText: item.member != null
+                                              ? item.member!.name
+                                              : "X",
+                                          imageUrl: item.member!.imageUrl,
+                                          size: 24,
+                                        ),
+                                        outsideTitle: LMTextView(
+                                          text: item.member!.name,
+                                          textStyle: const TextStyle(
+                                            fontSize: 10,
+                                            color:
+                                                Color.fromRGBO(71, 85, 105, 1),
                                           ),
-                                          borderRadius: const BorderRadius.only(
-                                            topLeft: Radius.circular(16),
-                                            topRight: Radius.circular(16),
-                                            bottomRight: Radius.zero,
-                                            bottomLeft: Radius.circular(16),
+                                        ),
+                                        outsideFooter: LMTextView(
+                                          text: item.createdAt,
+                                          textStyle: const TextStyle(
+                                            fontSize: 10,
+                                            color:
+                                                Color.fromRGBO(71, 85, 105, 1),
                                           ),
+                                        ),
+                                        mediaWidget:
+                                            item.deletedByUserId == null
+                                                ? getContent(item)
+                                                : null,
+                                        content: LMChatContent(
                                           conversation: item,
-                                          replyingTo: replyConversation,
-                                          replyItem: LMReplyItem(
-                                            replyToConversation:
-                                                replyConversation,
-                                            borderRadius: 10,
-                                            title: replyConversation != null
-                                                ? LMTextView(
-                                                    text: userMeta[
-                                                            replyConversation
-                                                                    .userId ??
-                                                                replyConversation
-                                                                    .memberId!]!
-                                                        .name,
-                                                    overflow:
-                                                        TextOverflow.ellipsis,
-                                                    maxLines: 1,
-                                                    textStyle: const TextStyle(
-                                                      color: kPrimaryColor,
-                                                      fontSize: 12,
-                                                      fontWeight:
-                                                          FontWeight.bold,
-                                                    ),
-                                                  )
-                                                : null,
-                                            backgroundColor: Theme.of(context)
-                                                .colorScheme
-                                                .onPrimary
-                                                .withOpacity(0.7),
-                                            subtitle: replyConversation != null
-                                                ? replyConversation
-                                                            .deletedByUserId !=
-                                                        null
-                                                    ? getDeletedTextWidget(
-                                                        replyConversation,
-                                                        user!)
-                                                    : getChatItemAttachmentTile(
-                                                        replyAttachments ?? [],
-                                                        replyConversation,
-                                                      )
-                                                : null,
+                                          visibleLines: 7,
+                                          animation: true,
+                                          textStyle: const TextStyle(
+                                            fontSize: 14,
+                                            color: Colors.black87,
                                           ),
-                                          sender: userMeta[item.userId ??
-                                                  item.memberId] ??
-                                              item.member!,
-                                          mediaWidget:
-                                              item.deletedByUserId == null
-                                                  ? getContent(item)
-                                                  : null,
-                                        )
-                                      : LMChatBubble(
-                                          currentUser: user!,
-                                          deletedText:
-                                              item.deletedByUserId != null
+                                          tagStyle: TextStyle(
+                                            fontSize: 14,
+                                            fontWeight: FontWeight.bold,
+                                            color: secondary.shade600,
+                                          ),
+                                          linkStyle: TextStyle(
+                                            fontSize: 14,
+                                            fontWeight: FontWeight.bold,
+                                            color: secondary.shade600,
+                                          ),
+                                        ),
+                                        borderRadius: const BorderRadius.only(
+                                          topLeft: Radius.circular(16),
+                                          topRight: Radius.circular(16),
+                                          bottomRight: Radius.circular(16),
+                                        ),
+                                        conversation: item,
+                                        replyingTo: replyConversation,
+                                        replyItem: LMReplyItem(
+                                          replyToConversation:
+                                              replyConversation,
+                                          borderRadius: 10,
+                                          highlightColor: secondary,
+                                          title: replyConversation != null
+                                              ? LMTextView(
+                                                  text: userMeta[
+                                                          replyConversation
+                                                                  .userId ??
+                                                              replyConversation
+                                                                  .memberId!]!
+                                                      .name,
+                                                  overflow:
+                                                      TextOverflow.ellipsis,
+                                                  maxLines: 1,
+                                                  textStyle: const TextStyle(
+                                                    color: kPrimaryColor,
+                                                    fontSize: 12,
+                                                    fontWeight: FontWeight.bold,
+                                                  ),
+                                                )
+                                              : null,
+                                          subtitle: replyConversation != null
+                                              ? replyConversation
+                                                          .deletedByUserId !=
+                                                      null
                                                   ? getDeletedTextWidget(
-                                                      item, user!)
-                                                  : null,
-                                          key: Key(item.id.toString()),
-                                          isSent: item.userId == user!.id,
-                                          backgroundColor: secondary.shade100,
-                                          menuBuilder: (child) {
-                                            return LMMenu(
-                                                surfaceTintColor: kWhiteColor,
-                                                color: kWhiteColor,
-                                                constraints: BoxConstraints(
-                                                  minWidth: 35.w,
-                                                  maxWidth: 50.w,
-                                                ),
-                                                menuItems: [
-                                                  if (user!.id ==
-                                                          chatroom!
-                                                              .member!.id ||
-                                                      locator<LMPreferenceService>()
-                                                          .fetchMemberRight(1))
-                                                    LMMenuItemUI(
-                                                      onTap: () {
-                                                        if (localTopic != null
-                                                            ? localTopic!.id !=
-                                                                item.id
-                                                            : chatroom!.topic
-                                                                    ?.id !=
-                                                                item.id) {
-                                                          _chatroomActionBloc
-                                                              .add(
-                                                            SetChatroomTopicEvent(
-                                                              chatroomId:
-                                                                  chatroom!.id,
-                                                              conversationId:
-                                                                  item.id,
-                                                              topic: item,
-                                                            ),
-                                                          );
-                                                        } else {
-                                                          toast(
-                                                              "Message is already pinned");
-                                                        }
-                                                      },
-                                                      leading: const LMIcon(
-                                                        type: LMIconType.svg,
-                                                        assetPath: ssPinIcon,
-                                                        size: 24,
-                                                      ),
-                                                      title: const LMTextView(
-                                                        text: "Pin Message",
-                                                        textStyle: TextStyle(
-                                                          fontSize: 14,
-                                                        ),
-                                                      ),
-                                                    ),
-                                                  LMMenuItemUI(
-                                                    onTap: () {
-                                                      int userId =
-                                                          item.userId ??
-                                                              item.memberId!;
-                                                      if (userId == user!.id) {
-                                                        item.member = user!;
-                                                      }
-                                                      if (item.deletedByUserId !=
-                                                          null) {
-                                                        return;
-                                                      }
-                                                      _convActionBloc.add(
-                                                        ReplyConversation(
-                                                          chatroomId:
-                                                              chatroom!.id,
-                                                          conversationId:
-                                                              item.id,
-                                                          replyConversation:
-                                                              item,
-                                                        ),
-                                                      );
-                                                    },
-                                                    leading: const LMIcon(
-                                                      type: LMIconType.svg,
-                                                      assetPath: ssReplyIcon,
-                                                      size: 24,
-                                                    ),
-                                                    title: const LMTextView(
-                                                      text: "Reply",
-                                                      textStyle: TextStyle(
-                                                        fontSize: 14,
-                                                      ),
-                                                    ),
-                                                  ),
-                                                  LMMenuItemUI(
-                                                    onTap: () {
-                                                      Clipboard.setData(
-                                                        ClipboardData(
-                                                          text: TaggingHelper
-                                                                      .convertRouteToTag(item
-                                                                          .answer)
-                                                                  ?.replaceAll(
-                                                                      RegExp(
-                                                                          r'[@~]'),
-                                                                      '') ??
-                                                              '',
-                                                        ),
-                                                      ).then((value) {
-                                                        toast(
-                                                            "Copied to clipboard");
-                                                        String type = item
-                                                                .attachments
-                                                                ?.first
-                                                                .type ??
-                                                            "text";
-                                                        LMAnalytics.get().track(
-                                                          AnalyticsKeys
-                                                              .messageCopied,
-                                                          {
-                                                            "type": type,
-                                                            "chatroom_id":
-                                                                chatroom?.id
-                                                          },
-                                                        );
-                                                      });
-                                                    },
-                                                    leading: const LMIcon(
-                                                      type: LMIconType.svg,
-                                                      assetPath: ssCopyIcon,
-                                                      size: 24,
-                                                    ),
-                                                    title: const LMTextView(
-                                                      text: "Copy",
-                                                      textStyle: TextStyle(
-                                                        fontSize: 14,
-                                                      ),
-                                                    ),
-                                                  ),
-                                                  if (checkDeletePermissions(
-                                                      item))
-                                                    LMMenuItemUI(
-                                                      onTap: () async {
-                                                        if ((localTopic !=
-                                                                    null &&
-                                                                localTopic!
-                                                                        .id ==
-                                                                    item.id) ||
-                                                            (chatroom!.topic !=
-                                                                    null &&
-                                                                item.id ==
-                                                                    chatroom!
-                                                                        .topic!
-                                                                        .id)) {
-                                                          showDialog(
-                                                              context: context,
-                                                              builder: (context) =>
-                                                                  LMConfirmationDialog(
-                                                                    width: 270,
-                                                                    titleText:
-                                                                        "Delete Chat",
-                                                                    bodyText:
-                                                                        "Are you sure you want to delete this chat? The message has been set as current topic of this chatroom",
-                                                                    onCancel:
-                                                                        () {
-                                                                      Navigator.pop(
-                                                                          context);
-                                                                    },
-                                                                    onDelete:
-                                                                        () {
-                                                                      DeleteConversationRequest
-                                                                          request =
-                                                                          (DeleteConversationRequestBuilder()
-                                                                                ..conversationIds([
-                                                                                  item.id
-                                                                                ])
-                                                                                ..reason("Delete"))
-                                                                              .build();
-                                                                      _convActionBloc.add(
-                                                                          DeleteConversation(
-                                                                              request));
-                                                                      Navigator.pop(
-                                                                          context);
-                                                                    },
-                                                                  ));
-                                                        } else {
-                                                          showDialog(
-                                                              context: context,
-                                                              builder: (context) =>
-                                                                  LMConfirmationDialog(
-                                                                    width: 270,
-                                                                    titleText:
-                                                                        "Delete Chat",
-                                                                    bodyText:
-                                                                        "Are you sure you want to delete this chat?",
-                                                                    onCancel:
-                                                                        () {
-                                                                      Navigator.pop(
-                                                                          context);
-                                                                    },
-                                                                    onDelete:
-                                                                        () {
-                                                                      DeleteConversationRequest
-                                                                          request =
-                                                                          (DeleteConversationRequestBuilder()
-                                                                                ..conversationIds([
-                                                                                  item.id
-                                                                                ])
-                                                                                ..reason("Delete"))
-                                                                              .build();
-                                                                      _convActionBloc.add(
-                                                                          DeleteConversation(
-                                                                              request));
-                                                                      Navigator.pop(
-                                                                          context);
-                                                                    },
-                                                                  ));
-                                                        }
-                                                      },
-                                                      leading: const LMIcon(
-                                                        type: LMIconType.svg,
-                                                        assetPath: ssDeleteIcon,
-                                                        color: Colors.red,
-                                                        size: 24,
-                                                      ),
-                                                      title: const LMTextView(
-                                                        text: "Delete",
-                                                        textStyle: TextStyle(
-                                                          fontSize: 14,
-                                                        ),
-                                                      ),
-                                                    ),
-                                                ],
-                                                child: child);
-                                          },
-                                          onReply: (replyingTo) {
-                                            int userId =
-                                                item.userId ?? item.memberId!;
-                                            if (userId == user!.id) {
-                                              item.member = user!;
-                                            }
-                                            if (item.deletedByUserId != null) {
-                                              return;
-                                            }
-                                            _convActionBloc.add(
-                                              ReplyConversation(
-                                                chatroomId: chatroom!.id,
-                                                conversationId: item.id,
-                                                replyConversation: replyingTo,
-                                              ),
-                                            );
-                                          },
-                                          avatar: LMProfilePicture(
-                                            fallbackText: item.member != null
-                                                ? item.member!.name
-                                                : "X",
-                                            imageUrl: item.member!.imageUrl,
-                                            size: 24,
-                                          ),
-                                          outsideTitle: LMTextView(
-                                            text: item.member!.name,
-                                            textStyle: const TextStyle(
-                                              fontSize: 10,
-                                              color: Color.fromRGBO(
-                                                  71, 85, 105, 1),
-                                            ),
-                                          ),
-                                          outsideFooter: LMTextView(
-                                            text: item.createdAt,
-                                            textStyle: const TextStyle(
-                                              fontSize: 10,
-                                              color: Color.fromRGBO(
-                                                  71, 85, 105, 1),
-                                            ),
-                                          ),
-                                          mediaWidget:
-                                              item.deletedByUserId == null
-                                                  ? getContent(item)
-                                                  : null,
-                                          content: LMChatContent(
-                                            conversation: item,
-                                            visibleLines: 7,
-                                            animation: true,
-                                            textStyle: const TextStyle(
-                                              fontSize: 14,
-                                              color: Colors.black87,
-                                            ),
-                                            tagStyle: TextStyle(
-                                              fontSize: 14,
-                                              fontWeight: FontWeight.bold,
-                                              color: secondary.shade600,
-                                            ),
-                                            linkStyle: TextStyle(
-                                              fontSize: 14,
-                                              fontWeight: FontWeight.bold,
-                                              color: secondary.shade600,
-                                            ),
-                                          ),
-                                          borderRadius: const BorderRadius.only(
-                                            topLeft: Radius.circular(16),
-                                            topRight: Radius.circular(16),
-                                            bottomLeft: Radius.zero,
-                                            bottomRight: Radius.circular(16),
-                                          ),
-                                          conversation: item,
-                                          replyingTo: replyConversation,
-                                          replyItem: LMReplyItem(
-                                            replyToConversation:
-                                                replyConversation,
-                                            borderRadius: 10,
-                                            highlightColor: secondary,
-                                            title: replyConversation != null
-                                                ? LMTextView(
-                                                    text: userMeta[
-                                                            replyConversation
-                                                                    .userId ??
-                                                                replyConversation
-                                                                    .memberId!]!
-                                                        .name,
-                                                    overflow:
-                                                        TextOverflow.ellipsis,
-                                                    maxLines: 1,
-                                                    textStyle: const TextStyle(
-                                                      color: kPrimaryColor,
-                                                      fontSize: 12,
-                                                      fontWeight:
-                                                          FontWeight.bold,
-                                                    ),
-                                                  )
-                                                : null,
-                                            subtitle: replyConversation != null
-                                                ? replyConversation
-                                                            .deletedByUserId !=
-                                                        null
-                                                    ? getDeletedTextWidget(
-                                                        replyConversation,
-                                                        user!)
-                                                    : getChatItemAttachmentTile(
-                                                        replyAttachments ?? [],
-                                                        replyConversation,
-                                                      )
-                                                : null,
-                                            backgroundColor: Theme.of(context)
-                                                .colorScheme
-                                                .onPrimary
-                                                .withOpacity(0.7),
-                                          ),
-                                          sender: userMeta[item.userId ??
-                                                  item.memberId] ??
-                                              item.member!,
-                                        );
-                                },
-                              ),
-                            );
-                          });
-                    },
-                  );
-
-                  return Column(
-                    children: [
-                      Container(
-                        decoration: BoxDecoration(
-                          color: kWhiteColor.withOpacity(1),
-                        ),
-                        child: Column(
-                          children: <Widget>[
-                            kVerticalPaddingMedium,
-                            Padding(
-                              padding: EdgeInsets.symmetric(
-                                horizontal: 4.w,
-                                vertical: 8,
-                              ),
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.start,
-                                children: [
-                                  BackButton(
-                                    onPressed: () {
-                                      _chatroomActionBloc.add(
-                                        MarkReadChatroomEvent(
-                                            chatroomId: widget.chatroomId),
+                                                      replyConversation, user!)
+                                                  : getChatItemAttachmentTile(
+                                                      replyAttachments ?? [],
+                                                      replyConversation,
+                                                    )
+                                              : null,
+                                          backgroundColor: Theme.of(context)
+                                              .colorScheme
+                                              .onPrimary
+                                              .withOpacity(0.7),
+                                        ),
+                                        sender: userMeta[
+                                                item.userId ?? item.memberId] ??
+                                            item.member!,
                                       );
-                                      HomeBloc.instance.add(UpdateHomeEvent());
+                              },
+                            ),
+                          );
+                        });
+                  },
+                );
 
-                                      // router.pop();
-                                      Navigator.pop(context);
-                                    },
-                                    style: ButtonStyle(
-                                      padding: MaterialStateProperty.all(
-                                        EdgeInsets.zero,
-                                      ),
-                                      fixedSize: MaterialStateProperty.all(
-                                        const Size(24, 24),
-                                      ),
+                return Column(
+                  children: [
+                    Container(
+                      decoration: BoxDecoration(
+                        color: kWhiteColor.withOpacity(1),
+                      ),
+                      child: Column(
+                        children: <Widget>[
+                          kVerticalPaddingMedium,
+                          Padding(
+                            padding: EdgeInsets.symmetric(
+                              horizontal: 4.w,
+                              vertical: 8,
+                            ),
+                            child: Row(
+                              children: [
+                                BackButton(
+                                  onPressed: () {
+                                    Navigator.pop(context);
+                                  },
+                                  style: ButtonStyle(
+                                    padding: MaterialStateProperty.all(
+                                      EdgeInsets.zero,
+                                    ),
+                                    fixedSize: MaterialStateProperty.all(
+                                      const Size(24, 24),
                                     ),
                                   ),
-                                  GestureDetector(
+                                ),
+                                GestureDetector(
+                                  behavior: HitTestBehavior.opaque,
+                                  onTap: () {
+                                    if (chatroom != null) {
+                                      LMAnalytics.get().track(
+                                        AnalyticsKeys.groupDetailsScreen,
+                                        {
+                                          'chatroom_id': chatroom!.id,
+                                        },
+                                      );
+                                      showBottomSheet(
+                                        context: context,
+                                        builder: (context) {
+                                          return LMGroupDetailBottomSheet(
+                                            chatRoom: chatroom!,
+                                            backgroundColor:
+                                                Colors.white.withOpacity(0.9),
+                                            swipeChipColor:
+                                                kGrey3Color.withOpacity(0.6),
+                                            description: LMTextView(
+                                              text: chatroom!.title,
+                                              textStyle: const TextStyle(
+                                                color: Color.fromARGB(
+                                                    255, 30, 41, 59),
+                                                fontSize: 16,
+                                              ),
+                                            ),
+                                          );
+                                        },
+                                      );
+                                    }
+                                  },
+                                  child: LMProfilePicture(
+                                    fallbackText: chatroom!.header,
+                                    imageUrl: chatroom?.chatroomImageUrl,
+                                    size: 36,
+                                  ),
+                                ),
+                                SizedBox(width: 2.w),
+                                Expanded(
+                                  child: GestureDetector(
                                     behavior: HitTestBehavior.opaque,
                                     onTap: () {
                                       if (chatroom != null) {
@@ -1437,186 +1436,144 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
                                         );
                                       }
                                     },
-                                    child: LMProfilePicture(
-                                      fallbackText: chatroom!.header,
-                                      imageUrl: chatroom?.chatroomImageUrl,
-                                      size: 36,
-                                    ),
-                                  ),
-                                  SizedBox(width: 2.w),
-                                  Expanded(
-                                    child: GestureDetector(
-                                      behavior: HitTestBehavior.opaque,
-                                      onTap: () {
-                                        if (chatroom != null) {
-                                          LMAnalytics.get().track(
-                                            AnalyticsKeys.groupDetailsScreen,
-                                            {
-                                              'chatroom_id': chatroom!.id,
-                                            },
-                                          );
-                                          showBottomSheet(
-                                            context: context,
-                                            builder: (context) {
-                                              return LMGroupDetailBottomSheet(
-                                                chatRoom: chatroom!,
-                                                backgroundColor: Colors.white
-                                                    .withOpacity(0.9),
-                                                swipeChipColor: kGrey3Color
-                                                    .withOpacity(0.6),
-                                                description: LMTextView(
-                                                  text: chatroom!.title,
-                                                  textStyle: const TextStyle(
-                                                    color: Color.fromARGB(
-                                                        255, 30, 41, 59),
-                                                    fontSize: 16,
-                                                  ),
-                                                ),
-                                              );
-                                            },
-                                          );
-                                        }
-                                      },
-                                      child: Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          LMTextView(
-                                            text: chatroom!.header,
-                                            maxLines: 1,
-                                            overflow: TextOverflow.ellipsis,
-                                            textStyle: const TextStyle(
-                                              fontSize: 14,
-                                              fontWeight: FontWeight.w500,
-                                            ),
-                                          ),
-                                          kVerticalPaddingXSmall,
-                                          LMTextView(
-                                            text:
-                                                '${chatroom!.participantCount} participants',
-                                            maxLines: 1,
-                                            overflow: TextOverflow.ellipsis,
-                                            textStyle: const TextStyle(
-                                              fontSize: 12,
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                  ),
-                                  ChatroomMenu(
-                                    chatroom: chatroom!,
-                                    chatroomActions: state
-                                        .getChatroomResponse.chatroomActions!,
-                                  ),
-                                  kHorizontalPaddingMedium,
-                                ],
-                              ),
-                            ),
-                            const Divider(height: 1),
-                            BlocListener<ChatroomActionBloc,
-                                ChatroomActionState>(
-                              bloc: _chatroomActionBloc,
-                              listener: (context, state) {
-                                if (state is ChatroomTopicSet) {
-                                  localTopic = state.topic;
-                                  addLocalConversationToPagedList(
-                                    conversationToLocalTopicStateMessage(
-                                      user!,
-                                      state.topic,
-                                    ),
-                                  );
-                                  if (!showChatTopic) showChatTopic = true;
-                                  rebuildChatTopic.value =
-                                      !rebuildChatTopic.value;
-                                  _scrollToBottom();
-                                }
-                                if (state is ChatroomTopicError) {
-                                  toast(state.errorMessage);
-                                }
-                              },
-                              child: ValueListenableBuilder(
-                                valueListenable: rebuildChatTopic,
-                                builder: (context, value, child) {
-                                  if (chatroom!.topic != null &&
-                                      showChatTopic) {
-                                    String topic =
-                                        TaggingHelper.extractStateMessage(
-                                            localTopic?.answer ??
-                                                chatroom!.topic!.answer);
-                                    return LMChatRoomTopic(
-                                        backGroundColor: secondary.shade100,
-                                        leading: const VerticalDivider(
-                                          color: kPrimaryColor,
-                                          thickness: 3,
-                                        ),
-                                        trailing: const LMIcon(
-                                          type: LMIconType.svg,
-                                          assetPath: ssPinIcon,
-                                          size: 24,
-                                        ),
-                                        subTitle: LMTextView(
-                                          text: topic.isEmpty
-                                              ? "Media message"
-                                              : topic,
-                                          textStyle: TextStyle(
-                                            fontSize: 13,
-                                            fontStyle: topic.isEmpty
-                                                ? FontStyle.italic
-                                                : FontStyle.normal,
-                                          ),
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        LMTextView(
+                                          text: chatroom!.header,
                                           maxLines: 1,
                                           overflow: TextOverflow.ellipsis,
+                                          textStyle: const TextStyle(
+                                            fontSize: 14,
+                                            fontWeight: FontWeight.w500,
+                                          ),
                                         ),
-                                        conversation:
-                                            localTopic ?? chatroom!.topic!,
-                                        onTap: () {});
-                                  } else {
-                                    return const SizedBox.shrink();
-                                  }
-                                },
-                              ),
+                                        kVerticalPaddingXSmall,
+                                        LMTextView(
+                                          text:
+                                              '${chatroom!.participantCount} participants',
+                                          maxLines: 1,
+                                          overflow: TextOverflow.ellipsis,
+                                          textStyle: const TextStyle(
+                                            fontSize: 12,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                                ChatroomMenu(
+                                  chatroom: chatroom!,
+                                  chatroomActions: state
+                                      .getChatroomResponse.chatroomActions!,
+                                ),
+                                kHorizontalPaddingMedium,
+                              ],
                             ),
-                          ],
-                        ),
-                      ),
-                      Expanded(
-                        child: Container(
-                          decoration: BoxDecoration(
-                            color: kWhiteColor.withOpacity(1),
-                            // boxShadow: [
-                            //   BoxShadow(
-                            //     color: Colors.black.withOpacity(1),
-                            //     blurRadius: 2,
-                            //     offset: const Offset(0, 2),
-                            //   )
-                            // ],
                           ),
-                          child: pagedListView,
-                        ),
+                          const Divider(height: 1),
+                          BlocListener<ChatroomActionBloc, ChatroomActionState>(
+                            bloc: _chatroomActionBloc,
+                            listener: (context, state) {
+                              if (state is ChatroomTopicSet) {
+                                localTopic = state.topic;
+                                addLocalConversationToPagedList(
+                                  conversationToLocalTopicStateMessage(
+                                    user!,
+                                    state.topic,
+                                  ),
+                                );
+                                if (!showChatTopic) showChatTopic = true;
+                                rebuildChatTopic.value =
+                                    !rebuildChatTopic.value;
+                                _scrollToBottom();
+                              }
+                              if (state is ChatroomTopicError) {
+                                toast(state.errorMessage);
+                              }
+                            },
+                            child: ValueListenableBuilder(
+                              valueListenable: rebuildChatTopic,
+                              builder: (context, value, child) {
+                                if (chatroom!.topic != null && showChatTopic) {
+                                  String topic =
+                                      TaggingHelper.extractStateMessage(
+                                          localTopic?.answer ??
+                                              chatroom!.topic!.answer);
+                                  return LMChatRoomTopic(
+                                      backGroundColor: secondary.shade100,
+                                      leading: const VerticalDivider(
+                                        color: kPrimaryColor,
+                                        thickness: 3,
+                                      ),
+                                      trailing: const LMIcon(
+                                        type: LMIconType.svg,
+                                        assetPath: ssPinIcon,
+                                        size: 24,
+                                      ),
+                                      subTitle: LMTextView(
+                                        text: topic.isEmpty
+                                            ? "Media message"
+                                            : topic,
+                                        textStyle: TextStyle(
+                                          fontSize: 13,
+                                          fontStyle: topic.isEmpty
+                                              ? FontStyle.italic
+                                              : FontStyle.normal,
+                                        ),
+                                        maxLines: 1,
+                                        overflow: TextOverflow.ellipsis,
+                                      ),
+                                      conversation:
+                                          localTopic ?? chatroom!.topic!,
+                                      onTap: () {});
+                                } else {
+                                  return const SizedBox.shrink();
+                                }
+                              },
+                            ),
+                          ),
+                        ],
                       ),
-                      BlocConsumer(
-                          bloc: _convActionBloc,
-                          listener: (context, state) {
-                            if (state is ConversationDelete) {
-                              updateDeletedConversation(
-                                  state.deleteConversationResponse);
-                              String type = state
-                                      .deleteConversationResponse
-                                      .conversations
-                                      ?.first
-                                      .attachments
-                                      ?.first
-                                      .type ??
-                                  "text";
-                              LMAnalytics.get().track(
-                                AnalyticsKeys.messageDeleted,
-                                {
-                                  "type": type,
-                                  "chatroom_id": chatroom?.id,
-                                },
-                              );
-                            }
+                    ),
+                    Expanded(
+                      child: Container(
+                        decoration: BoxDecoration(
+                          color: kWhiteColor.withOpacity(1),
+                          // boxShadow: [
+                          //   BoxShadow(
+                          //     color: Colors.black.withOpacity(1),
+                          //     blurRadius: 2,
+                          //     offset: const Offset(0, 2),
+                          //   )
+                          // ],
+                        ),
+                        child: pagedListView,
+                      ),
+                    ),
+                    BlocConsumer(
+                        bloc: _convActionBloc,
+                        listener: (context, state) {
+                          if (state is ConversationDelete) {
+                            updateDeletedConversation(
+                                state.deleteConversationResponse);
+                            String type = state
+                                    .deleteConversationResponse
+                                    .conversations
+                                    ?.first
+                                    .attachments
+                                    ?.first
+                                    .type ??
+                                "text";
+                            LMAnalytics.get().track(
+                              AnalyticsKeys.messageDeleted,
+                              {
+                                "type": type,
+                                "chatroom_id": chatroom?.id,
+                              },
+                            );
+                          }
 
                             if (state is ConversationEdited) {
                               updateEditedConversation(

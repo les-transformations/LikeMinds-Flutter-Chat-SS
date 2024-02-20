@@ -4,13 +4,14 @@ part of 'home_bloc.dart';
 abstract class HomeEvent extends Equatable {}
 
 class InitHomeEvent extends HomeEvent {
-  final int page;
-  final int pageSize;
+  final GetHomeFeedRequest request;
 
-  InitHomeEvent({required this.page, required this.pageSize});
+  InitHomeEvent({
+    required this.request,
+  });
 
   @override
-  List<Object?> get props => [page, pageSize];
+  List<Object?> get props => [request];
 }
 
 class GetHomeFeedPage extends HomeEvent {
