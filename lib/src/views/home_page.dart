@@ -24,7 +24,8 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  final int pageSize = 50;
+  int currentTime = DateTime.now().millisecondsSinceEpoch;
+  final int pageSize = 20;
   User? user;
   HomeBloc? homeBloc;
   ValueNotifier<bool> rebuildPagedList = ValueNotifier(false);
@@ -40,9 +41,6 @@ class _HomePageState extends State<HomePage> {
     user = locator<LMPreferenceService>().getUser();
     homeFeedPagingController.itemList?.clear();
     homeBloc = HomeBloc.instance;
-    homeBloc!.add(
-      InitHomeEvent(page: _pageKey, pageSize: pageSize),
-    );
     _addPaginationListener();
   }
 
@@ -50,7 +48,15 @@ class _HomePageState extends State<HomePage> {
     homeFeedPagingController.addPageRequestListener(
       (pageKey) {
         homeBloc!.add(
-          InitHomeEvent(page: pageKey, pageSize: pageSize),
+          InitHomeEvent(
+            request: (GetHomeFeedRequestBuilder()
+                  ..page(pageKey)
+                  ..pageSize(pageSize)
+                  ..minTimeStamp(0)
+                  ..maxTimeStamp(currentTime)
+                  ..isLocalDB(false))
+                .build(),
+          ),
         );
       },
     );
@@ -58,9 +64,6 @@ class _HomePageState extends State<HomePage> {
 
   updatePagingControllers(HomeState state) {
     if (state is HomeLoaded) {
-      if (state.page == 1) {
-        homeFeedPagingController.itemList?.clear();
-      }
       List<LMListItem> chatItems = getChats(context, state.response);
       _pageKey++;
       if (state.response.chatroomsData == null ||
@@ -95,7 +98,6 @@ class _HomePageState extends State<HomePage> {
               child: SafeArea(
                 bottom: false,
                 child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.center,
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Row(
@@ -207,7 +209,7 @@ class _HomePageState extends State<HomePage> {
 
       final List<Media>? attachmentMeta =
           attachment?.map((e) => Media.fromJson(e)).toList();
-      String _message = conversation.deletedByUserId == null
+      String message = conversation.deletedByUserId == null
           ? '${conversationUser.name}: ${conversation.state != 0 ? TaggingHelper.extractStateMessage(
               conversation.answer,
             ) : TaggingHelper.convertRouteToTag(
@@ -249,8 +251,8 @@ class _HomePageState extends State<HomePage> {
                   attachmentMeta ?? <Media>[], conversation)
               : LMTextView(
                   text: conversation.state != 0
-                      ? TaggingHelper.extractStateMessage(_message)
-                      : _message,
+                      ? TaggingHelper.extractStateMessage(message)
+                      : message,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   textStyle: const TextStyle(
@@ -303,9 +305,9 @@ class _HomePageState extends State<HomePage> {
   }
 
   String getTime(String time) {
-    final int _time = int.tryParse(time) ?? 0;
+    final int time0 = int.tryParse(time) ?? 0;
     final DateTime now = DateTime.now();
-    final DateTime messageTime = DateTime.fromMillisecondsSinceEpoch(_time);
+    final DateTime messageTime = DateTime.fromMillisecondsSinceEpoch(time0);
     final Duration difference = now.difference(messageTime);
     if (difference.inDays > 0 || now.day != messageTime.day) {
       return DateFormat('dd/MM/yyyy').format(messageTime);
@@ -341,7 +343,6 @@ Widget getShimmer() => Shimmer.fromColors(
       baseColor: Colors.grey.shade200,
       highlightColor: Colors.grey.shade300,
       period: const Duration(seconds: 2),
-      direction: ShimmerDirection.ltr,
       child: Padding(
         padding: const EdgeInsets.only(
           bottom: 12,

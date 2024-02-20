@@ -110,14 +110,6 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
     super.dispose();
   }
 
-  // Future<bool> _willPopCallback() {
-  //   _chatroomActionBloc.add(
-  //     MarkReadChatroomEvent(chatroomId: widget.chatroomId),
-  //   );
-  //   BlocProvider.of<HomeBloc>(context).add(UpdateHomeEvent());
-  //   return Future.value(false);
-  // }
-
   _addPaginationListener() {
     pagedListController.addPageRequestListener(
       (pageKey) {
@@ -127,6 +119,7 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
                   ..chatroomId(widget.chatroomId)
                   ..page(pageKey)
                   ..pageSize(500)
+                  ..isLocalDB(false)
                   ..minTimestamp(0)
                   ..maxTimestamp(currentTime))
                 .build(),
@@ -591,7 +584,6 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
                             physics: const ClampingScrollPhysics(),
                             padding: const EdgeInsets.symmetric(vertical: 10),
                             reverse: true,
-                            scrollDirection: Axis.vertical,
                             builderDelegate:
                                 PagedChildBuilderDelegate<Conversation>(
                               noItemsFoundIndicatorBuilder: (context) =>
@@ -948,7 +940,6 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
                                         borderRadius: const BorderRadius.only(
                                           topLeft: Radius.circular(16),
                                           topRight: Radius.circular(16),
-                                          bottomRight: Radius.zero,
                                           bottomLeft: Radius.circular(16),
                                         ),
                                         conversation: item,
@@ -1287,7 +1278,6 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
                                         borderRadius: const BorderRadius.only(
                                           topLeft: Radius.circular(16),
                                           topRight: Radius.circular(16),
-                                          bottomLeft: Radius.zero,
                                           bottomRight: Radius.circular(16),
                                         ),
                                         conversation: item,
@@ -1357,17 +1347,9 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
                               vertical: 8,
                             ),
                             child: Row(
-                              mainAxisAlignment: MainAxisAlignment.start,
                               children: [
                                 BackButton(
                                   onPressed: () {
-                                    _chatroomActionBloc.add(
-                                      MarkReadChatroomEvent(
-                                          chatroomId: widget.chatroomId),
-                                    );
-                                    HomeBloc.instance.add(UpdateHomeEvent());
-
-                                    // router.pop();
                                     Navigator.pop(context);
                                   },
                                   style: ButtonStyle(
