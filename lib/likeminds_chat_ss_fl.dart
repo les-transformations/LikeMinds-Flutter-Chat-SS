@@ -76,28 +76,31 @@ class LMChat extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     ScreenSize.init(context);
-    return LMCustomWillPop(
-      onWillPop: true,
-      backButtonCallback: _backButtonCallback,
-      child: Scaffold(
-        backgroundColor: kWhiteColor,
-        body: Center(
-          child: BlocConsumer<AuthBloc, AuthState>(
-            bloc: _authBloc,
-            listener: (context, state) {},
-            builder: (context, state) {
-              if (state is AuthSuccess) {
-                return const HomePage();
-              }
+    return Theme(
+      data: kSuraasaThemeData,
+      child: LMCustomWillPop(
+        onWillPop: true,
+        backButtonCallback: _backButtonCallback,
+        child: Scaffold(
+          backgroundColor: kWhiteColor,
+          body: Center(
+            child: BlocConsumer<AuthBloc, AuthState>(
+              bloc: _authBloc,
+              listener: (context, state) {},
+              builder: (context, state) {
+                if (state is AuthSuccess) {
+                  return const HomePage();
+                }
 
-              return const SizedBox(
-                width: 50,
-                height: 50,
-                child: CircularProgressIndicator(
-                  color: kPrimaryColor,
-                ),
-              );
-            },
+                return const SizedBox(
+                  width: 50,
+                  height: 50,
+                  child: CircularProgressIndicator(
+                    color: kPrimaryColor,
+                  ),
+                );
+              },
+            ),
           ),
         ),
       ),

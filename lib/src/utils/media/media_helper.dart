@@ -197,14 +197,17 @@ Widget getChatItemAttachmentTile(
   }
 }
 
-Widget getDocumentThumbnail(File document) {
+Widget getDocumentThumbnail(File document,{Size? size}) {
   return PdfDocumentLoader.openFile(
     document.path,
     onError: (error) {},
     pageNumber: 1,
     pageBuilder: (context, textureBuilder, pageSize) {
-      return textureBuilder();
+      return textureBuilder(
+        size: size,
+      );
     },
+    
   );
 }
 

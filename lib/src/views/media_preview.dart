@@ -74,131 +74,134 @@ class _MediaPreviewState extends State<MediaPreview> {
     userMeta = widget.userMeta;
     conversation = widget.conversation;
     setupFlickManager();
-    return Scaffold(
-      backgroundColor: kWhiteColor,
-      appBar: AppBar(
+    return Theme(
+       data: kSuraasaThemeData,
+      child: Scaffold(
         backgroundColor: kWhiteColor,
-        centerTitle: false,
-        leading: LMIconButton(
-          onTap: (active) {
-            Navigator.pop(context);
-          },
-          icon: const LMIcon(
-            type: LMIconType.icon,
-            icon: CupertinoIcons.xmark,
-            color: Colors.black,
-            size: 28,
-            boxSize: 64,
-            boxPadding: 18,
+        appBar: AppBar(
+          backgroundColor: kWhiteColor,
+          centerTitle: false,
+          leading: LMIconButton(
+            onTap: (active) {
+              Navigator.pop(context);
+            },
+            icon: const LMIcon(
+              type: LMIconType.icon,
+              icon: CupertinoIcons.xmark,
+              color: Colors.black,
+              size: 28,
+              boxSize: 64,
+              boxPadding: 18,
+            ),
+          ),
+          elevation: 0,
+          title: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: <Widget>[
+              LMTextView(
+                text: userMeta?[conversation?.userId]?.name ?? '',
+                textStyle: Theme.of(context).textTheme.bodyMedium!.copyWith(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w500,
+                    ),
+              ),
+              LMTextView(
+                text: '${conversation?.date}, ${conversation?.createdAt}',
+                textStyle: Theme.of(context)
+                    .textTheme
+                    .bodyMedium!
+                    .copyWith(fontSize: 12, color: kGreyColor),
+              ),
+            ],
           ),
         ),
-        elevation: 0,
-        title: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: <Widget>[
-            LMTextView(
-              text: userMeta?[conversation?.userId]?.name ?? '',
-              textStyle: Theme.of(context).textTheme.bodyMedium!.copyWith(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w500,
-                  ),
-            ),
-            LMTextView(
-              text: '${conversation?.date}, ${conversation?.createdAt}',
-              textStyle: Theme.of(context)
-                  .textTheme
-                  .bodyMedium!
-                  .copyWith(fontSize: 12, color: kGreyColor),
-            ),
-          ],
-        ),
-      ),
-      body: SafeArea(
-        bottom: true,
-        top: false,
-        child: Column(
-          children: <Widget>[
-            Expanded(
-              child: CarouselSlider.builder(
-                  options: CarouselOptions(
-                      clipBehavior: Clip.hardEdge,
-                      scrollDirection: Axis.horizontal,
-                      initialPage: 0,
-                      enlargeCenterPage: false,
-                      enableInfiniteScroll: false,
-                      height: 80.h,
-                      enlargeFactor: 0.0,
-                      viewportFraction: 1.0,
-                      onPageChanged: (index, reason) {
-                        currPosition = index;
-                        if (conversationAttachments![index].mediaType ==
-                            MediaType.video) {
-                          if (flickManager == null) {
-                            setupFlickManager();
-                          } else {
-                            flickManager?.handleChangeVideo(
-                              VideoPlayerController.network(
-                                conversationAttachments![currPosition]
-                                    .mediaUrl!,
-                              ),
-                            );
+        body: SafeArea(
+          bottom: true,
+          top: false,
+          child: Column(
+            children: <Widget>[
+              Expanded(
+                child: CarouselSlider.builder(
+                    options: CarouselOptions(
+                        clipBehavior: Clip.hardEdge,
+                        scrollDirection: Axis.horizontal,
+                        initialPage: 0,
+                        enlargeCenterPage: false,
+                        enableInfiniteScroll: false,
+                        height: 80.h,
+                        enlargeFactor: 0.0,
+                        viewportFraction: 1.0,
+                        onPageChanged: (index, reason) {
+                          currPosition = index;
+                          if (conversationAttachments![index].mediaType ==
+                              MediaType.video) {
+                            if (flickManager == null) {
+                              setupFlickManager();
+                            } else {
+                              flickManager?.handleChangeVideo(
+                                VideoPlayerController.network(
+                                  conversationAttachments![currPosition]
+                                      .mediaUrl!,
+                                ),
+                              );
+                            }
                           }
-                        }
-                        rebuildCurr.value = !rebuildCurr.value;
-                      }),
-                  itemCount: conversationAttachments!.length,
-                  itemBuilder: (context, index, realIndex) {
-                    if (conversationAttachments![index].mediaType ==
-                        MediaType.video) {
-                      return chatVideoFactory(
-                          conversationAttachments![index], flickManager!);
-                    }
-                    return AspectRatio(
-                      aspectRatio: conversationAttachments![index].width! /
-                          conversationAttachments![index].height!,
-                      child: CachedNetworkImage(
-                        imageUrl: conversationAttachments![index].mediaUrl!,
-                        errorWidget: (context, url, error) =>
-                            mediaErrorWidget(),
-                        progressIndicatorBuilder: (context, url, progress) =>
-                            mediaShimmer(),
-                        fit: BoxFit.contain,
-                      ),
+                          rebuildCurr.value = !rebuildCurr.value;
+                        }),
+                    itemCount: conversationAttachments!.length,
+                    itemBuilder: (context, index, realIndex) {
+                      if (conversationAttachments![index].mediaType ==
+                          MediaType.video) {
+                        return chatVideoFactory(
+                            conversationAttachments![index], flickManager!);
+                      }
+                      return AspectRatio(
+                        aspectRatio: conversationAttachments![index].width! /
+                            conversationAttachments![index].height!,
+                        child: CachedNetworkImage(
+                          imageUrl: conversationAttachments![index].mediaUrl!,
+                          errorWidget: (context, url, error) =>
+                              mediaErrorWidget(),
+                          progressIndicatorBuilder: (context, url, progress) =>
+                              mediaShimmer(),
+                          fit: BoxFit.contain,
+                        ),
+                      );
+                    }),
+              ),
+              ValueListenableBuilder(
+                  valueListenable: rebuildCurr,
+                  builder: (context, _, __) {
+                    return Column(
+                      children: [
+                        checkIfMultipleAttachments()
+                            ? kVerticalPaddingMedium
+                            : const SizedBox(),
+                        checkIfMultipleAttachments()
+                            ? Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: conversationAttachments!.map((url) {
+                                  int index =
+                                      conversationAttachments!.indexOf(url);
+                                  return Container(
+                                    width: 8.0,
+                                    height: 8.0,
+                                    margin: const EdgeInsets.symmetric(
+                                        vertical: 7.0, horizontal: 2.0),
+                                    decoration: BoxDecoration(
+                                      shape: BoxShape.circle,
+                                      color: currPosition == index
+                                          ? kBlackColor
+                                          : kGrey3Color,
+                                    ),
+                                  );
+                                }).toList())
+                            : const SizedBox(),
+                      ],
                     );
                   }),
-            ),
-            ValueListenableBuilder(
-                valueListenable: rebuildCurr,
-                builder: (context, _, __) {
-                  return Column(
-                    children: [
-                      checkIfMultipleAttachments()
-                          ? kVerticalPaddingMedium
-                          : const SizedBox(),
-                      checkIfMultipleAttachments()
-                          ? Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: conversationAttachments!.map((url) {
-                                int index =
-                                    conversationAttachments!.indexOf(url);
-                                return Container(
-                                  width: 8.0,
-                                  height: 8.0,
-                                  margin: const EdgeInsets.symmetric(
-                                      vertical: 7.0, horizontal: 2.0),
-                                  decoration: BoxDecoration(
-                                    shape: BoxShape.circle,
-                                    color: currPosition == index
-                                        ? kBlackColor
-                                        : kGrey3Color,
-                                  ),
-                                );
-                              }).toList())
-                          : const SizedBox(),
-                    ],
-                  );
-                }),
-          ],
+            ],
+          ),
         ),
       ),
     );

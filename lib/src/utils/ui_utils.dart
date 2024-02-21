@@ -15,28 +15,30 @@ double getWidth(BuildContext context) {
 }
 
 bool checkDeletePermissions(Conversation conversation) {
-    final MemberStateResponse isCm =
-        locator<LMPreferenceService>().getMemberRights()!;
+  final MemberStateResponse isCm =
+      locator<LMPreferenceService>().getMemberRights()!;
 
-    if (isCm.member?.state == 1 && conversation.deletedByUserId == null) {
-      return true;
-    } else if ( locator<LMPreferenceService>().getUser()!.id == conversation.userId &&
-        conversation.deletedByUserId == null) {
-      return true;
-    } else {
-      return false;
-    }
-  }
-
-  bool checkEditPermissions(Conversation conversation) {
-    if (conversation.answer.isEmpty) {
-      return false;
-    } else if (locator<LMPreferenceService>().getUser()!.id == conversation.userId &&
-        conversation.deletedByUserId == null) {
-      return true;
-    }
+  if (isCm.member?.state == 1 && conversation.deletedByUserId == null) {
+    return true;
+  } else if (locator<LMPreferenceService>().getUser()!.id ==
+          conversation.userId &&
+      conversation.deletedByUserId == null) {
+    return true;
+  } else {
     return false;
   }
+}
+
+bool checkEditPermissions(Conversation conversation) {
+  if (conversation.answer.isEmpty) {
+    return false;
+  } else if (locator<LMPreferenceService>().getUser()!.id ==
+          conversation.userId &&
+      conversation.deletedByUserId == null) {
+    return true;
+  }
+  return false;
+}
 
 //Utils method for getting initials of a name (or first letter of every word)
 String getInitials(String? name) {
@@ -90,39 +92,4 @@ String getTime(String time) {
     return DateFormat('dd/MM/yyyy').format(messageTime);
   }
   return DateFormat('kk:mm').format(messageTime);
-}
-
-class ConversationMessageState {
-  static const int normal = 0;
-  static const int firstMessage = 1;
-  static const int memberJoinedOpenChatroom = 2;
-  static const int memberLeftOpenChatroom = 3;
-  static const int memberAddedToChatroom = 7;
-  static const int memberLeftSecretChatroom = 8;
-  static const int memberRemovedFromChatroom = 9;
-  static const int poll = 10;
-  static const int allMembersAdded = 11;
-  static const int topicChanged = 12;
-}
-
-void filterOutStateMessage(List<Conversation> conversationList) {
-  conversationList.removeWhere((element) {
-    return element.state != null &&
-        (element.state == ConversationMessageState.memberJoinedOpenChatroom ||
-            element.state == ConversationMessageState.memberLeftOpenChatroom ||
-            element.state ==
-                ConversationMessageState.memberLeftSecretChatroom ||
-            element.state == ConversationMessageState.poll);
-  });
-}
-
-bool stateMessage(Conversation conversation) {
-  if (conversation.state == ConversationMessageState.memberJoinedOpenChatroom ||
-      conversation.state == ConversationMessageState.memberLeftOpenChatroom ||
-      conversation.state == ConversationMessageState.memberLeftSecretChatroom ||
-      conversation.state == ConversationMessageState.poll) {
-    return false;
-  } else {
-    return true;
-  }
 }

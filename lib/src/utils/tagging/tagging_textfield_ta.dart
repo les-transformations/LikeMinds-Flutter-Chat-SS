@@ -231,6 +231,7 @@ class _LMTextFieldState extends State<LMTextField> {
                       fallbackText: opt.name,
                       imageUrl: opt.imageUrl,
                       size: 36,
+                      backgroundColor: kPrimaryColor,
                     ),
                     const SizedBox(width: 12),
                     Text(

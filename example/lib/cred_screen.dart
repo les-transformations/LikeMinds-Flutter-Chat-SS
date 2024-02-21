@@ -168,51 +168,51 @@ class _CredScreenState extends State<CredScreen> {
                 padding: const EdgeInsets.symmetric(horizontal: 8.0),
                 child: Row(
                   children: [
-                    DropdownMenu(
-                      enableFilter: true,
-                      width: 42.w,
-                      menuHeight: 20.h,
-                      label: Text(
-                        "Choose font",
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: GoogleFonts.josefinSans(
-                          color: Colors.white,
-                          fontSize: 12.sp,
-                        ),
-                      ),
-                      textStyle: _textStyle?.copyWith(
-                            color: Colors.white,
-                            fontSize: 12.sp,
-                          ) ??
-                          GoogleFonts.josefinSans(
-                            color: Colors.white,
-                            fontSize: 12.sp,
-                          ),
-                      inputDecorationTheme: InputDecorationTheme(
-                        focusColor: Colors.white,
-                        fillColor: Colors.white,
-                        hoverColor: Colors.white,
-                        floatingLabelStyle: GoogleFonts.josefinSans(
-                          color: Colors.white,
-                          fontSize: 12.sp,
-                        ),
-                        labelStyle: GoogleFonts.josefinSans(
-                          color: Colors.white,
-                          fontSize: 12.sp,
-                        ),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                      ),
-                      dropdownMenuEntries: getGoogleFontsAsMap(),
-                      onSelected: (value) {
-                        setState(() {
-                          _textStyle = GoogleFonts.asMap()[value]?.call();
-                        });
-                      },
-                    ),
-                    const Spacer(),
+                    // DropdownMenu(
+                    //   enableFilter: true,
+                    //   width: 42.w,
+                    //   menuHeight: 20.h,
+                    //   label: Text(
+                    //     "Choose font",
+                    //     maxLines: 1,
+                    //     overflow: TextOverflow.ellipsis,
+                    //     style: GoogleFonts.josefinSans(
+                    //       color: Colors.white,
+                    //       fontSize: 12.sp,
+                    //     ),
+                    //   ),
+                    //   textStyle: _textStyle?.copyWith(
+                    //         color: Colors.white,
+                    //         fontSize: 12.sp,
+                    //       ) ??
+                    //       GoogleFonts.josefinSans(
+                    //         color: Colors.white,
+                    //         fontSize: 12.sp,
+                    //       ),
+                    //   inputDecorationTheme: InputDecorationTheme(
+                    //     focusColor: Colors.white,
+                    //     fillColor: Colors.white,
+                    //     hoverColor: Colors.white,
+                    //     floatingLabelStyle: GoogleFonts.josefinSans(
+                    //       color: Colors.white,
+                    //       fontSize: 12.sp,
+                    //     ),
+                    //     labelStyle: GoogleFonts.josefinSans(
+                    //       color: Colors.white,
+                    //       fontSize: 12.sp,
+                    //     ),
+                    //     border: OutlineInputBorder(
+                    //       borderRadius: BorderRadius.circular(8),
+                    //     ),
+                    //   ),
+                    //   dropdownMenuEntries: getGoogleFontsAsMap(),
+                    //   onSelected: (value) {
+                    //     setState(() {
+                    //       _textStyle = GoogleFonts.asMap()[value]?.call();
+                    //     });
+                    //   },
+                    // ),
+                    // const Spacer(),
                     GestureDetector(
                       onTap: () => showDialog(
                         context: context,
